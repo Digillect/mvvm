@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+	    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	    
+	    <BuildPath>..\Build\$(Configuration)</BuildPath>
+	    <PackagePath>..\Build\$(Configuration)\DCL.MVVM</PackagePath>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+	    <BuildPath>..\Build\$(Configuration)</BuildPath>
+	    <PackagePath>..\Build\$(Configuration)\DCL.MVVM</PackagePath>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+	    <BuildPath>..\Build\$(Configuration)</BuildPath>
+	    <PackagePath>..\Build\$(Configuration)\DCL.MVVM</PackagePath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<VersionAssembly>$(BuildPath)\Desktop\Digillect.MVVM.dll</VersionAssembly>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<LibNet40 Include="$(BuildPath)\Desktop\Digillect.MVVM.*"/>
+		<LibWP71 Include="$(BuildPath)\WP7\Digillect.MVVM.*"/>
+	</ItemGroup>
+
+	<Import Project="NuGet.Project.Targets"/>
+</Project>

@@ -1,0 +1,6 @@
+D:\Development\Digillect\CommonLibraries\MVVM\Sources\Digillect.MVVM\obj.WP7\Debug\ResolveAssemblyReference.cache
+D:\Development\Digillect\CommonLibraries\MVVM\Build\Debug\WP7\Digillect.MVVM.xml
+D:\Development\Digillect\CommonLibraries\MVVM\Build\Debug\WP7\Digillect.MVVM.dll
+D:\Development\Digillect\CommonLibraries\MVVM\Build\Debug\WP7\Digillect.MVVM.pdb
+D:\Development\Digillect\CommonLibraries\MVVM\Sources\Digillect.MVVM\obj.WP7\Debug\Digillect.MVVM.dll
+D:\Development\Digillect\CommonLibraries\MVVM\Sources\Digillect.MVVM\obj.WP7\Debug\Digillect.MVVM.pdb
