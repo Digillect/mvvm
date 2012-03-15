@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Digillect.MVVM
+namespace Digillect.Mvvm
 {
 	public enum SessionState
 	{

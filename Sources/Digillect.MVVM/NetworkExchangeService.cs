@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.Phone.Net.NetworkInformation;
 #endif
 
-namespace Digillect.MVVM
+namespace Digillect.Mvvm
 {
-	public class NetworkExchangeService
+	public sealed class NetworkExchangeService
 	{
 		public static NetworkExchangeService Current { get; private set; }
 
@@ -22,7 +22,7 @@ namespace Digillect.MVVM
 		{
 			NetworkAvailable = true;
 			System.Net.NetworkInformation.NetworkChange.NetworkAddressChanged += NetworkChange_NetworkAddressChanged;
-			NetworkChange_NetworkAddressChanged( this, EventArgs.Empty );
+			NetworkChange_NetworkAddressChanged(null, EventArgs.Empty);
 		}
 		#endregion
 
@@ -42,10 +42,8 @@ namespace Digillect.MVVM
 
 		private static bool InspectNetwork()
 		{
-			bool result = false;
-
 #if !WINDOWS_PHONE
-			result = System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable();
+			return System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable();
 #else
 			switch( NetworkInterface.NetworkInterfaceType )
 			{
@@ -53,15 +51,14 @@ namespace Digillect.MVVM
 				case NetworkInterfaceType.MobileBroadbandGsm:
 				case NetworkInterfaceType.MobileBroadbandCdma:
 				case NetworkInterfaceType.Ethernet:
-					result = true;
-					break;
+					return true;
 
 				default:
 					break;
 			}
-#endif
 
-			return result;
+			return false;
+#endif
 		}
 		#endregion
 		#region Data-Exchange notifications

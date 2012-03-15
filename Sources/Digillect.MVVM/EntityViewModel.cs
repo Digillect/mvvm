@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Digillect.MVVM
+namespace Digillect.Mvvm
 {
 	public abstract class EntityViewModel<TId, TEntity> : ViewModel
 		where TId : IComparable<TId>, IEquatable<TId>

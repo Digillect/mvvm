@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace Digillect.MVVM
+namespace Digillect.Mvvm
 {
 	[AttributeUsage( AttributeTargets.Class )]
-	public class SingletonViewModelAttribute : Attribute
+	public sealed class SingletonViewModelAttribute : Attribute
 	{
 	}
 }

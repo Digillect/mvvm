@@ -1,6 +1,6 @@
 using System;
 
-namespace Digillect.MVVM
+namespace Digillect.Mvvm
 {
 	public class ViewModelPageDataContext : PageDataContext
 	{

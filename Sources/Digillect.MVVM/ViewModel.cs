@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Digillect.MVVM
+namespace Digillect.Mvvm
 {
 	public class ViewModel : ObservableObject, IDisposable
 	{
@@ -187,17 +188,7 @@ namespace Digillect.MVVM
 			}
 			catch( AggregateException aex )
 			{
-				bool canceled = false;
-
-				foreach( var iex in aex.InnerExceptions )
-				{
-					if( iex is OperationCanceledException )
-					{
-						canceled = true;
-						break;
-					}
-				}
-
+				bool canceled = aex.InnerExceptions.OfType<OperationCanceledException>().Any();
 				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : aex );
 
 				RaiseSessionAborted( eventArgs );
