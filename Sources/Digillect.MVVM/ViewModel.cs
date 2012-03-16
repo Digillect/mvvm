@@ -5,13 +5,18 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Digillect.Mvvm.Services;
+
 namespace Digillect.Mvvm
 {
 	public class ViewModel : ObservableObject, IDisposable
 	{
+		private readonly IDataExchangeService dataExchangeService;
+
 		#region Constructors/Disposer
-		protected ViewModel()
+		protected ViewModel( IDataExchangeService dataExchangeService )
 		{
+			this.dataExchangeService = dataExchangeService;
 		}
 
 		public void Dispose()
@@ -108,8 +113,7 @@ namespace Digillect.Mvvm
 				{
 					if( m_sessions.Count > 0 )
 					{
-						foreach( var existingSession in m_sessions )
-							existingSession.Cancel();
+						m_sessions.ForEach( existingSession => existingSession.Cancel() );
 
 						m_sessions.Clear();
 					}
@@ -131,7 +135,7 @@ namespace Digillect.Mvvm
 			}
 
 			session.State = SessionState.Active;
-			NetworkExchangeService.Current.BeginDataExchange();
+			dataExchangeService.BeginDataExchange();
 
 			try
 			{
@@ -144,7 +148,7 @@ namespace Digillect.Mvvm
 					m_sessions.Remove( session );
 				}
 
-				NetworkExchangeService.Current.EndDataExchange();
+				dataExchangeService.EndDataExchange();
 
 				var canceled = ex is OperationCanceledException;
 				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
@@ -166,7 +170,7 @@ namespace Digillect.Mvvm
 
 				session.State = SessionState.Complete;
 
-				NetworkExchangeService.Current.EndDataExchange();
+				dataExchangeService.EndDataExchange();
 				RaiseSessionComplete( new SessionEventArgs( session ) );
 
 				return session;
@@ -203,7 +207,7 @@ namespace Digillect.Mvvm
 					m_sessions.Remove( session );
 				}
 
-				NetworkExchangeService.Current.EndDataExchange();
+				dataExchangeService.EndDataExchange();
 			}
 
 			return session;

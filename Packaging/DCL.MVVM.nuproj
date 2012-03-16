@@ -8,9 +8,9 @@
 		<PackagePath>..\Build\package\$(Configuration)\DCL.MVVM</PackagePath>
 	</PropertyGroup>
 
-	<PropertyGroup>
+	<!--PropertyGroup>
 		<VersionAssembly>$(BuildPath)\Desktop\Digillect.Mvvm.dll</VersionAssembly>
-	</PropertyGroup>
+	</PropertyGroup-->
 
 	<ItemGroup>
 		<LibNet40 Include="$(BuildPath)\Desktop\Digillect.Mvvm.*"/>

@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Threading;
+using System.Windows;
 using System.Windows.Markup;
+
+using Autofac;
 
 namespace Digillect.Mvvm
 {
-	public class PhoneApplicationPage : Microsoft.Phone.Controls.PhoneApplicationPage
+	public class PhoneApplicationPage : Microsoft.Phone.Controls.PhoneApplicationPage, ILifetimeScopeProvider
 	{
 		private PageDataContext dataContext;
+		private ILifetimeScope lifetimeScope;
 
 		#region Constructor
 		public PhoneApplicationPage()
@@ -17,6 +21,21 @@ namespace Digillect.Mvvm
 			this.Unloaded += Page_Unloaded;
 		}
 		#endregion
+
+		public ILifetimeScope Scope
+		{
+			get
+			{
+				if( lifetimeScope == null )
+				{
+					var scopeProvider = Application.Current as ILifetimeScopeProvider;
+
+					lifetimeScope = scopeProvider.Scope.BeginLifetimeScope();
+				}
+
+				return lifetimeScope;
+			}
+		}
 
 		#region Page Load/Unload events handling
 		private void Page_Loaded( object sender, EventArgs e )
@@ -43,15 +62,15 @@ namespace Digillect.Mvvm
 		{
 			PageDecorationService.Current.RemoveDecoration( this );
 
-			if( dataContext != null )
-			{
-				dataContext.Dispose();
-			}
+			if( lifetimeScope != null )
+				lifetimeScope.Dispose();
 		}
 
 		protected virtual PageDataContext CreateDataContext()
 		{
-			return new PageDataContext( this );
+			var factory = Scope.Resolve<PageDataContext.Factory>();
+
+			return factory( this );
 		}
 		#endregion
 

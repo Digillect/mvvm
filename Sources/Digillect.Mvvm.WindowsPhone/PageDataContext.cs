@@ -1,20 +1,26 @@
 ﻿using System;
 using System.Windows;
 
+using Digillect.Mvvm.Services;
+
 namespace Digillect.Mvvm
 {
 	public class PageDataContext : ObservableObject, IDisposable
 	{
+		public delegate PageDataContext Factory( PhoneApplicationPage page );
+
 		private readonly PhoneApplicationPage page;
+		private readonly INetworkAvailabilityService networkAvailabilityService;
 		private bool networkAvailable;
 
 		#region Constructors/Disposer
-		public PageDataContext( PhoneApplicationPage page )
+		public PageDataContext( PhoneApplicationPage page, INetworkAvailabilityService networkAvailabilityService )
 		{
 			this.page = page;
-			this.networkAvailable = NetworkExchangeService.Current.NetworkAvailable;
+			this.networkAvailabilityService = networkAvailabilityService;
+			this.networkAvailable = this.networkAvailabilityService.NetworkAvailable;
 
-			NetworkExchangeService.Current.NetworkAvailabilityChanged += NetworkExchangeService_NetworkAvailabilityChanged;
+			this.networkAvailabilityService.NetworkAvailabilityChanged += NetworkExchangeService_NetworkAvailabilityChanged;
 		}
 
 		public void Dispose()
@@ -26,7 +32,7 @@ namespace Digillect.Mvvm
 		protected virtual void Dispose( bool disposing )
 		{
 			if( disposing )
-				NetworkExchangeService.Current.NetworkAvailabilityChanged -= NetworkExchangeService_NetworkAvailabilityChanged;
+				this.networkAvailabilityService.NetworkAvailabilityChanged -= NetworkExchangeService_NetworkAvailabilityChanged;
 		}
 		#endregion
 
@@ -54,9 +60,9 @@ namespace Digillect.Mvvm
 		private void NetworkExchangeService_NetworkAvailabilityChanged( object sender, EventArgs e )
 		{
 			if( Deployment.Current.Dispatcher.CheckAccess() )
-				this.NetworkAvailable = NetworkExchangeService.Current.NetworkAvailable;
+				this.NetworkAvailable = this.networkAvailabilityService.NetworkAvailable;
 			else
-				Deployment.Current.Dispatcher.BeginInvoke( () => this.NetworkAvailable = NetworkExchangeService.Current.NetworkAvailable );
+				Deployment.Current.Dispatcher.BeginInvoke( () => this.NetworkAvailable = this.networkAvailabilityService.NetworkAvailable );
 		}
 	}
 }

@@ -2,6 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+using Digillect.Mvvm.Services;
+
 namespace Digillect.Mvvm
 {
 	public abstract class EntityViewModel<TId, TEntity> : ViewModel
@@ -9,6 +11,13 @@ namespace Digillect.Mvvm
 		where TEntity : XObject<TId>
 	{
 		private TEntity entity;
+
+		#region Constructors/Disposer
+		public EntityViewModel( IDataExchangeService dataExchangeService )
+			: base( dataExchangeService )
+		{
+		}
+		#endregion
 
 		#region Public Properties
 		public TEntity Entity

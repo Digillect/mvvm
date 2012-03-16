@@ -3,10 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
+using System.Windows;
+using System.Windows.Navigation;
+
+using Autofac;
+
 namespace Digillect.Mvvm
 {
-	public class ViewModelPage<TViewModel> : PhoneApplicationPage, IViewModelPage
-		where TViewModel: ViewModel, new()
+	public class ViewModelPage<TViewModel> : PhoneApplicationPage
+		where TViewModel : ViewModel, new()
 	{
 		private readonly TViewModel viewModel;
 
@@ -15,7 +20,7 @@ namespace Digillect.Mvvm
 		{
 			if( !IsInDesignMode )
 			{
-				viewModel = ViewModelFactory.GetViewModel<TViewModel>();
+				viewModel = Scope.Resolve<TViewModel>();
 			}
 		}
 		#endregion
@@ -28,7 +33,7 @@ namespace Digillect.Mvvm
 		#endregion
 
 		#region OnNavigatedTo/OnNavigatedFrom
-		protected override void OnNavigatedTo( System.Windows.Navigation.NavigationEventArgs e )
+		protected override void OnNavigatedTo( NavigationEventArgs e )
 		{
 			if( viewModel != null )
 				viewModel.Activate();
@@ -36,7 +41,7 @@ namespace Digillect.Mvvm
 			base.OnNavigatedTo( e );
 		}
 
-		protected override void OnNavigatedFrom( System.Windows.Navigation.NavigationEventArgs e )
+		protected override void OnNavigatedFrom( NavigationEventArgs e )
 		{
 			if( viewModel != null )
 				ViewModel.Deactivate();
@@ -58,26 +63,19 @@ namespace Digillect.Mvvm
 
 		protected override void OnPageUnloaded()
 		{
-			ViewModelFactory.ReleaseViewModel( viewModel );
-
 			base.OnPageUnloaded();
 		}
 		#endregion
 
 		protected override PageDataContext CreateDataContext()
 		{
-			return new ViewModelPageDataContext( this, viewModel );
+			var factory = Scope.Resolve<ViewModelPageDataContext.Factory>();
+
+			return factory( this, viewModel );
 		}
 
 		protected virtual void InitialLoadData()
 		{
 		}
-
-		#region IViewModelPage implementation
-		ViewModel IViewModelPage.ViewModel
-		{
-			get { return viewModel; }
-		}
-		#endregion
 	}
 }
