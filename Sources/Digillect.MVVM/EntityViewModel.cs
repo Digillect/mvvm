@@ -12,13 +12,6 @@ namespace Digillect.Mvvm
 	{
 		private TEntity entity;
 
-		#region Constructors/Disposer
-		public EntityViewModel( IDataExchangeService dataExchangeService )
-			: base( dataExchangeService )
-		{
-		}
-		#endregion
-
 		#region Public Properties
 		public TEntity Entity
 		{

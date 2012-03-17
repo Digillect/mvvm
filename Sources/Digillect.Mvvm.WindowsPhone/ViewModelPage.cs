@@ -11,61 +11,42 @@ using Autofac;
 namespace Digillect.Mvvm
 {
 	public class ViewModelPage<TViewModel> : PhoneApplicationPage
-		where TViewModel : ViewModel, new()
+		where TViewModel : ViewModel
 	{
-		private readonly TViewModel viewModel;
-
-		#region Constructors/Disposer
-		public ViewModelPage()
-		{
-			if( !IsInDesignMode )
-			{
-				viewModel = Scope.Resolve<TViewModel>();
-			}
-		}
-		#endregion
+		private TViewModel viewModel;
 
 		#region Public Properties
+		/// <summary>
+		/// Gets Page's ViewModel
+		/// </summary>
 		public TViewModel ViewModel
 		{
 			get { return viewModel; }
 		}
 		#endregion
 
-		#region OnNavigatedTo/OnNavigatedFrom
-		protected override void OnNavigatedTo( NavigationEventArgs e )
+		#region Page lifecycle
+		protected override void OnPageCreated()
 		{
-			if( viewModel != null )
-				viewModel.Activate();
-
-			base.OnNavigatedTo( e );
-		}
-
-		protected override void OnNavigatedFrom( NavigationEventArgs e )
-		{
-			if( viewModel != null )
-				ViewModel.Deactivate();
-
-			base.OnNavigatedFrom( e );
-		}
-		#endregion
-		#region OnPageLoaded/OnPageUnloaded
-		protected override void OnPageLoaded()
-		{
-			base.OnPageLoaded();
+			base.OnPageCreated();
 
 			if( !IsInDesignMode )
 			{
-				viewModel.Activate();
+				this.viewModel = Scope.Resolve<TViewModel>();
 				InitialLoadData();
 			}
 		}
 
-		protected override void OnPageUnloaded()
+		protected override void OnPageResurrected()
 		{
-			base.OnPageUnloaded();
+			base.OnPageResurrected();
+
+			if( !IsInDesignMode )
+			{
+				this.viewModel = Scope.Resolve<TViewModel>();
+				InitialLoadData();
+			}
 		}
-		#endregion
 
 		protected override PageDataContext CreateDataContext()
 		{
@@ -73,9 +54,17 @@ namespace Digillect.Mvvm
 
 			return factory( this, viewModel );
 		}
+		#endregion
 
+		#region InitialLoadData
+		/// <summary>
+		/// This method is called to perform initial load of data when page is created for the first time
+		/// or resurrected from thombstombing if no other state-saving scenario exists. Default implementation
+		/// does nothing.
+		/// </summary>
 		protected virtual void InitialLoadData()
 		{
 		}
+		#endregion
 	}
 }

@@ -26,12 +26,16 @@ namespace Digillect.Mvvm
 			builder.RegisterAssemblyTypes( assemblies )
 				.AssignableTo<ViewModel>()
 				.Where( t => !t.IsAbstract && t.GetCustomAttributes( typeof( SingletonViewModelAttribute ), false ).Length == 0 )
-				.AsSelf();
+				.AsSelf()
+				.OwnedByLifetimeScope()
+				.PropertiesAutowired();
 
 			builder.RegisterAssemblyTypes( assemblies )
 				.AssignableTo<ViewModel>()
 				.Where( t => !t.IsAbstract && t.GetCustomAttributes( typeof( SingletonViewModelAttribute ), false ).Length != 0 )
 				.AsSelf()
+				.OwnedByLifetimeScope()
+				.PropertiesAutowired()
 				.SingleInstance();
 		}
 	}

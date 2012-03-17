@@ -5,14 +5,14 @@ namespace Digillect.Mvvm
 	public class EntityPage<TId, TEntity, TViewModel> : ViewModelPage<TViewModel>
 		where TId: IComparable<TId>, IEquatable<TId>
 		where TEntity: XObject<TId>
-		where TViewModel: EntityViewModel<TId, TEntity>, new()
+		where TViewModel: EntityViewModel<TId, TEntity>
 	{
-		private TId m_id;
+		private TId entityId;
 
 		#region InitialLoadData
 		protected override void InitialLoadData()
 		{
-			this.ViewModel.Load( m_id );
+			this.ViewModel.Load( this.entityId );
 		}
 		#endregion
 		#region OnNavigatedTo
@@ -20,17 +20,10 @@ namespace Digillect.Mvvm
 		{
 			if( this.NavigationContext.QueryString.ContainsKey( "Id" ) )
 			{
-				m_id = (TId) Convert.ChangeType( NavigationContext.QueryString["Id"], typeof( TId ), null );
+				this.entityId = (TId) Convert.ChangeType( NavigationContext.QueryString["Id"], typeof( TId ), null );
 			}
 
 			base.OnNavigatedTo( e );
-		}
-		#endregion
-
-		#region Protected Properties
-		public TId EntityId
-		{
-			get { return m_id; }
 		}
 		#endregion
 	}

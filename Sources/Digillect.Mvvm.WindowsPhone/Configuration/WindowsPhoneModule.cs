@@ -13,7 +13,8 @@ namespace Digillect.Mvvm.Configuration
 			base.Load( builder );
 
 			// Services
-			builder.RegisterType<NetworkAvailabilityService>().As<INetworkAvailabilityService>().SingleInstance();
+			builder.Register( c => new NetworkAvailabilityService() ).As<INetworkAvailabilityService>().SingleInstance();
+			builder.Register( c => new PageDecorationService() ).As<IPageDecorationService>().SingleInstance();
 
 			// Parts
 			builder.RegisterType<PageDataContext>().AsSelf();

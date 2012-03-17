@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Digillect.Mvvm
+namespace Digillect.Mvvm.Services
 {
-	public class PageDecorationService
+	internal class PageDecorationService : IPageDecorationService
 	{
 		private readonly List<IPageDecorator> decorators = new List<IPageDecorator>();
-
-		#region Constructors/Disposer
-		private PageDecorationService()
-		{
-		}
-		#endregion
 
 		#region Add/Remove Decorators
 		public void AddDecorator( IPageDecorator decorator )
@@ -46,20 +40,6 @@ namespace Digillect.Mvvm
 				throw new ArgumentNullException( "page" );
 
 			decorators.ForEach( d => d.RemoveDecoration( page ) );
-		}
-		#endregion
-		#region Singleton implementation
-		private static PageDecorationService current;
-
-		public static PageDecorationService Current
-		{
-			get
-			{
-				if( current == null )
-					current = new PageDecorationService();
-
-				return current;
-			}
 		}
 		#endregion
 	}

@@ -11,12 +11,9 @@ namespace Digillect.Mvvm
 {
 	public class ViewModel : ObservableObject, IDisposable
 	{
-		private readonly IDataExchangeService dataExchangeService;
-
 		#region Constructors/Disposer
-		protected ViewModel( IDataExchangeService dataExchangeService )
+		protected ViewModel()
 		{
-			this.dataExchangeService = dataExchangeService;
 		}
 
 		public void Dispose()
@@ -27,7 +24,12 @@ namespace Digillect.Mvvm
 
 		protected virtual void Dispose( bool disposing )
 		{
+			System.Diagnostics.Debug.WriteLine( "{0} disposed.", GetType().Name );
 		}
+		#endregion
+
+		#region Public Properties
+		public IDataExchangeService DataExchangeService { get; set; }
 		#endregion
 
 		#region Data-Exchange notifications
@@ -54,44 +56,6 @@ namespace Digillect.Mvvm
 		}
 		#endregion
 
-		#region Activate/Deactivate
-		public bool Active { get; private set; }
-
-		public void Activate()
-		{
-			if( !this.Active )
-			{
-				this.Active = true;
-				OnActivated();
-			}
-		}
-
-		public void Deactivate()
-		{
-			if( this.Active )
-			{
-				OnDeactivated();
-				this.Active = false;
-			}
-		}
-
-		protected virtual void OnActivated() {}
-		protected virtual void OnDeactivated()
-		{
-			/*
-			if( m_sessions.Count > 0 )
-			{
-				lock( m_sessions )
-				{
-					foreach( var session in m_sessions )
-						session.Cancel();
-
-					m_sessions.Clear();
-				}
-			}
-			*/
-		}
-		#endregion
 		#region Loading/Sessions
 		private readonly List<Session> m_sessions = new List<Session>();
 
@@ -135,7 +99,7 @@ namespace Digillect.Mvvm
 			}
 
 			session.State = SessionState.Active;
-			dataExchangeService.BeginDataExchange();
+			DataExchangeService.BeginDataExchange();
 
 			try
 			{
@@ -148,7 +112,7 @@ namespace Digillect.Mvvm
 					m_sessions.Remove( session );
 				}
 
-				dataExchangeService.EndDataExchange();
+				DataExchangeService.EndDataExchange();
 
 				var canceled = ex is OperationCanceledException;
 				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
@@ -170,7 +134,7 @@ namespace Digillect.Mvvm
 
 				session.State = SessionState.Complete;
 
-				dataExchangeService.EndDataExchange();
+				DataExchangeService.EndDataExchange();
 				RaiseSessionComplete( new SessionEventArgs( session ) );
 
 				return session;
@@ -207,7 +171,7 @@ namespace Digillect.Mvvm
 					m_sessions.Remove( session );
 				}
 
-				dataExchangeService.EndDataExchange();
+				DataExchangeService.EndDataExchange();
 			}
 
 			return session;

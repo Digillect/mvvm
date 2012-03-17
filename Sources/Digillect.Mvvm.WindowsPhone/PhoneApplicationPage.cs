@@ -5,72 +5,128 @@ using System.Windows.Markup;
 
 using Autofac;
 
+using Digillect.Mvvm.Services;
+
 namespace Digillect.Mvvm
 {
 	public class PhoneApplicationPage : Microsoft.Phone.Controls.PhoneApplicationPage, ILifetimeScopeProvider
 	{
-		private PageDataContext dataContext;
+		private const string RessurectionMark = "__mark$mark__";
+
 		private ILifetimeScope lifetimeScope;
 
 		#region Constructor
+		/// <summary>
+		/// Constructs new instance of the page and sets Page's <see cref="Language"/> to current culture.
+		/// </summary>
 		public PhoneApplicationPage()
 		{
 			this.Language = XmlLanguage.GetLanguage( Thread.CurrentThread.CurrentCulture.Name );
-
-			this.Loaded += Page_Loaded;
-			this.Unloaded += Page_Unloaded;
 		}
 		#endregion
 
+		#region Scope
+		/// <summary>
+		/// Gets IoC lifetime scope that can be used to resolve components and services.
+		/// </summary>
 		public ILifetimeScope Scope
 		{
-			get
+			get { return lifetimeScope; }
+		}
+		#endregion
+
+		#region Navigation handling
+		protected override void OnNavigatedTo( System.Windows.Navigation.NavigationEventArgs e )
+		{
+			base.OnNavigatedTo( e );
+
+			if( this.lifetimeScope == null )
 			{
-				if( lifetimeScope == null )
-				{
-					var scopeProvider = Application.Current as ILifetimeScopeProvider;
+				this.lifetimeScope = (Application.Current as ILifetimeScopeProvider).Scope.BeginLifetimeScope();
 
-					lifetimeScope = scopeProvider.Scope.BeginLifetimeScope();
-				}
+				if( State.ContainsKey( RessurectionMark ) )
+					OnPageResurrected();
+				else
+					OnPageCreated();
 
-				return lifetimeScope;
+				this.DataContext = CreateDataContext();
+
+				Scope.Resolve<IPageDecorationService>().AddDecoration( this );
 			}
 		}
 
-		#region Page Load/Unload events handling
-		private void Page_Loaded( object sender, EventArgs e )
+		protected override void OnNavigatedFrom( System.Windows.Navigation.NavigationEventArgs e )
 		{
-			if( !IsInDesignMode )
-				OnPageLoaded();
+			if( e.NavigationMode == System.Windows.Navigation.NavigationMode.Back )
+			{
+				OnPageDestroyed();
+
+				if( this.lifetimeScope != null )
+				{
+					this.lifetimeScope.Dispose();
+					this.lifetimeScope = null;
+				}
+
+				Scope.Resolve<IPageDecorationService>().RemoveDecoration( this );
+			}
+			else
+			{
+				State[RessurectionMark] = true;
+				OnPageAsleep();
+			}
+
+			base.OnNavigatedFrom( e );
 		}
+		#endregion
 
-		private void Page_Unloaded( object sender, EventArgs e )
-		{
-			if( !IsInDesignMode )
-				OnPageUnloaded();
-		}
-
-		protected virtual void OnPageLoaded()
-		{
-			dataContext = CreateDataContext();
-			this.DataContext = dataContext;
-
-			PageDecorationService.Current.AddDecoration( this );
-		}
-
-		protected virtual void OnPageUnloaded()
-		{
-			PageDecorationService.Current.RemoveDecoration( this );
-
-			if( lifetimeScope != null )
-				lifetimeScope.Dispose();
-		}
-
+		#region Page Lifecycle handlers
+		/// <summary>
+		/// Creates data context to be set for the page
+		/// </summary>
+		/// <returns>PageDataContext that will be set to the page's <see cref="DataContext"/> property.</returns>
 		protected virtual PageDataContext CreateDataContext()
 		{
 			var factory = Scope.Resolve<PageDataContext.Factory>();
 
 			return factory( this );
+		}
+
+		/// <summary>
+		/// This method is called when page is visited for the very first time. You should perform
+		/// initialization and create one-time initialized resources here.
+		/// </summary>
+		protected virtual void OnPageCreated()
+		{
+		}
+
+		/// <summary>
+		/// This method is called when page is returned from being Dormant. All resources are preserved,
+		/// so most of the time you should just ignore this event.
+		/// </summary>
+		protected virtual void OnPageAwaken()
+		{
+		}
+
+		/// <summary>
+		/// This method is called when page navigated after application has been resurrected from thombstombed state.
+		/// Use <see cref="State"/> property to restore state.
+		/// </summary>
+		protected virtual void OnPageResurrected()
+		{
+		}
+
+		/// <summary>
+		/// This method is called when navigation outside of the page occures.
+		/// </summary>
+		protected virtual void OnPageAsleep()
+		{
+		}
+
+		/// <summary>
+		/// This method is called when page is being destroyed, usually after user presses Back key.
+		/// </summary>
+		protected virtual void OnPageDestroyed()
+		{
 		}
 		#endregion
 

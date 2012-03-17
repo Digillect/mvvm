@@ -65,8 +65,11 @@
     <Compile Include="Configuration\WindowsPhoneModule.cs" />
     <Compile Include="EntityPage.cs" />
     <Compile Include="IPageDecorator.cs" />
+    <Compile Include="NavigationServiceExtensions.cs" />
     <Compile Include="PageDataContext.cs" />
-    <Compile Include="PageDecorationService.cs" />
+    <Compile Include="Services\IPageDecorationService.cs" />
+    <Compile Include="Services\PageDecorationService.cs" />
+    <Compile Include="PhoneApplication.cs" />
     <Compile Include="PhoneApplicationPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\NetworkAvailabilityService.cs" />

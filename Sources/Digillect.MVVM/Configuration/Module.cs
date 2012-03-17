@@ -13,7 +13,7 @@ namespace Digillect.Mvvm.Configuration
 		protected override void Load( ContainerBuilder builder )
 		{
 			// Services
-			builder.RegisterType<DataExchangeService>().As<IDataExchangeService>().SingleInstance();
+			builder.Register( c => new DataExchangeService() ).As<IDataExchangeService>().SingleInstance();
 		}
 	}
 }
