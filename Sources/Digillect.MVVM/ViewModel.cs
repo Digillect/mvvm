@@ -9,46 +9,59 @@ using Digillect.Mvvm.Services;
 
 namespace Digillect.Mvvm
 {
-	public class ViewModel : ObservableObject, IDisposable
+	/// <summary>
+	/// Base ViewModel that can be used to build Model-View-ViewModel architecture. All application ViewModels must be descendant of this class.
+	/// </summary>
+	public abstract class ViewModel : ObservableObject
 	{
-		#region Constructors/Disposer
-		protected ViewModel()
-		{
-		}
-
-		public void Dispose()
-		{
-			Dispose( true );
-			GC.SuppressFinalize( this );
-		}
-
-		protected virtual void Dispose( bool disposing )
-		{
-			System.Diagnostics.Debug.WriteLine( "{0} disposed.", GetType().Name );
-		}
-		#endregion
-
 		#region Public Properties
+		/// <summary>
+		/// Gets or sets the data exchange service.
+		/// </summary>
+		/// <value>
+		/// The service used to indicate that data exchange is in the progress.
+		/// </value>
 		public IDataExchangeService DataExchangeService { get; set; }
 		#endregion
 
 		#region Data-Exchange notifications
+		/// <summary>
+		/// Occurs when <see cref="Digillect.Mvvm.Session"/> load is started.
+		/// </summary>
 		public event EventHandler<SessionEventArgs> SessionStarted;
+		/// <summary>
+		/// Occurs when <see cref="Digillect.Mvvm.Session"/> load is successfully completed.
+		/// </summary>
 		public event EventHandler<SessionEventArgs> SessionComplete;
+		/// <summary>
+		/// Occurs when <see cref="Digillect.Mvvm.Session"/> load was aborted due to unhandled error.
+		/// </summary>
 		public event EventHandler<SessionAbortedEventArgs> SessionAborted;
 
+		/// <summary>
+		/// Raises the session started event.
+		/// </summary>
+		/// <param name="e">The <see cref="Digillect.Mvvm.SessionEventArgs"/> instance containing the event data.</param>
 		protected void RaiseSessionStarted( SessionEventArgs e )
 		{
 			if( SessionStarted != null )
 				SessionStarted( this, e );
 		}
 
+		/// <summary>
+		/// Raises the session complete event.
+		/// </summary>
+		/// <param name="e">The <see cref="Digillect.Mvvm.SessionEventArgs"/> instance containing the event data.</param>
 		protected void RaiseSessionComplete( SessionEventArgs e )
 		{
 			if( SessionComplete != null )
 				SessionComplete( this, e );
 		}
 
+		/// <summary>
+		/// Raises the session aborted event.
+		/// </summary>
+		/// <param name="e">The <see cref="Digillect.Mvvm.SessionAbortedEventArgs"/> instance containing the event data.</param>
 		protected void RaiseSessionAborted( SessionAbortedEventArgs e )
 		{
 			if( SessionAborted != null )
@@ -59,6 +72,11 @@ namespace Digillect.Mvvm
 		#region Loading/Sessions
 		private readonly List<Session> m_sessions = new List<Session>();
 
+		/// <summary>
+		/// Loads the specified session.
+		/// </summary>
+		/// <param name="session">The session.</param>
+		/// <returns><see cref="System.Threading.Tasks.Task{T}"/> that can be awaited.</returns>
 		[EditorBrowsable( EditorBrowsableState.Never )]
 		public async Task<Session> Load( Session session )
 		{
@@ -177,11 +195,21 @@ namespace Digillect.Mvvm
 			return session;
 		}
 
+		/// <summary>
+		/// When overriden checks that the specified session should be loaded or ignored. Default behavior is
+		/// to load any session.
+		/// </summary>
+		/// <param name="session">The session to check.</param>
+		/// <returns><c>true</c> if view model should proceed with loading session; otherwise, <c>false</c>.</returns>
 		protected virtual bool ShouldLoadSession( Session session )
 		{
 			return true;
 		}
 
+		/// <summary>
+		/// Override this method to perform actual session loading.
+		/// </summary>
+		/// <param name="session">The session.</param>
 		protected virtual void LoadSession( Session session )
 		{
 		}

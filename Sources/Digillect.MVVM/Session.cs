@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 namespace Digillect.Mvvm
 {
 	/// <summary>
-	/// Holds information about <see cref="ViewModel"/>'s loading session.
+	/// Holds information about <see cref="Digillect.Mvvm.ViewModel"/>'s loading session.
 	/// </summary>
 	public class Session : IDisposable
 	{
 		/// <summary>
-		/// Gets dictionary of session key-value organized parameters.
+		/// Gets the parameters.
 		/// </summary>
 		public Dictionary<string, object> Parameters { get; private set; }
 		/// <summary>
-		/// Gets collection of tasks that should be finished for the session to complete.
+		/// Gets the collection of tasks, associated with this session.
 		/// </summary>
 		public List<Task> Tasks { get; private set; }
 		/// <summary>
@@ -32,7 +32,7 @@ namespace Digillect.Mvvm
 
 		#region Constructors/Disposer
 		/// <summary>
-		/// Creates new session.
+		/// Initializes a new instance of the <see cref="Session"/> class.
 		/// </summary>
 		public Session()
 		{
@@ -41,17 +41,28 @@ namespace Digillect.Mvvm
 			this.State = SessionState.Created;
 		}
 
+		/// <summary>
+		/// Releases unmanaged resources and performs other cleanup operations before the
+		/// <see cref="Session"/> is reclaimed by garbage collection.
+		/// </summary>
 		~Session()
 		{
 			Dispose( false );
 		}
 
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public void Dispose()
 		{
 			Dispose( true );
 			GC.SuppressFinalize( this );
 		}
 
+		/// <summary>
+		/// Releases unmanaged and - optionally - managed resources
+		/// </summary>
+		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
 		protected virtual void Dispose( bool disposing )
 		{
 			if( disposing )
@@ -67,15 +78,18 @@ namespace Digillect.Mvvm
 
 		#region Cancellation Support
 		/// <summary>
-		/// Gets value indicating that session cancellation was requested.
+		/// Gets a value indicating whether cancellation of this session is requested.
 		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if cancellation is requested for this session; otherwise, <c>false</c>.
+		/// </value>
 		public bool IsCancellationRequested
 		{
 			get { return tokenSource.IsCancellationRequested; }
 		}
 
 		/// <summary>
-		/// Gets cancellation token to be used in asynchronous operations.
+		/// Gets the <see cref="System.Threading.CancellationToken"/> to be used in asynchronous operations.
 		/// </summary>
 		public CancellationToken Token
 		{
@@ -83,7 +97,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Requests session cancellation.
+		/// Cancels this session.
 		/// </summary>
 		public void Cancel()
 		{
@@ -93,23 +107,23 @@ namespace Digillect.Mvvm
 		#endregion
 		#region Parameters
 		/// <summary>
-		/// Gets parameter from session's parameters dictionary.
+		/// Gets the parameter.
 		/// </summary>
-		/// <typeparam name="T">Type of the parameter</typeparam>
-		/// <param name="name">Parameter's name</param>
-		/// <returns>Parameter converted to specified type.</returns>
+		/// <typeparam name="T">Parameter type.</typeparam>
+		/// <param name="name">Parameter name</param>
+		/// <returns>Parameter value, casted to <typeparamref name="T"/>.</returns>
 		public T GetParameter<T>( string name )
 		{
 			return (T) this.Parameters[name];
 		}
 
 		/// <summary>
-		/// Gets parameter from session's parameters dictionary or default value, if parameter doesn't exists.
+		/// Gets the parameter.
 		/// </summary>
-		/// <typeparam name="T">Type of the parameter</typeparam>
-		/// <param name="name">Parameter's name</param>
-		/// <param name="defaultValue">Default value to be used if parameter doesn't exists.</param>
-		/// <returns>Parameter's value or default value.</returns>
+		/// <typeparam name="T">Parameter type.</typeparam>
+		/// <param name="name">Parameter name.</param>
+		/// <param name="defaultValue">Default value.</param>
+		/// <returns>Parameter value or <paramref name="defaultValue"/> if parameter with corresponding <paramref name="name"/> is not found, casted to <typeparamref name="T"/>.</returns>
 		public T GetParameter<T>( string name, T defaultValue )
 		{
 			if( !this.Parameters.ContainsKey( name ) )

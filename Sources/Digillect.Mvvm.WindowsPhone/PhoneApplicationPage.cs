@@ -9,6 +9,9 @@ using Digillect.Mvvm.Services;
 
 namespace Digillect.Mvvm
 {
+	/// <summary>
+	/// Base for application pages.
+	/// </summary>
 	public class PhoneApplicationPage : Microsoft.Phone.Controls.PhoneApplicationPage, ILifetimeScopeProvider
 	{
 		private const string RessurectionMark = "__mark$mark__";
@@ -17,7 +20,7 @@ namespace Digillect.Mvvm
 
 		#region Constructor
 		/// <summary>
-		/// Constructs new instance of the page and sets Page's <see cref="Language"/> to current culture.
+		/// Initializes a new instance of the <see cref="PhoneApplicationPage"/> class.
 		/// </summary>
 		public PhoneApplicationPage()
 		{
@@ -27,7 +30,7 @@ namespace Digillect.Mvvm
 
 		#region Scope
 		/// <summary>
-		/// Gets IoC lifetime scope that can be used to resolve components and services.
+		/// Gets the scope that can be used to resolve services and components.
 		/// </summary>
 		public ILifetimeScope Scope
 		{
@@ -36,6 +39,10 @@ namespace Digillect.Mvvm
 		#endregion
 
 		#region Navigation handling
+		/// <summary>
+		/// Called when a page becomes the active page in a frame.
+		/// </summary>
+		/// <param name="e">An object that contains the event data.</param>
 		protected override void OnNavigatedTo( System.Windows.Navigation.NavigationEventArgs e )
 		{
 			base.OnNavigatedTo( e );
@@ -55,6 +62,10 @@ namespace Digillect.Mvvm
 			}
 		}
 
+		/// <summary>
+		/// Called when a page is no longer the active page in a frame.
+		/// </summary>
+		/// <param name="e">An object that contains the event data.</param>
 		protected override void OnNavigatedFrom( System.Windows.Navigation.NavigationEventArgs e )
 		{
 			if( e.NavigationMode == System.Windows.Navigation.NavigationMode.Back )
@@ -81,9 +92,9 @@ namespace Digillect.Mvvm
 
 		#region Page Lifecycle handlers
 		/// <summary>
-		/// Creates data context to be set for the page
+		/// Creates data context to be set for the page. Override to create your own data context.
 		/// </summary>
-		/// <returns>PageDataContext that will be set to the page's <see cref="DataContext"/> property.</returns>
+		/// <returns>Data context that will be set to <see cref="System.Windows.FrameworkElement.DataContext"/> property.</returns>
 		protected virtual PageDataContext CreateDataContext()
 		{
 			var factory = Scope.Resolve<PageDataContext.Factory>();
@@ -109,7 +120,7 @@ namespace Digillect.Mvvm
 
 		/// <summary>
 		/// This method is called when page navigated after application has been resurrected from thombstombed state.
-		/// Use <see cref="State"/> property to restore state.
+		/// Use <see cref="Microsoft.Phone.Controls.PhoneApplicationPage.State"/> property to restore state.
 		/// </summary>
 		protected virtual void OnPageResurrected()
 		{
@@ -133,6 +144,12 @@ namespace Digillect.Mvvm
 		#region IsInDesignMode
 		private static bool? isInDesignMode;
 
+		/// <summary>
+		/// Gets a value indicating whether this page is in design mode.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this page is in design mode; otherwise, <c>false</c>.
+		/// </value>
 		public static bool IsInDesignMode
 		{
 			get

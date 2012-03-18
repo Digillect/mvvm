@@ -10,6 +10,10 @@ using Autofac;
 
 namespace Digillect.Mvvm
 {
+	/// <summary>
+	/// Provides infrastructure for page backed up with <see cref="Digillect.Mvvm.ViewModel"/>.
+	/// </summary>
+	/// <typeparam name="TViewModel">The type of the view model.</typeparam>
 	public class ViewModelPage<TViewModel> : PhoneApplicationPage
 		where TViewModel : ViewModel
 	{
@@ -17,7 +21,7 @@ namespace Digillect.Mvvm
 
 		#region Public Properties
 		/// <summary>
-		/// Gets Page's ViewModel
+		/// Gets the view model.
 		/// </summary>
 		public TViewModel ViewModel
 		{
@@ -26,6 +30,10 @@ namespace Digillect.Mvvm
 		#endregion
 
 		#region Page lifecycle
+		/// <summary>
+		/// This method is called when page is visited for the very first time. You should perform
+		/// initialization and create one-time initialized resources here.
+		/// </summary>
 		protected override void OnPageCreated()
 		{
 			base.OnPageCreated();
@@ -37,6 +45,10 @@ namespace Digillect.Mvvm
 			}
 		}
 
+		/// <summary>
+		/// This method is called when page navigated after application has been resurrected from thombstombed state.
+		/// Use <see cref="Microsoft.Phone.Controls.PhoneApplicationPage.State"/> property to restore state.
+		/// </summary>
 		protected override void OnPageResurrected()
 		{
 			base.OnPageResurrected();
@@ -48,6 +60,12 @@ namespace Digillect.Mvvm
 			}
 		}
 
+		/// <summary>
+		/// Creates data context to be set for the page. Override to create your own data context.
+		/// </summary>
+		/// <returns>
+		/// Data context that will be set to <see cref="System.Windows.FrameworkElement.DataContext"/> property.
+		/// </returns>
 		protected override PageDataContext CreateDataContext()
 		{
 			var factory = Scope.Resolve<ViewModelPageDataContext.Factory>();
