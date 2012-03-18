@@ -51,7 +51,7 @@
       <HintPath>..\packages\AsyncCtp.1.0.0\lib\sl4-windowsphone71\AsyncCtpLibrary_Phone.dll</HintPath>
     </Reference>
     <Reference Include="Autofac">
-      <HintPath>..\..\..\..\..\Projects\NTV\Sources\packages\Autofac.2.6.1.841\lib\SL4-WindowsPhone71\Autofac.dll</HintPath>
+      <HintPath>..\packages\Autofac.2.6.1.841\lib\SL4-WindowsPhone71\Autofac.dll</HintPath>
     </Reference>
     <Reference Include="Digillect">
       <HintPath>..\packages\DCL.Core.4.0.0.0\lib\sl4-windowsphone71\Digillect.dll</HintPath>
