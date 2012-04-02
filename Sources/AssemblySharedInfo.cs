@@ -17,7 +17,12 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion(AssemblyInfo.FileVersion)]
 [assembly: AssemblyInformationalVersion(AssemblyInfo.ProductVersion)]
 
+#if !NETFX_CORE
 [assembly: CLSCompliant(true)]
+#else
+[assembly: CLSCompliant(false)]
+#endif
+
 [assembly: ComVisible(false)]
 [assembly: NeutralResourcesLanguage("en-US")]
 [assembly: SatelliteContractVersion(AssemblyInfo.SatelliteContractVersion)]
@@ -27,7 +32,7 @@ internal static class AssemblyInfo
 	public const string Major = "2";
 	public const string Minor = "0";
 	public const string Patch = "0";
-	public const string SemVerSuffix = "-alpha";
+	public const string SemVerSuffix = "";
 
 	public const string Version = Major + "." + Minor + "." + Patch;
 	public const string FileVersion = Major + "." + Minor + "." + Patch + SemVerSuffix;

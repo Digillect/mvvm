@@ -106,7 +106,8 @@ namespace Digillect.Mvvm
 				{
 					if( this.sessions.Count > 0 )
 					{
-						this.sessions.ForEach( existingSession => existingSession.Cancel() );
+						foreach( var existingSession in this.sessions )
+							existingSession.Cancel();
 
 						this.sessions.Clear();
 					}
@@ -128,7 +129,9 @@ namespace Digillect.Mvvm
 			}
 
 			session.State = SessionState.Active;
-			DataExchangeService.BeginDataExchange();
+
+			if( DataExchangeService != null )
+				DataExchangeService.BeginDataExchange();
 
 			try
 			{
@@ -141,7 +144,8 @@ namespace Digillect.Mvvm
 					this.sessions.Remove( session );
 				}
 
-				DataExchangeService.EndDataExchange();
+				if( DataExchangeService != null )
+					DataExchangeService.EndDataExchange();
 
 				var canceled = ex is OperationCanceledException;
 				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
@@ -163,7 +167,9 @@ namespace Digillect.Mvvm
 
 				session.State = SessionState.Complete;
 
-				DataExchangeService.EndDataExchange();
+				if( DataExchangeService != null )
+					DataExchangeService.EndDataExchange();
+
 				RaiseSessionComplete( new SessionEventArgs( session ) );
 
 				return session;
@@ -171,7 +177,11 @@ namespace Digillect.Mvvm
 
 			try
 			{
+#if !NET45
 				await TaskEx.WhenAll( session.Tasks );
+#else
+				await Task.WhenAll( session.Tasks );
+#endif
 
 				session.State = SessionState.Complete;
 
@@ -200,7 +210,8 @@ namespace Digillect.Mvvm
 					this.sessions.Remove( session );
 				}
 
-				DataExchangeService.EndDataExchange();
+				if( DataExchangeService != null )
+					DataExchangeService.EndDataExchange();
 			}
 
 			return session;
