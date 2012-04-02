@@ -13,18 +13,23 @@ namespace Digillect.Mvvm.Services
 
 		public int DataExchangeCount
 		{
-			get { return dataExchangeCount; }
+			get { return this.dataExchangeCount; }
 		}
 
 		public void BeginDataExchange()
 		{
 			lock( syncRoot )
 			{
-				dataExchangeCount++;
+				this.dataExchangeCount++;
 			}
 
-			if( dataExchangeCount == 1 && DataExchangeStarted != null )
-				DataExchangeStarted( this, EventArgs.Empty );
+			if( this.dataExchangeCount == 1 )
+			{
+				var handler = DataExchangeStarted;
+
+				if( handler != null )
+					handler( this, EventArgs.Empty );
+			}
 		}
 
 		public void EndDataExchange()
@@ -42,8 +47,13 @@ namespace Digillect.Mvvm.Services
 					}
 				}
 
-				if( fire && DataExchangeComplete != null )
-					DataExchangeComplete( this, EventArgs.Empty );
+				if( fire )
+				{
+					var handler = DataExchangeComplete;
+
+					if( handler != null )
+						handler( this, EventArgs.Empty );
+				}
 			}
 		}
 	}

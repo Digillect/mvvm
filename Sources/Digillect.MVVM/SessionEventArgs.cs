@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Digillect.Mvvm
 {
@@ -8,10 +9,7 @@ namespace Digillect.Mvvm
 	/// </summary>
 	public class SessionEventArgs : EventArgs
 	{
-		/// <summary>
-		/// Gets the session.
-		/// </summary>
-		public Session Session { get; private set; }
+		private readonly Session session;
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -20,7 +18,19 @@ namespace Digillect.Mvvm
 		/// <param name="session">The session.</param>
 		public SessionEventArgs( Session session )
 		{
-			this.Session = session;
+			Contract.Requires( session != null );
+
+			this.session = session;
+		}
+		#endregion
+
+		#region Public Properties
+		/// <summary>
+		/// Gets the session.
+		/// </summary>
+		public Session Session
+		{
+			get { return this.session; }
 		}
 		#endregion
 	}

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.Contracts;
 
 namespace Digillect.Mvvm
 {
@@ -13,14 +14,8 @@ namespace Digillect.Mvvm
 		/// </summary>
 		public const string Entity = "Entity";
 
-		/// <summary>
-		/// Gets entity identifier.
-		/// </summary>
-		public TId Id { get; private set; }
-		/// <summary>
-		/// Gets logical part for multipart requests.
-		/// </summary>
-		public string Part { get; private set; }
+		private readonly TId id;
+		private readonly string part;
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -30,13 +25,27 @@ namespace Digillect.Mvvm
 		/// <param name="part">Specifies what part of multipart entity to load, by default load everything.</param>
 		public EntitySession( TId id, string part = null )
 		{
-			this.Id = id;
-			this.Part = part;
+			this.id = id;
+			this.part = part;
 			this.Exclusive = part == null;
 		}
 		#endregion
 
 		#region Public Properties
+		/// <summary>
+		/// Gets entity identifier.
+		/// </summary>
+		public TId Id
+		{
+			get { return this.id; }
+		}
+		/// <summary>
+		/// Gets logical part for multipart requests.
+		/// </summary>
+		public string Part
+		{
+			get { return this.part; }
+		}
 		/// <summary>
 		/// Gets a value indicating whether this instance is partial.
 		/// </summary>
@@ -45,7 +54,7 @@ namespace Digillect.Mvvm
 		/// </value>
 		public bool IsPartial
 		{
-			get { return this.Part != null; }
+			get { return this.part != null; }
 		}
 
 		/// <summary>
@@ -56,7 +65,7 @@ namespace Digillect.Mvvm
 		/// </value>
 		public bool IsEntity
 		{
-			get { return this.Part == null || this.Part == Entity; }
+			get { return this.part == null || this.part == Entity; }
 		}
 		#endregion
 
@@ -68,13 +77,12 @@ namespace Digillect.Mvvm
 		/// <exception cref="System.ArgumentNullException">if part is <c>null</c>.</exception>
 		public bool Includes( string part )
 		{
-			if( part == null )
-				throw new ArgumentNullException( "part" );
+			Contract.Requires( part != null );
 
-			if( this.Part == null )
+			if( this.part == null )
 				return true;
 
-			return this.Part == part;
+			return this.part == part;
 		}
 	}
 }

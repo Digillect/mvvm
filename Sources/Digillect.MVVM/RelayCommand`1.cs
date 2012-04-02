@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Windows.Input;
 
 namespace Digillect.Mvvm
@@ -20,6 +21,8 @@ namespace Digillect.Mvvm
 		/// <param name="canExecute">Function that indicates whether command can be executed or not.</param>
 		public RelayCommand( Action<T> execute, Func<T, bool> canExecute = null )
 		{
+			Contract.Requires( execute != null );
+
 			this.execute = execute;
 			this.canExecute = canExecute;
 		}

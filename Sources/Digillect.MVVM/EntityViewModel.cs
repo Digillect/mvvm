@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,17 +27,14 @@ namespace Digillect.Mvvm
 		/// </value>
 		public TEntity Entity
 		{
-			get
-			{
-				return entity;
-			}
+			get { return this.entity; }
 
 			protected set
 			{
-				if( entity != value )
+				if( this.entity != value )
 				{
-					OnPropertyChanging( "Entity", entity, value );
-					entity = value;
+					OnPropertyChanging( "Entity", this.entity, value );
+					this.entity = value;
 					OnPropertyChanged( "Entity" );
 				}
 			}
@@ -51,6 +49,8 @@ namespace Digillect.Mvvm
 		/// <returns><see cref="System.Threading.Tasks.Task{T}"/> that can be awaited and will return <see cref="Digillect.Mvvm.Session"/>.</returns>
 		public Task<Session> Load( TId id )
 		{
+			Contract.Ensures( Contract.Result<Task<Session>>() != null );
+
 			var session = new EntitySession<TId>( id );
 
 			return Load( session );
@@ -63,6 +63,8 @@ namespace Digillect.Mvvm
 		/// <returns><see cref="System.Threading.Tasks.Task{T}"/> that can be awaited.</returns>
 		public Task<Session> LoadEntity( TId id )
 		{
+			Contract.Ensures( Contract.Result<Task<Session>>() != null );
+
 			var session = new EntitySession<TId>( id, EntitySession<TId>.Entity );
 
 			return Load( session );

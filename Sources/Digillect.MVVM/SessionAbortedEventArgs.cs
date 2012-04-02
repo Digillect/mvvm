@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Digillect.Mvvm
 {
@@ -8,17 +9,7 @@ namespace Digillect.Mvvm
 	/// </summary>
 	public class SessionAbortedEventArgs : SessionEventArgs
 	{
-		/// <summary>
-		/// Gets the exception occured while loading <see cref="Digillect.Mvvm.Session"/>.
-		/// </summary>
-		public Exception Exception { get; private set; }
-		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="SessionAbortedEventArgs"/> is handled.
-		/// </summary>
-		/// <value>
-		///   <c>true</c> if handled; otherwise, <c>false</c>.
-		/// </value>
-		public bool Handled { get; set; }
+		private readonly Exception exception;
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -29,8 +20,28 @@ namespace Digillect.Mvvm
 		public SessionAbortedEventArgs( Session session, Exception exception )
 			: base( session )
 		{
-			this.Exception = exception;
+			Contract.Requires( session != null );
+
+			this.exception = exception;
 		}
+		#endregion
+
+		#region Public Properties
+		/// <summary>
+		/// Gets the exception occured while loading <see cref="Digillect.Mvvm.Session"/>.
+		/// </summary>
+		public Exception Exception
+		{
+			get { return this.exception; }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="SessionAbortedEventArgs"/> is handled.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if handled; otherwise, <c>false</c>.
+		/// </value>
+		public bool Handled { get; set; }
 		#endregion
 	}
 }

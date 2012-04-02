@@ -25,6 +25,7 @@ namespace Digillect.Mvvm.Services
 		{
 			var oldNetworkAvailable = NetworkAvailable;
 
+
 			NetworkAvailable = await TaskEx.Run<bool>( InspectNetwork );
 
 			if( NetworkAvailable != oldNetworkAvailable && NetworkAvailabilityChanged != null )

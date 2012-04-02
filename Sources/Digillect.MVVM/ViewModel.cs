@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,8 +13,17 @@ namespace Digillect.Mvvm
 	/// <summary>
 	/// Base ViewModel that can be used to build Model-View-ViewModel architecture. All application ViewModels must be descendant of this class.
 	/// </summary>
-	public abstract class ViewModel : ObservableObject
+	public class ViewModel : ObservableObject
 	{
+		#region Constructors/Disposer
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ViewModel"/> class.
+		/// </summary>
+		protected ViewModel()
+		{
+		}
+		#endregion
+
 		#region Public Properties
 		/// <summary>
 		/// Gets or sets the data exchange service.
@@ -70,7 +80,7 @@ namespace Digillect.Mvvm
 		#endregion
 
 		#region Loading/Sessions
-		private readonly List<Session> m_sessions = new List<Session>();
+		private readonly List<Session> sessions = new List<Session>();
 
 		/// <summary>
 		/// Loads the specified session.
@@ -80,37 +90,38 @@ namespace Digillect.Mvvm
 		[EditorBrowsable( EditorBrowsableState.Never )]
 		public async Task<Session> Load( Session session )
 		{
-			if( session == null )
-				throw new ArgumentNullException( "session" );
+			Contract.Requires( session != null );
+			Contract.Ensures( Contract.Result<Task<Session>>() != null );
 
 			if( !ShouldLoadSession( session ) )
 			{
 				session.State = SessionState.Complete;
+				
 				return session;
 			}
 
-			lock( m_sessions )
+			lock( this.sessions )
 			{
 				if( session.Exclusive )
 				{
-					if( m_sessions.Count > 0 )
+					if( this.sessions.Count > 0 )
 					{
-						m_sessions.ForEach( existingSession => existingSession.Cancel() );
+						this.sessions.ForEach( existingSession => existingSession.Cancel() );
 
-						m_sessions.Clear();
+						this.sessions.Clear();
 					}
 				}
 
-				m_sessions.Add( session );
+				this.sessions.Add( session );
 			}
 
 			RaiseSessionStarted( new SessionEventArgs( session ) );
 
 			if( session.IsCancellationRequested )
 			{
-				lock( m_sessions )
+				lock( this.sessions )
 				{
-					m_sessions.Remove( session );
+					this.sessions.Remove( session );
 				}
 
 				return session;
@@ -125,9 +136,9 @@ namespace Digillect.Mvvm
 			}
 			catch( Exception ex )
 			{
-				lock( m_sessions )
+				lock( this.sessions )
 				{
-					m_sessions.Remove( session );
+					this.sessions.Remove( session );
 				}
 
 				DataExchangeService.EndDataExchange();
@@ -145,9 +156,9 @@ namespace Digillect.Mvvm
 
 			if( session.Tasks.Count == 0 )
 			{
-				lock( m_sessions )
+				lock( this.sessions )
 				{
-					m_sessions.Remove( session );
+					this.sessions.Remove( session );
 				}
 
 				session.State = SessionState.Complete;
@@ -184,9 +195,9 @@ namespace Digillect.Mvvm
 			}
 			finally
 			{
-				lock( m_sessions )
+				lock( this.sessions )
 				{
-					m_sessions.Remove( session );
+					this.sessions.Remove( session );
 				}
 
 				DataExchangeService.EndDataExchange();
@@ -203,6 +214,8 @@ namespace Digillect.Mvvm
 		/// <returns><c>true</c> if view model should proceed with loading session; otherwise, <c>false</c>.</returns>
 		protected virtual bool ShouldLoadSession( Session session )
 		{
+			Contract.Requires( session != null );
+
 			return true;
 		}
 
@@ -212,6 +225,7 @@ namespace Digillect.Mvvm
 		/// <param name="session">The session.</param>
 		protected virtual void LoadSession( Session session )
 		{
+			Contract.Requires( session != null );
 		}
 		#endregion
 	}

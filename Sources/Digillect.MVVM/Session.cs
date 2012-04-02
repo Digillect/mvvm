@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,25 +11,9 @@ namespace Digillect.Mvvm
 	/// </summary>
 	public class Session : IDisposable
 	{
-		/// <summary>
-		/// Gets the parameters.
-		/// </summary>
-		public Dictionary<string, object> Parameters { get; private set; }
-		/// <summary>
-		/// Gets the collection of tasks, associated with this session.
-		/// </summary>
-		public List<Task> Tasks { get; private set; }
-		/// <summary>
-		/// Gets or sets flag indicating that all other sessions should be terminated when this one
-		/// begins to load.
-		/// </summary>
-		public bool Exclusive { get; set; }
-		/// <summary>
-		/// Gets session state
-		/// </summary>
-		public SessionState State { get; internal set; }
-
-		private CancellationTokenSource tokenSource = new CancellationTokenSource();
+		private readonly Dictionary<string, object> parameters = new Dictionary<string, object>();
+		private readonly List<Task> tasks = new List<Task>();
+		private readonly CancellationTokenSource tokenSource = new CancellationTokenSource();
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -36,8 +21,6 @@ namespace Digillect.Mvvm
 		/// </summary>
 		public Session()
 		{
-			this.Parameters = new Dictionary<string, object>();
-			this.Tasks = new List<Task>();
 			this.State = SessionState.Created;
 		}
 
@@ -67,15 +50,38 @@ namespace Digillect.Mvvm
 		{
 			if( disposing )
 			{
-				if( tokenSource != null )
-				{
-					tokenSource.Dispose();
-					tokenSource = null;
-				}
+				this.tokenSource.Dispose();
 			}
 		}
 		#endregion
 
+		#region Public Properties
+		/// <summary>
+		/// Gets the parameters.
+		/// </summary>
+		public IDictionary<string, object> Parameters
+		{
+			get { return this.parameters; }
+		}
+
+		/// <summary>
+		/// Gets the collection of tasks, associated with this session.
+		/// </summary>
+		public IList<Task> Tasks
+		{
+			get { return this.tasks; }
+		}
+
+		/// <summary>
+		/// Gets or sets flag indicating that all other sessions should be terminated when this one
+		/// begins to load.
+		/// </summary>
+		public bool Exclusive { get; set; }
+		/// <summary>
+		/// Gets session state
+		/// </summary>
+		public SessionState State { get; internal set; }
+		#endregion
 		#region Cancellation Support
 		/// <summary>
 		/// Gets a value indicating whether cancellation of this session is requested.
@@ -85,7 +91,7 @@ namespace Digillect.Mvvm
 		/// </value>
 		public bool IsCancellationRequested
 		{
-			get { return tokenSource.IsCancellationRequested; }
+			get { return this.tokenSource.IsCancellationRequested; }
 		}
 
 		/// <summary>
@@ -93,7 +99,7 @@ namespace Digillect.Mvvm
 		/// </summary>
 		public CancellationToken Token
 		{
-			get { return tokenSource.Token; }
+			get { return this.tokenSource.Token; }
 		}
 
 		/// <summary>
@@ -101,7 +107,7 @@ namespace Digillect.Mvvm
 		/// </summary>
 		public void Cancel()
 		{
-			tokenSource.Cancel();
+			this.tokenSource.Cancel();
 			State = SessionState.Canceled;
 		}
 		#endregion
@@ -114,7 +120,9 @@ namespace Digillect.Mvvm
 		/// <returns>Parameter value, casted to <typeparamref name="T"/>.</returns>
 		public T GetParameter<T>( string name )
 		{
-			return (T) this.Parameters[name];
+			Contract.Requires( !string.IsNullOrEmpty( name ) );
+
+			return (T) this.parameters[name];
 		}
 
 		/// <summary>

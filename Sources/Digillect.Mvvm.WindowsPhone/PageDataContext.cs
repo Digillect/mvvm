@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Windows;
 
 using Digillect.Mvvm.Services;
@@ -29,6 +30,9 @@ namespace Digillect.Mvvm
 		/// <param name="networkAvailabilityService">The network availability service (provided by container).</param>
 		public PageDataContext( PhoneApplicationPage page, INetworkAvailabilityService networkAvailabilityService )
 		{
+			Contract.Requires( page != null );
+			Contract.Requires( networkAvailabilityService != null );
+
 			this.page = page;
 			this.networkAvailabilityService = networkAvailabilityService;
 			this.networkAvailable = this.networkAvailabilityService.NetworkAvailable;

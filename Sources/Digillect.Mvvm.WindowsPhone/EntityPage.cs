@@ -9,7 +9,7 @@ namespace Digillect.Mvvm
 	/// <typeparam name="TEntity">The type of the entity.</typeparam>
 	/// <typeparam name="TViewModel">The type of the view model.</typeparam>
 	/// <remarks>Instance of this class performs lookup of the query string upon navigation to find and extract parameter with
-	/// name <code>Id</code> that is used as entity id for view model. If that parameter is not found then <see cref="System.ArgumentException"/> will be thrown.</remarks>
+	/// name <c>Id</c> that is used as entity id for view model. If that parameter is not found then <see cref="System.ArgumentException"/> will be thrown.</remarks>
 	public class EntityPage<TId, TEntity, TViewModel> : ViewModelPage<TViewModel>
 		where TId: IComparable<TId>, IEquatable<TId>
 		where TEntity: XObject<TId>
