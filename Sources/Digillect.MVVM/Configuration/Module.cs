@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Reflection;
 
-using Autofac;
-
 using Digillect.Mvvm.Services;
 
 namespace Digillect.Mvvm.Configuration
@@ -11,17 +9,11 @@ namespace Digillect.Mvvm.Configuration
 	/// <summary>
 	/// Module that is used to register sevices and components into Autofac container.
 	/// </summary>
-	public class Module : Autofac.Module
+	public class Module
 	{
-		/// <summary>
-		/// Override to add registrations to the container.
-		/// </summary>
-		/// <param name="builder">The builder through which components can be
-		/// registered.</param>
-		protected override void Load( ContainerBuilder builder )
+		public virtual void RegisterServices( IServiceProvider provider )
 		{
-			// Services
-			builder.Register( c => new DataExchangeService() ).As<IDataExchangeService>().SingleInstance();
+			provider.RegisterService<IDataExchangeService>( () => new DataExchangeService() );
 		}
 	}
 }

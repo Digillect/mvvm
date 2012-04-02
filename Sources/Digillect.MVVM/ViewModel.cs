@@ -70,7 +70,7 @@ namespace Digillect.Mvvm
 		#endregion
 
 		#region Loading/Sessions
-		private readonly List<Session> m_sessions = new List<Session>();
+		private readonly List<Session> sessions = new List<Session>();
 
 		/// <summary>
 		/// Loads the specified session.
@@ -89,35 +89,38 @@ namespace Digillect.Mvvm
 				return session;
 			}
 
-			lock( m_sessions )
+			lock( this.sessions )
 			{
 				if( session.Exclusive )
 				{
-					if( m_sessions.Count > 0 )
+					if( this.sessions.Count > 0 )
 					{
-						m_sessions.ForEach( existingSession => existingSession.Cancel() );
+						foreach( var existingSession in this.sessions )
+							existingSession.Cancel();
 
-						m_sessions.Clear();
+						this.sessions.Clear();
 					}
 				}
 
-				m_sessions.Add( session );
+				this.sessions.Add( session );
 			}
 
 			RaiseSessionStarted( new SessionEventArgs( session ) );
 
 			if( session.IsCancellationRequested )
 			{
-				lock( m_sessions )
+				lock( this.sessions )
 				{
-					m_sessions.Remove( session );
+					this.sessions.Remove( session );
 				}
 
 				return session;
 			}
 
 			session.State = SessionState.Active;
-			DataExchangeService.BeginDataExchange();
+
+			if( DataExchangeService != null )
+				DataExchangeService.BeginDataExchange();
 
 			try
 			{
@@ -125,12 +128,13 @@ namespace Digillect.Mvvm
 			}
 			catch( Exception ex )
 			{
-				lock( m_sessions )
+				lock( this.sessions )
 				{
-					m_sessions.Remove( session );
+					this.sessions.Remove( session );
 				}
 
-				DataExchangeService.EndDataExchange();
+				if( DataExchangeService != null )
+					DataExchangeService.EndDataExchange();
 
 				var canceled = ex is OperationCanceledException;
 				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
@@ -145,14 +149,16 @@ namespace Digillect.Mvvm
 
 			if( session.Tasks.Count == 0 )
 			{
-				lock( m_sessions )
+				lock( this.sessions )
 				{
-					m_sessions.Remove( session );
+					this.sessions.Remove( session );
 				}
 
 				session.State = SessionState.Complete;
 
-				DataExchangeService.EndDataExchange();
+				if( DataExchangeService != null )
+					DataExchangeService.EndDataExchange();
+
 				RaiseSessionComplete( new SessionEventArgs( session ) );
 
 				return session;
@@ -160,7 +166,11 @@ namespace Digillect.Mvvm
 
 			try
 			{
+#if !NET45
 				await TaskEx.WhenAll( session.Tasks );
+#else
+				await Task.WhenAll( session.Tasks );
+#endif
 
 				session.State = SessionState.Complete;
 
@@ -184,12 +194,13 @@ namespace Digillect.Mvvm
 			}
 			finally
 			{
-				lock( m_sessions )
+				lock( this.sessions )
 				{
-					m_sessions.Remove( session );
+					this.sessions.Remove( session );
 				}
 
-				DataExchangeService.EndDataExchange();
+				if( DataExchangeService != null )
+					DataExchangeService.EndDataExchange();
 			}
 
 			return session;

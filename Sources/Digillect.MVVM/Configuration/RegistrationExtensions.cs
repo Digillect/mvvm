@@ -22,7 +22,11 @@ namespace Digillect.Mvvm
 		{
 			var rb = builder.RegisterType<TViewModel>();
 
+#if NETFX_CORE
+			if( typeof( TViewModel ).GetTypeInfo().GetCustomAttribute<SingletonViewModelAttribute>() != null )
+#else
 			if( typeof( TViewModel ).GetCustomAttributes( typeof( SingletonViewModelAttribute ), false ).Length > 0 )
+#endif
 			{
 				rb = rb.SingleInstance();
 			}
@@ -39,14 +43,22 @@ namespace Digillect.Mvvm
 		{
 			builder.RegisterAssemblyTypes( assemblies )
 				.AssignableTo<ViewModel>()
+#if NETFX_CORE
+				.Where( t => !t.GetTypeInfo().IsAbstract && t.GetTypeInfo().GetCustomAttribute<SingletonViewModelAttribute>() == null )
+#else
 				.Where( t => !t.IsAbstract && t.GetCustomAttributes( typeof( SingletonViewModelAttribute ), false ).Length == 0 )
+#endif
 				.AsSelf()
 				.OwnedByLifetimeScope()
 				.PropertiesAutowired();
 
 			builder.RegisterAssemblyTypes( assemblies )
 				.AssignableTo<ViewModel>()
+#if NETFX_CORE
+				.Where( t => !t.GetTypeInfo().IsAbstract && t.GetTypeInfo().GetCustomAttribute<SingletonViewModelAttribute>() != null )
+#else
 				.Where( t => !t.IsAbstract && t.GetCustomAttributes( typeof( SingletonViewModelAttribute ), false ).Length != 0 )
+#endif
 				.AsSelf()
 				.OwnedByLifetimeScope()
 				.PropertiesAutowired()
