@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using Digillect.Mvvm.UI;
+
 namespace Digillect.Mvvm.Services
 {
 	/// <summary>

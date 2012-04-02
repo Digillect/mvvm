@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Digillect.Mvvm
+namespace Digillect.Mvvm.UI
 {
 	/// <summary>
 	/// Provides infrastructure for page backed up with <see cref="Digillect.Mvvm.EntityViewModel{TId,TModel}"/>.

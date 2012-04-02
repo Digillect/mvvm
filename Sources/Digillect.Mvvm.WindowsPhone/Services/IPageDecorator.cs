@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Digillect.Mvvm.UI;
+
 namespace Digillect.Mvvm.Services
 {
 	/// <summary>

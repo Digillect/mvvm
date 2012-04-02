@@ -6,9 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Navigation;
 
-using Autofac;
-
-namespace Digillect.Mvvm
+namespace Digillect.Mvvm.UI
 {
 	/// <summary>
 	/// Provides infrastructure for page backed up with <see cref="Digillect.Mvvm.ViewModel"/>.
@@ -40,7 +38,7 @@ namespace Digillect.Mvvm
 
 			if( !IsInDesignMode )
 			{
-				this.viewModel = Scope.Resolve<TViewModel>();
+				this.viewModel = CurrentApplication.CreateViewModel<TViewModel>();
 				InitialLoadData();
 			}
 		}
@@ -55,7 +53,7 @@ namespace Digillect.Mvvm
 
 			if( !IsInDesignMode )
 			{
-				this.viewModel = Scope.Resolve<TViewModel>();
+				this.viewModel = CurrentApplication.CreateViewModel<TViewModel>();
 				InitialLoadData();
 			}
 		}
@@ -68,9 +66,7 @@ namespace Digillect.Mvvm
 		/// </returns>
 		protected override PageDataContext CreateDataContext()
 		{
-			var factory = Scope.Resolve<ViewModelPageDataContext.Factory>();
-
-			return factory( this, viewModel );
+			return new ViewModelPageDataContext( this, this.viewModel, CurrentApplication.GetService<Digillect.Mvvm.Services.INetworkAvailabilityService>() );
 		}
 		#endregion
 

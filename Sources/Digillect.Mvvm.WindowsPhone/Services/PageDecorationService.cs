@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Digillect.Mvvm.UI;
+
 namespace Digillect.Mvvm.Services
 {
-	internal class PageDecorationService : IPageDecorationService
+	public sealed class PageDecorationService : IPageDecorationService
 	{
 		private readonly List<IPageDecorator> decorators = new List<IPageDecorator>();
 

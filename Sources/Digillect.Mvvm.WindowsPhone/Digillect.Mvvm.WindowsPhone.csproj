@@ -80,9 +80,6 @@
     <Reference Include="AsyncCtpLibrary_Phone, Version=1.1.4304.19911, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\AsyncCtp.1.0.0\lib\sl4-windowsphone71\AsyncCtpLibrary_Phone.dll</HintPath>
     </Reference>
-    <Reference Include="Autofac">
-      <HintPath>..\packages\Autofac.2.6.1.841\lib\SL4-WindowsPhone71\Autofac.dll</HintPath>
-    </Reference>
     <Reference Include="Digillect, Version=4.0.0.0, Culture=neutral, PublicKeyToken=46fb24501f5dffcf, processorArchitecture=MSIL">
       <HintPath>..\packages\DCL.Core.4.0.0.0\lib\sl4-windowsphone71\Digillect.dll</HintPath>
     </Reference>
@@ -101,19 +98,18 @@
     <Compile Include="..\AssemblySharedInfo.cs">
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
-    <Compile Include="Configuration\WindowsPhoneModule.cs" />
-    <Compile Include="EntityPage.cs" />
+    <Compile Include="UI\EntityPage.cs" />
     <Compile Include="Services\IPageDecorator.cs" />
-    <Compile Include="NavigationServiceExtensions.cs" />
-    <Compile Include="PageDataContext.cs" />
+    <Compile Include="UI\NavigationServiceExtensions.cs" />
+    <Compile Include="UI\PageDataContext.cs" />
     <Compile Include="Services\IPageDecorationService.cs" />
     <Compile Include="Services\PageDecorationService.cs" />
-    <Compile Include="PhoneApplication.cs" />
-    <Compile Include="PhoneApplicationPage.cs" />
+    <Compile Include="UI\PhoneApplication.cs" />
+    <Compile Include="UI\PhoneApplicationPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\NetworkAvailabilityService.cs" />
-    <Compile Include="ViewModelPage.cs" />
-    <Compile Include="ViewModelPageDataContext.cs" />
+    <Compile Include="UI\ViewModelPage.cs" />
+    <Compile Include="UI\ViewModelPageDataContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Digillect.MVVM\Digillect.Mvvm %28WP7%29.csproj">

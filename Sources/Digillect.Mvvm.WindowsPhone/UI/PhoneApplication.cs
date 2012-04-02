@@ -1,26 +1,20 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Navigation;
-
-using Autofac;
 
 using Microsoft.Phone.Controls;
 
-namespace Digillect.Mvvm
+namespace Digillect.Mvvm.UI
 {
 	/// <summary>
-	/// Base class for Windows Phone 7 applications. Implements <see cref="Digillect.Mvvm.ILifetimeScopeProvider"/> and performs registration of services and components.
+	/// Base class for Windows Phone 7 applications.
 	/// </summary>
-	public class PhoneApplication : Application, ILifetimeScopeProvider
+	public class PhoneApplication : Application
 	{
 		/// <summary>
 		/// Gets the application root frame.
 		/// </summary>
 		public PhoneApplicationFrame RootFrame { get; private set; }
-
-		/// <summary>
-		/// Gets the application scope to be used to resolve services and components.
-		/// </summary>
-		public ILifetimeScope Scope { get; private set; }
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -29,7 +23,6 @@ namespace Digillect.Mvvm
 		public PhoneApplication()
 		{
 			InitializePhoneApplication();
-			InitializeIoC();
 		}
 		#endregion
 
@@ -72,28 +65,7 @@ namespace Digillect.Mvvm
 			return new PhoneApplicationFrame();
 		}
 		#endregion
-		
-		#region IoC registration
-		private void InitializeIoC()
-		{
-			var builder = new ContainerBuilder();
 
-			RegisterServices( builder );
-
-			var container = builder.Build();
-
-			this.Scope = container;
-		}
-
-		/// <summary>
-		/// Registers services and components. Override to register your own services and components.
-		/// </summary>
-		/// <param name="builder">The builder.</param>
-		protected virtual void RegisterServices( ContainerBuilder builder )
-		{
-			builder.RegisterModule<Configuration.WindowsPhoneModule>();
-		}
-		#endregion
 		#region Navigation
 		private void RootFrame_NavigationFailed( object sender, NavigationFailedEventArgs e )
 		{
@@ -106,5 +78,30 @@ namespace Digillect.Mvvm
 		/// <param name="e">The <see cref="System.Windows.Navigation.NavigationFailedEventArgs"/> instance containing the event data.</param>
 		protected virtual void HandleNavigationFailed( NavigationFailedEventArgs e ) { }
 		#endregion
+
+		public T GetService<T>()
+		{
+			return (T) GetService( typeof( T ) );
+		}
+
+		public virtual object GetService( Type serviceType )
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <summary>
+		/// Creates new instance of view model.
+		/// </summary>
+		/// <typeparam name="T">Type of view model to create.</typeparam>
+		/// <returns>View model.</returns>
+		public T CreateViewModel<T>() where T : ViewModel
+		{
+			return (T) CreateViewModel( typeof( T ) );
+		}
+
+		public virtual ViewModel CreateViewModel( Type viewModelType )
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

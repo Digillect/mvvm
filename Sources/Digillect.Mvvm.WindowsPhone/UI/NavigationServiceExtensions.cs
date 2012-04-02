@@ -3,7 +3,7 @@ using System.Diagnostics.Contracts;
 using System.Windows;
 using System.Windows.Navigation;
 
-namespace Digillect.Mvvm
+namespace Digillect.Mvvm.UI
 {
 	/// <summary>
 	/// Extensions to help using <see cref="System.Windows.Navigation.NavigationService"/> class.

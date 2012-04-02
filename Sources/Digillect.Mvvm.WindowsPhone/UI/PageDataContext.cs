@@ -4,7 +4,7 @@ using System.Windows;
 
 using Digillect.Mvvm.Services;
 
-namespace Digillect.Mvvm
+namespace Digillect.Mvvm.UI
 {
 	/// <summary>
 	/// Instances of this class are used by MVVM infrastructure to support data binding.

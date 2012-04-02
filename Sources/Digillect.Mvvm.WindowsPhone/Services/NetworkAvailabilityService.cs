@@ -4,11 +4,9 @@ using System.Threading.Tasks;
 
 using Microsoft.Phone.Net.NetworkInformation;
 
-using Autofac;
-
 namespace Digillect.Mvvm.Services
 {
-	internal sealed class NetworkAvailabilityService : INetworkAvailabilityService, IStartable
+	public sealed class NetworkAvailabilityService : INetworkAvailabilityService
 	{
 		public void Start()
 		{

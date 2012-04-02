@@ -3,3 +3,4 @@ obj/
 obj.WP7/
 *.suo
 *.user
+*.vsdoc
