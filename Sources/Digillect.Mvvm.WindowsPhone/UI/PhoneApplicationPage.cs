@@ -26,6 +26,9 @@ namespace Digillect.Mvvm.UI
 		}
 		#endregion
 
+		/// <summary>
+		/// Gets the current application.
+		/// </summary>
 		public PhoneApplication CurrentApplication
 		{
 			get { return (PhoneApplication) Application.Current; }
