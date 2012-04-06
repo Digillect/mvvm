@@ -79,41 +79,26 @@ namespace Digillect.Mvvm.UI
 		protected virtual void HandleNavigationFailed( NavigationFailedEventArgs e ) { }
 		#endregion
 
-		/// <summary>
-		/// Gets the service.
-		/// </summary>
-		/// <typeparam name="T">Type of the service to return.</typeparam>
-		/// <returns>Instance of the requested service.</returns>
 		public T GetService<T>()
 		{
 			return (T) GetService( typeof( T ) );
 		}
 
-		/// <summary>
-		/// Gets the service.
-		/// </summary>
-		/// <param name="serviceType">Type of the service.</param>
-		/// <returns>Instance of the requested service.</returns>
 		public virtual object GetService( Type serviceType )
 		{
 			throw new NotImplementedException();
 		}
 
 		/// <summary>
-		/// Creates new instance of the view model.
+		/// Creates new instance of view model.
 		/// </summary>
-		/// <typeparam name="T">Type of the view model.</typeparam>
+		/// <typeparam name="T">Type of view model to create.</typeparam>
 		/// <returns>View model.</returns>
 		public T CreateViewModel<T>() where T : ViewModel
 		{
 			return (T) CreateViewModel( typeof( T ) );
 		}
 
-		/// <summary>
-		/// Creates new instance of the view model.
-		/// </summary>
-		/// <param name="viewModelType">Type of the view model.</param>
-		/// <returns>View model.</returns>
 		public virtual ViewModel CreateViewModel( Type viewModelType )
 		{
 			throw new NotImplementedException();

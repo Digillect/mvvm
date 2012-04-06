@@ -6,15 +6,9 @@ using Microsoft.Phone.Net.NetworkInformation;
 
 namespace Digillect.Mvvm.Services
 {
-	/// <summary>
-	/// Default implementation of <see cref="Digillect.Mvvm.Services.INetworkAvailabilityService"/> for Windows Phone 7.
-	/// </summary>
 	public sealed class NetworkAvailabilityService : INetworkAvailabilityService
 	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="NetworkAvailabilityService"/> class.
-		/// </summary>
-		public NetworkAvailabilityService()
+		public void Start()
 		{
 			NetworkAvailable = true;
 			NetworkChange.NetworkAddressChanged += NetworkChange_NetworkAddressChanged;
@@ -22,16 +16,7 @@ namespace Digillect.Mvvm.Services
 			NetworkChange_NetworkAddressChanged( null, EventArgs.Empty );
 		}
 
-		/// <summary>
-		/// Gets a value indicating whether network connection is available.
-		/// </summary>
-		/// <value>
-		/// 	<c>true</c> if network connection available; otherwise, <c>false</c>.
-		/// </value>
 		public bool NetworkAvailable { get; private set; }
-		/// <summary>
-		/// Occurs when network availability changed.
-		/// </summary>
 		public event EventHandler NetworkAvailabilityChanged;
 
 		private async void NetworkChange_NetworkAddressChanged( object sender, EventArgs e )
