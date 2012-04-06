@@ -112,18 +112,24 @@
     <Compile Include="..\AssemblySharedInfo.cs">
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
-    <Compile Include="Application.cs" />
-    <Compile Include="EntityPage.cs" />
-    <Compile Include="EntityPage`1.cs" />
-    <Compile Include="Page.cs" />
-    <Compile Include="PageDataContext.cs" />
+    <Compile Include="Configuration\WinRTModule.cs" />
+    <Compile Include="UI\Application.cs" />
+    <Compile Include="UI\EntityPage.cs" />
+    <Compile Include="UI\EntityPage`1.cs" />
+    <Compile Include="UI\Page.cs" />
+    <Compile Include="UI\PageDataContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\NetworkAvailabilityService.cs" />
-    <Compile Include="ViewModelPage.cs" />
-    <Compile Include="ViewModelPage`1.cs" />
-    <Compile Include="ViewModelPageDataContext.cs" />
+    <Compile Include="UI\ViewModelPage.cs" />
+    <Compile Include="UI\ViewModelPage`1.cs" />
+    <Compile Include="UI\ViewModelPageDataContext.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=2.6.1.841, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Autofac.2.6.1.841\lib\winrt45\Autofac.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Digillect, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\DCL.Core.4.0.0\lib\winrt45\Digillect.dll</HintPath>
@@ -138,9 +144,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Configuration\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
   </PropertyGroup>
