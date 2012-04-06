@@ -4,6 +4,8 @@ using System.Windows.Navigation;
 
 using Microsoft.Phone.Controls;
 
+using Autofac;
+
 namespace Digillect.Mvvm.UI
 {
 	/// <summary>
@@ -15,6 +17,10 @@ namespace Digillect.Mvvm.UI
 		/// Gets the application root frame.
 		/// </summary>
 		public PhoneApplicationFrame RootFrame { get; private set; }
+		/// <summary>
+		/// Gets the IoC scope.
+		/// </summary>
+		public ILifetimeScope Scope { get; private set; }
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -23,6 +29,7 @@ namespace Digillect.Mvvm.UI
 		public PhoneApplication()
 		{
 			InitializePhoneApplication();
+			InitializeIoC();
 		}
 		#endregion
 
@@ -79,29 +86,24 @@ namespace Digillect.Mvvm.UI
 		protected virtual void HandleNavigationFailed( NavigationFailedEventArgs e ) { }
 		#endregion
 
-		public T GetService<T>()
+		#region IoC Support
+		private void InitializeIoC()
 		{
-			return (T) GetService( typeof( T ) );
-		}
+			var builder = new ContainerBuilder();
 
-		public virtual object GetService( Type serviceType )
-		{
-			throw new NotImplementedException();
+			RegisterServices( builder );
+
+			this.Scope = builder.Build();
 		}
 
 		/// <summary>
-		/// Creates new instance of view model.
+		/// Registers available services.
 		/// </summary>
-		/// <typeparam name="T">Type of view model to create.</typeparam>
-		/// <returns>View model.</returns>
-		public T CreateViewModel<T>() where T : ViewModel
+		/// <param name="builder">The builder.</param>
+		protected virtual void RegisterServices( ContainerBuilder builder )
 		{
-			return (T) CreateViewModel( typeof( T ) );
+			builder.RegisterModule<Configuration.WindowsPhoneModule>();
 		}
-
-		public virtual ViewModel CreateViewModel( Type viewModelType )
-		{
-			throw new NotImplementedException();
-		}
+		#endregion
 	}
 }

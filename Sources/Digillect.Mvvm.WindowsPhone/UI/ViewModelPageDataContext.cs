@@ -1,6 +1,7 @@
 using System;
 
 using Digillect.Mvvm.Services;
+using System.Diagnostics.Contracts;
 
 namespace Digillect.Mvvm.UI
 {
@@ -27,6 +28,9 @@ namespace Digillect.Mvvm.UI
 		public ViewModelPageDataContext( PhoneApplicationPage page, ViewModel viewModel, INetworkAvailabilityService networkAvailabilityService )
 			: base( page, networkAvailabilityService )
 		{
+			Contract.Requires( page != null );
+			Contract.Requires( networkAvailabilityService != null );
+
 			this.ViewModel = viewModel;
 		}
 		#endregion
