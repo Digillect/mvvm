@@ -22,12 +22,12 @@ namespace Digillect.Mvvm.Configuration
 			base.Load( builder );
 
 			// Services
-			builder.Register( c => new NetworkAvailabilityService() ).As<INetworkAvailabilityService>().SingleInstance();
-			builder.Register( c => new PageDecorationService() ).As<IPageDecorationService>().SingleInstance();
+			builder.RegisterType<NetworkAvailabilityService>().As<INetworkAvailabilityService>().SingleInstance();
+			builder.RegisterType<PageDecorationService>().As<IPageDecorationService>().SingleInstance();
 
 			// Parts
-			builder.RegisterType<PageDataContext>().AsSelf();
-			builder.RegisterType<ViewModelPageDataContext>().AsSelf();
+			builder.RegisterType<UI.PageDataContext>().AsSelf();
+			builder.RegisterType<UI.ViewModelPageDataContext>().AsSelf();
 		}
 	}
 }

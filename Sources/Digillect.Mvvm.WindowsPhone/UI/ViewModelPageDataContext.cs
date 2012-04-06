@@ -6,7 +6,7 @@ using System.Diagnostics.Contracts;
 namespace Digillect.Mvvm.UI
 {
 	/// <summary>
-	/// Instances of this class are used by <see cref="Digillect.Mvvm.ViewModelPage{TViewModel}"/> and descendants to provide data binding support.
+	/// Instances of this class are used by <see cref="Digillect.Mvvm.UI.ViewModelPage{TViewModel}"/> and descendants to provide data binding support.
 	/// </summary>
 	public class ViewModelPageDataContext : PageDataContext
 	{
