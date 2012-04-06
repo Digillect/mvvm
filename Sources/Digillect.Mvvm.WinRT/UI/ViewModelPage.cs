@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autofac;
+
 namespace Digillect.Mvvm.UI
 {
 	public class ViewModelPage : Page
@@ -35,9 +37,6 @@ namespace Digillect.Mvvm.UI
 
 		protected override void OnPageDestroyed()
 		{
-			if( this.viewModel is IDisposable )
-				((IDisposable) this.viewModel).Dispose();
-
 			this.viewModel = null;
 			
 			base.OnPageDestroyed();
@@ -50,7 +49,7 @@ namespace Digillect.Mvvm.UI
 		/// </returns>
 		protected override PageDataContext CreateDataContext()
 		{
-			return new ViewModelPageDataContext( this, this.viewModel, CurrentApplication.GetService<Digillect.Mvvm.Services.INetworkAvailabilityService>() );
+			return this.Scope.Resolve<ViewModelPageDataContext.Factory>()( this, this.viewModel );
 		}
 		#endregion
 

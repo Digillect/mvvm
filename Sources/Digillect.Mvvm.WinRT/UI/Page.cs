@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.IO;
 using System.Linq;
+
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
@@ -14,9 +17,9 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
+using Autofac;
+
 using Digillect.Mvvm.Services;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace Digillect.Mvvm.UI
 {
@@ -26,7 +29,7 @@ namespace Digillect.Mvvm.UI
 	[Windows.Foundation.Metadata.WebHostHidden]
 	public class Page : Windows.UI.Xaml.Controls.Page, INotifyPropertyChanged
 	{
-		private PageDataContext dataContext;
+		private ILifetimeScope scope;
 		private bool useFilledStateForNarrowWindow;
 		private List<Control> layoutAwareControls;
 
@@ -47,6 +50,11 @@ namespace Digillect.Mvvm.UI
 		#endregion
 
 		#region Protected Properties
+		public ILifetimeScope Scope
+		{
+			get { return this.scope; }
+		}
+
 		protected Digillect.Mvvm.UI.Application CurrentApplication
 		{
 			get { return (Digillect.Mvvm.UI.Application) Application.Current; }
@@ -58,13 +66,18 @@ namespace Digillect.Mvvm.UI
 
 		protected bool SetProperty<T>( ref T storage, T value, [CallerMemberName] string propertyName = null )
 		{
-			if( !object.Equals( storage, value ) )
+			if( object.Equals( storage, value ) )
 				return false;
 
 			storage = value;
 			OnPropertyChanged( new PropertyChangedEventArgs( propertyName ) );
 
 			return true;
+		}
+
+		protected void OnPropertyChanged( string propertyName )
+		{
+			OnPropertyChanged( new PropertyChangedEventArgs( propertyName ) );
 		}
 
 		protected virtual void OnPropertyChanged( PropertyChangedEventArgs e )
@@ -85,12 +98,13 @@ namespace Digillect.Mvvm.UI
 		{
 			base.OnNavigatedTo( e );
 
-			if( this.dataContext == null )
+			if( this.scope == null )
 			{
+				this.scope = CurrentApplication.Scope.BeginLifetimeScope();
+
 				OnPageCreated();
 
-				this.dataContext = CreateDataContext();
-				DataContext = this.dataContext;
+				DataContext = CreateDataContext();
 			}
 			else
 			{
@@ -108,10 +122,10 @@ namespace Digillect.Mvvm.UI
 			{
 				OnPageDestroyed();
 
-				if( this.dataContext != null )
+				if( this.scope != null )
 				{
-					this.dataContext.Dispose();
-					this.dataContext = null;
+					this.scope.Dispose();
+					this.scope = null;
 				}
 			}
 			else
@@ -130,7 +144,9 @@ namespace Digillect.Mvvm.UI
 		/// <returns>Data context that will be set to <see cref="DataContext"/> property.</returns>
 		protected virtual PageDataContext CreateDataContext()
 		{
-			return new PageDataContext( this, CurrentApplication.GetService<INetworkAvailabilityService>() );
+			var factory = this.Scope.Resolve<PageDataContext.Factory>();
+
+			return factory( this );
 		}
 
 		/// <summary>

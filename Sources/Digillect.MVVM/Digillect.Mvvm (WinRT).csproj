@@ -107,6 +107,11 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=2.6.1.841, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Autofac.2.6.1.841\lib\winrt45\Autofac.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Digillect, Version=4.0.0.0, Culture=neutral, PublicKeyToken=46fb24501f5dffcf, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\DCL.Core.4.0.0\lib\winrt45\Digillect.dll</HintPath>
@@ -117,6 +122,8 @@
     <Compile Include="..\AssemblySharedInfo.cs">
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
+    <Compile Include="Configuration\Module.cs" />
+    <Compile Include="Configuration\RegistrationExtensions.cs" />
     <Compile Include="EntitySession.cs" />
     <Compile Include="EntityViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -135,9 +142,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Configuration\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
   </PropertyGroup>

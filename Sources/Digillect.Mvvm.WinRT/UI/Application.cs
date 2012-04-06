@@ -13,6 +13,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
+using Autofac;
+
 namespace Digillect.Mvvm.UI
 {
 	/// <summary>
@@ -26,12 +28,15 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		public Frame RootFrame { get; private set; }
 
+		public ILifetimeScope Scope { get; private set; }
+
 		#region Constructors/Disposer
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Application"/> class.
 		/// </summary>
 		public Application()
 		{
+			InitializeIoC();
 			this.Suspending += ( s, e ) => HandleSuspension( e );
 		}
 		#endregion
@@ -78,29 +83,18 @@ namespace Digillect.Mvvm.UI
 		protected virtual void HandleNavigationFailed( NavigationFailedEventArgs e ) { }
 		#endregion
 
-		public T GetService<T>() where T : class
+		private void InitializeIoC()
 		{
-			return (T) GetService( typeof( T ) );
+			var builder = new ContainerBuilder();
+
+			RegisterServices( builder );
+
+			this.Scope = builder.Build();
 		}
 
-		public virtual object GetService( Type serviceType )
+		protected virtual void RegisterServices( ContainerBuilder builder )
 		{
-			throw new NotImplementedException();
-		}
-
-		/// <summary>
-		/// Creates new instance of view model.
-		/// </summary>
-		/// <typeparam name="T">Type of view model to create.</typeparam>
-		/// <returns>View model.</returns>
-		public T CreateViewModel<T>() where T : ViewModel
-		{
-			return (T) CreateViewModel( typeof( T ) );
-		}
-
-		public virtual ViewModel CreateViewModel( Type viewModelType )
-		{
-			throw new NotImplementedException();
+			builder.RegisterModule<Configuration.WinRTModule>();
 		}
 	}
 }

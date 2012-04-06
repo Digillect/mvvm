@@ -94,12 +94,12 @@ namespace Digillect.Mvvm.UI
 		}
 		#endregion
 
-		private void NetworkExchangeService_NetworkAvailabilityChanged( object sender, EventArgs e )
+		private async void NetworkExchangeService_NetworkAvailabilityChanged( object sender, EventArgs e )
 		{
 			if( this.page.Dispatcher.HasThreadAccess )
 				this.NetworkAvailable = this.networkAvailabilityService.NetworkAvailable;
 			else
-				this.page.Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, () => this.NetworkAvailable = this.networkAvailabilityService.NetworkAvailable );
+				await this.page.Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, () => this.NetworkAvailable = this.networkAvailabilityService.NetworkAvailable );
 		}
 	}
 }
