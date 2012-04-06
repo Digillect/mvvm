@@ -8,7 +8,7 @@ namespace Digillect.Mvvm.Services
 	/// <summary>
 	/// Default implementation of <see cref="IPageDecorationService"/>.
 	/// </summary>
-	public sealed class PageDecorationService : IPageDecorationService
+	internal sealed class PageDecorationService : IPageDecorationService
 	{
 		private readonly List<IPageDecorator> decorators = new List<IPageDecorator>();
 

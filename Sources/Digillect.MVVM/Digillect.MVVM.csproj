@@ -74,6 +74,9 @@
     <Reference Include="AsyncCtpLibrary, Version=1.0.4107.18181, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\AsyncCtp.1.0.0\lib\net40\AsyncCtpLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="Autofac, Version=2.6.1.841, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.2.6.1.841\lib\NET40\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="Digillect, Version=4.0.0.0, Culture=neutral, PublicKeyToken=46fb24501f5dffcf, processorArchitecture=MSIL">
       <HintPath>..\packages\DCL.Core.4.0.0.0\lib\net40\Digillect.dll</HintPath>
     </Reference>
@@ -85,6 +88,8 @@
     <Compile Include="..\AssemblySharedInfo.cs">
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
+    <Compile Include="Configuration\Module.cs" />
+    <Compile Include="Configuration\RegistrationExtensions.cs" />
     <Compile Include="EntitySession.cs" />
     <Compile Include="EntityViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

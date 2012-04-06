@@ -6,6 +6,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Navigation;
 
+using Autofac;
+
 namespace Digillect.Mvvm.UI
 {
 	/// <summary>
@@ -38,7 +40,7 @@ namespace Digillect.Mvvm.UI
 
 			if( !IsInDesignMode )
 			{
-				this.viewModel = CurrentApplication.CreateViewModel<TViewModel>();
+				this.viewModel = this.Scope.Resolve<TViewModel>();
 				InitialLoadData();
 			}
 		}
@@ -53,7 +55,7 @@ namespace Digillect.Mvvm.UI
 
 			if( !IsInDesignMode )
 			{
-				this.viewModel = CurrentApplication.CreateViewModel<TViewModel>();
+				this.viewModel = this.Scope.Resolve<TViewModel>();
 				InitialLoadData();
 			}
 		}
@@ -66,7 +68,7 @@ namespace Digillect.Mvvm.UI
 		/// </returns>
 		protected override PageDataContext CreateDataContext()
 		{
-			return new ViewModelPageDataContext( this, this.viewModel, CurrentApplication.GetService<Digillect.Mvvm.Services.INetworkAvailabilityService>() );
+			return this.Scope.Resolve<ViewModelPageDataContext.Factory>()( this, this.viewModel );
 		}
 		#endregion
 
