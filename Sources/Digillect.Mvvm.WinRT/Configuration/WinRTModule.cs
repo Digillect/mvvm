@@ -18,6 +18,7 @@ namespace Digillect.Mvvm.Configuration
 
 			// Services
 			builder.RegisterType<NetworkAvailabilityService>().As<INetworkAvailabilityService>().SingleInstance();
+			builder.RegisterType<PageDecorationService>().As<IPageDecorationService>().SingleInstance();
 
 			// Data contexts
 			builder.RegisterType<UI.PageDataContext>().AsSelf();

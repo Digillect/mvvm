@@ -139,6 +139,13 @@ namespace Digillect.Mvvm
 
 			return (T) this.Parameters[name];
 		}
+
+		public Session AddParameter( string name, object value )
+		{
+			this.Parameters[name] = value;
+
+			return this;
+		}
 		#endregion
 	}
 }

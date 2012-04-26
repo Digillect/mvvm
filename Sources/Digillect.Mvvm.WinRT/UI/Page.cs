@@ -26,7 +26,6 @@ namespace Digillect.Mvvm.UI
 	/// <summary>
 	/// Base for application pages.
 	/// </summary>
-	[Windows.Foundation.Metadata.WebHostHidden]
 	public class Page : Windows.UI.Xaml.Controls.Page, INotifyPropertyChanged
 	{
 		private ILifetimeScope scope;
@@ -58,6 +57,11 @@ namespace Digillect.Mvvm.UI
 		protected Digillect.Mvvm.UI.Application CurrentApplication
 		{
 			get { return (Digillect.Mvvm.UI.Application) Application.Current; }
+		}
+
+		public PageDataContext Context
+		{
+			get { return (dynamic) DataContext; }
 		}
 		#endregion
 
@@ -102,9 +106,11 @@ namespace Digillect.Mvvm.UI
 			{
 				this.scope = CurrentApplication.Scope.BeginLifetimeScope();
 
+				DataContext = CreateDataContext();
+
 				OnPageCreated();
 
-				DataContext = CreateDataContext();
+				this.Scope.Resolve<IPageDecorationService>().AddDecoration( this );
 			}
 			else
 			{
@@ -121,6 +127,8 @@ namespace Digillect.Mvvm.UI
 			if( e.NavigationMode == NavigationMode.Back )
 			{
 				OnPageDestroyed();
+
+				this.Scope.Resolve<IPageDecorationService>().RemoveDecoration( this );
 
 				if( this.scope != null )
 				{

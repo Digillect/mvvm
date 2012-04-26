@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace Digillect.Mvvm
 		where TEntity : XObject<TId>
 	{
 		private TEntity entity;
+		private readonly Dictionary<string, Func<EntitySession<TId>, Task>> parts = new Dictionary<string, Func<EntitySession<TId>, Task>>();
 
 		#region Public Properties
 		/// <summary>
@@ -40,6 +42,19 @@ namespace Digillect.Mvvm
 			}
 		}
 		#endregion
+
+		/// <summary>
+		/// Registers handler of multipart loader.
+		/// </summary>
+		/// <param name="part">Part identifier.</param>
+		/// <param name="loader">Loader to handle specified part.</param>
+		protected void RegisterPart( string part, Func<EntitySession<TId>, Task> loader )
+		{
+			Contract.Assert( part != null );
+			Contract.Assert( loader != null );
+
+			this.parts[part] = loader;
+		}
 
 		#region Load
 		/// <summary>
@@ -104,6 +119,14 @@ namespace Digillect.Mvvm
 
 			if( entitySession.IsEntity )
 				entitySession.Tasks.Add( LoadEntity( entitySession ) );
+
+			foreach( var pair in this.parts )
+			{
+				if( entitySession.Includes( pair.Key ) )
+				{
+					entitySession.Tasks.Add( pair.Value( entitySession ) );
+				}
+			}
 		}
 
 		/// <summary>

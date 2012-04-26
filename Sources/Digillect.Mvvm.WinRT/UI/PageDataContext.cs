@@ -1,6 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Dynamic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 using Digillect.Mvvm.Services;
+using Windows.Foundation.Collections;
 
 namespace Digillect.Mvvm.UI
 {
@@ -17,8 +23,7 @@ namespace Digillect.Mvvm.UI
 		public delegate PageDataContext Factory( Page page );
 
 		private readonly Page page;
-		private readonly INetworkAvailabilityService networkAvailabilityService;
-		private bool networkAvailable;
+		private readonly ObservableDictionary values = new ObservableDictionary();
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -26,17 +31,9 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		/// <param name="page">The page used in this context.</param>
 		/// <param name="networkAvailabilityService">The network availability service (provided by container).</param>
-		public PageDataContext( Page page, INetworkAvailabilityService networkAvailabilityService )
+		public PageDataContext( Page page )
 		{
 			this.page = page;
-			this.networkAvailabilityService = networkAvailabilityService;
-
-			if( this.networkAvailabilityService != null )
-			{
-				this.networkAvailable = this.networkAvailabilityService.NetworkAvailable;
-
-				this.networkAvailabilityService.NetworkAvailabilityChanged += NetworkExchangeService_NetworkAvailabilityChanged;
-			}
 		}
 
 		/// <summary>
@@ -64,11 +61,6 @@ namespace Digillect.Mvvm.UI
 		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
 		protected virtual void Dispose( bool disposing )
 		{
-			if( disposing )
-			{
-				if( this.networkAvailabilityService != null )
-					this.networkAvailabilityService.NetworkAvailabilityChanged -= NetworkExchangeService_NetworkAvailabilityChanged;
-			}
 		}
 		#endregion
 
@@ -81,25 +73,170 @@ namespace Digillect.Mvvm.UI
 			get { return this.page; }
 		}
 
-		/// <summary>
-		/// Gets a value indicating whether network connection is available.
-		/// </summary>
-		/// <value>
-		///   <c>true</c> if network connection is available; otherwise, <c>false</c>.
-		/// </value>
-		public bool NetworkAvailable
+		public IObservableMap<string, object> Values
 		{
-			get { return networkAvailable; }
-			private set { SetProperty( ref this.networkAvailable, value ); }
+			get { return this.values; }
 		}
 		#endregion
 
-		private async void NetworkExchangeService_NetworkAvailabilityChanged( object sender, EventArgs e )
+		#region ObservableDictionary
+		private class ObservableDictionary : IObservableMap<string, object>
 		{
-			if( this.page.Dispatcher.HasThreadAccess )
-				this.NetworkAvailable = this.networkAvailabilityService.NetworkAvailable;
-			else
-				await this.page.Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, () => this.NetworkAvailable = this.networkAvailabilityService.NetworkAvailable );
+			private Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+			public event MapChangedEventHandler<string, object> MapChanged;
+
+			/*
+			public override bool TryGetMember( GetMemberBinder binder, out object result )
+			{
+				return this.dictionary.TryGetValue( binder.Name, out result );
+			}
+
+			public override bool TrySetMember( SetMemberBinder binder, object value )
+			{
+				this.dictionary[binder.Name] = value;
+				InvokeMapChanged( CollectionChange.ItemChanged, binder.Name );
+
+				return true;
+			}
+			*/
+			private void InvokeMapChanged( CollectionChange change, string key )
+			{
+				var eventHandler = MapChanged;
+				if( eventHandler != null )
+				{
+					eventHandler( this, new ObservableDictionaryChangedEventArgs( CollectionChange.ItemInserted, key ) );
+				}
+			}
+
+			public void Add( string key, object value )
+			{
+				this.dictionary.Add( key, value );
+				this.InvokeMapChanged( CollectionChange.ItemInserted, key );
+			}
+
+			public void Add( KeyValuePair<string, object> item )
+			{
+				this.Add( item.Key, item.Value );
+			}
+
+			public bool Remove( string key )
+			{
+				if( this.dictionary.Remove( key ) )
+				{
+					this.InvokeMapChanged( CollectionChange.ItemRemoved, key );
+					return true;
+				}
+
+				return false;
+			}
+
+			public bool Remove( KeyValuePair<string, object> item )
+			{
+				object currentValue;
+
+				if( this.dictionary.TryGetValue( item.Key, out currentValue ) &&
+					Object.Equals( item.Value, currentValue ) && this.dictionary.Remove( item.Key ) )
+				{
+					this.InvokeMapChanged( CollectionChange.ItemRemoved, item.Key );
+					return true;
+				}
+
+				return false;
+			}
+
+			public object this[string key]
+			{
+				get { return this.dictionary[key]; }
+				set
+				{
+					this.dictionary[key] = value;
+					this.InvokeMapChanged( CollectionChange.ItemChanged, key );
+				}
+			}
+
+			public void Clear()
+			{
+				var priorKeys = this.dictionary.Keys.ToArray();
+
+				this.dictionary.Clear();
+
+				foreach( var key in priorKeys )
+				{
+					this.InvokeMapChanged( CollectionChange.ItemRemoved, key );
+				}
+			}
+
+			public ICollection<string> Keys
+			{
+				get { return this.dictionary.Keys; }
+			}
+
+			public bool ContainsKey( string key )
+			{
+				return this.dictionary.ContainsKey( key );
+			}
+
+			public bool TryGetValue( string key, out object value )
+			{
+				return this.dictionary.TryGetValue( key, out value );
+			}
+
+			public ICollection<object> Values
+			{
+				get { return this.dictionary.Values; }
+			}
+
+			public bool Contains( KeyValuePair<string, object> item )
+			{
+				return this.dictionary.Contains( item );
+			}
+
+			public int Count
+			{
+				get { return this.dictionary.Count; }
+			}
+
+			public bool IsReadOnly
+			{
+				get { return false; }
+			}
+
+			public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+			{
+				return this.dictionary.GetEnumerator();
+			}
+
+			System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			{
+				return this.dictionary.GetEnumerator();
+			}
+
+			public void CopyTo( KeyValuePair<string, object>[] array, int arrayIndex )
+			{
+				int arraySize = array.Length;
+
+				foreach( var pair in this.dictionary )
+				{
+					if( arrayIndex >= arraySize ) break;
+					array[arrayIndex++] = pair;
+				}
+			}
+
+			#region private class ObservableDictionaryChangedEventArgs
+			private class ObservableDictionaryChangedEventArgs : IMapChangedEventArgs<string>
+			{
+				public ObservableDictionaryChangedEventArgs( CollectionChange change, string key )
+				{
+					this.CollectionChange = change;
+					this.Key = key;
+				}
+
+				public CollectionChange CollectionChange { get; private set; }
+				public string Key { get; private set; }
+			}
+			#endregion
 		}
+		#endregion
 	}
 }

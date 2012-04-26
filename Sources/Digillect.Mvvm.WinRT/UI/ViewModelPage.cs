@@ -30,7 +30,6 @@ namespace Digillect.Mvvm.UI
 
 			if( !Windows.ApplicationModel.DesignMode.DesignModeEnabled )
 			{
-				this.viewModel = CreateViewModel();
 				InitialLoadData();
 			}
 		}
@@ -41,6 +40,7 @@ namespace Digillect.Mvvm.UI
 			
 			base.OnPageDestroyed();
 		}
+
 		/// <summary>
 		/// Creates data context to be set for the page. Override to create your own data context.
 		/// </summary>
@@ -49,7 +49,9 @@ namespace Digillect.Mvvm.UI
 		/// </returns>
 		protected override PageDataContext CreateDataContext()
 		{
-			return this.Scope.Resolve<ViewModelPageDataContext.Factory>()( this, this.viewModel );
+			this.viewModel = CreateViewModel();
+
+			return Scope.Resolve<ViewModelPageDataContext.Factory>()( this, this.viewModel );
 		}
 		#endregion
 

@@ -84,5 +84,12 @@ namespace Digillect.Mvvm
 
 			return this.part == part;
 		}
+
+		public new EntitySession<TId> AddParameter( string name, object value )
+		{
+			this.Parameters[name] = value;
+
+			return this;
+		}
 	}
 }
