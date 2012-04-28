@@ -117,8 +117,10 @@
     <Compile Include="Services\IPageDecorator.cs" />
     <Compile Include="Services\PageDecorationService.cs" />
     <Compile Include="UI\Application.cs" />
+    <Compile Include="UI\Breadcrumb.cs" />
     <Compile Include="UI\EntityPage.cs" />
     <Compile Include="UI\EntityPage`1.cs" />
+    <Compile Include="UI\NavigationParameters.cs" />
     <Compile Include="UI\Page.cs" />
     <Compile Include="UI\PageDataContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

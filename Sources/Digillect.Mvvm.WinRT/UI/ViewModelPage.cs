@@ -24,13 +24,16 @@ namespace Digillect.Mvvm.UI
 		/// This method is called when page is visited for the very first time. You should perform
 		/// initialization and create one-time initialized resources here.
 		/// </summary>
-		protected override void OnPageCreated()
+		protected override void OnPageCreated( object parameter )
 		{
-			base.OnPageCreated();
+			base.OnPageCreated( parameter );
 
 			if( !Windows.ApplicationModel.DesignMode.DesignModeEnabled )
 			{
-				InitialLoadData();
+				if( parameter == null || parameter is NavigationParameters )
+				{
+					InitialLoadData( (NavigationParameters) parameter );
+				}
 			}
 		}
 
@@ -72,7 +75,7 @@ namespace Digillect.Mvvm.UI
 		/// or resurrected from thombstombing if no other state-saving scenario exists. Default implementation
 		/// does nothing.
 		/// </summary>
-		protected virtual void InitialLoadData()
+		protected virtual void InitialLoadData( NavigationParameters parameter )
 		{
 			throw new NotImplementedException();
 		}

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -14,6 +17,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 using Autofac;
+using System.Text;
 
 namespace Digillect.Mvvm.UI
 {
@@ -27,7 +31,6 @@ namespace Digillect.Mvvm.UI
 		/// Gets the application root frame.
 		/// </summary>
 		public Frame RootFrame { get; private set; }
-
 		public ILifetimeScope Scope { get; private set; }
 
 		#region Constructors/Disposer
@@ -59,7 +62,17 @@ namespace Digillect.Mvvm.UI
 		protected virtual void HandleLaunch( LaunchActivatedEventArgs e )
 		{
 		}
-		#endregion
+
+		protected void SaveState()
+		{
+			SaveBreadcrumbs();
+		}
+
+		protected void RestoreStateOrGoToLandingPage( Type pageType )
+		{
+			if( !RestoreBreadcrumbs() )
+				RootFrame.Navigate( pageType );
+		}
 
 		/// <summary>
 		/// Creates application root frame. By default creates instance of <see cref="Windows.UI.Xaml.Controls.Frame"/>, override
@@ -70,6 +83,8 @@ namespace Digillect.Mvvm.UI
 		{
 			return new Frame();
 		}
+		#endregion
+
 		#region Navigation
 		private void RootFrame_NavigationFailed( object sender, NavigationFailedEventArgs e )
 		{
@@ -83,6 +98,7 @@ namespace Digillect.Mvvm.UI
 		protected virtual void HandleNavigationFailed( NavigationFailedEventArgs e ) { }
 		#endregion
 
+		#region IoC/Services
 		private void InitializeIoC()
 		{
 			var builder = new ContainerBuilder();
@@ -96,5 +112,148 @@ namespace Digillect.Mvvm.UI
 		{
 			builder.RegisterModule<Configuration.WinRTModule>();
 		}
+		#endregion
+
+		#region Breadcrumbing
+		private readonly Stack<Breadcrumb> breadcrumbs = new Stack<Breadcrumb>();
+
+		internal bool IsUnwinding { get; private set; }
+
+		internal void PushBreadcrumb( Type type, NavigationParameters parameters = null )
+		{
+			this.breadcrumbs.Push( new Breadcrumb( type, parameters ) );
+		}
+
+		internal Breadcrumb PopBreadcrumb( Type pageType )
+		{
+			if( this.breadcrumbs.Count == 0 )
+				return null;
+
+			var bc = this.breadcrumbs.Peek();
+
+			if( bc.Type == pageType )
+			{
+				this.breadcrumbs.Pop();
+
+				return bc;
+			}
+
+			return null;
+		}
+
+		internal Breadcrumb PeekBreadcrumb( Type pageType )
+		{
+			if( this.breadcrumbs.Count == 0 )
+				return null;
+
+			var bc = this.breadcrumbs.Peek();
+
+			if( bc.Type == pageType )
+			{
+				return bc;
+			}
+
+			return null;
+		}
+
+		internal void SaveBreadcrumbs()
+		{
+			string history = null;
+
+			try
+			{
+				using( var stream = new System.IO.MemoryStream() )
+				{
+					using( var writer = new System.IO.BinaryWriter(stream) )
+					{
+						writer.Write( RootFrame.GetNavigationState() );
+						writer.Write( this.breadcrumbs.Count );
+
+						foreach( var breadcrumb in this.breadcrumbs )
+						{
+							writer.Write( breadcrumb.Type.AssemblyQualifiedName );
+							writer.Write( breadcrumb.Parameters != null );
+
+							if( breadcrumb.Parameters != null )
+								breadcrumb.Parameters.WriteTo( writer );
+						}
+
+						writer.Flush();
+
+						history = Convert.ToBase64String( stream.ToArray() );
+					}
+				}
+			}
+			catch
+			{
+			}
+
+			ApplicationData.Current.RoamingSettings.Values["Breadcrumbs"] = history;
+		}
+
+		internal bool RestoreBreadcrumbs( bool clearOnSuccess = true )
+		{
+			if( !ApplicationData.Current.RoamingSettings.Values.ContainsKey( "Breadcrumbs" ) )
+				return false;
+
+			Stack<Breadcrumb> unwind = new Stack<Breadcrumb>();
+			string state = null;
+
+			try
+			{
+				var history = (string) ApplicationData.Current.RoamingSettings.Values["Breadcrumbs"];
+
+				using( var stream = new System.IO.MemoryStream(Convert.FromBase64String( history )) )
+				{
+					using( var reader = new System.IO.BinaryReader(stream) )
+					{
+						state = reader.ReadString();
+						int count = reader.ReadInt32();
+
+						while( count-- > 0 )
+						{
+							var pageTypeName = reader.ReadString();
+							var hasParameters = reader.ReadBoolean();
+							var pageType = Type.GetType( pageTypeName );
+							NavigationParameters parameters = null;
+
+							if( hasParameters )
+							{
+								parameters = new NavigationParameters();
+
+								parameters.ReadFrom( reader );
+							}
+
+							var breadcrumb = new Breadcrumb( pageType, parameters );
+
+							unwind.Push( breadcrumb );
+						}
+					}
+				}
+
+				if( unwind.Count == 0 )
+					return false;
+			}
+			catch
+			{
+				return false;
+			}
+
+			foreach( var bc in unwind )
+				this.breadcrumbs.Push( bc );
+
+			this.IsUnwinding = true;
+
+			RootFrame.SetNavigationState( state );
+
+			this.IsUnwinding = false;
+
+			if( clearOnSuccess )
+				ApplicationData.Current.RoamingSettings.Values["Breadcrumbs"] = null;
+
+			return true;
+		}
+		#endregion
 	}
+
 }

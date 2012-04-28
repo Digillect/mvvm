@@ -31,6 +31,7 @@ namespace Digillect.Mvvm.UI
 		private ILifetimeScope scope;
 		private bool useFilledStateForNarrowWindow;
 		private List<Control> layoutAwareControls;
+		private Breadcrumb breadcrumb;
 
 		#region Constructor
 		/// <summary>
@@ -44,7 +45,9 @@ namespace Digillect.Mvvm.UI
 			// Map application view state to visual state for this page when it is part of the visual tree
 			this.Loaded += this.StartLayoutUpdates;
 			this.Unloaded += this.StopLayoutUpdates;
-			//this.Language = XmlLanguage.GetLanguage( Thread.CurrentThread.CurrentCulture.Name );
+
+			if( CurrentApplication.IsUnwinding )
+				this.breadcrumb = CurrentApplication.PeekBreadcrumb( GetType() );
 		}
 		#endregion
 
@@ -94,6 +97,22 @@ namespace Digillect.Mvvm.UI
 		#endregion
 
 		#region Navigation handling
+		protected void Navigate( Type pageType, NavigationParameters parameters = null )
+		{
+			Frame.Navigate( pageType, parameters );
+		}
+
+		protected void Navigate( Type pageType, string parameter )
+		{
+			Frame.Navigate( pageType, NavigationParameters.From( parameter ) );
+		}
+
+		protected void Navigate<T>( Type pageType, T parameter )
+			where T : struct
+		{
+			Frame.Navigate( pageType, NavigationParameters.From<T>( parameter ) );
+		}
+
 		/// <summary>
 		/// Called when a page becomes the active page in a frame.
 		/// </summary>
@@ -102,13 +121,50 @@ namespace Digillect.Mvvm.UI
 		{
 			base.OnNavigatedTo( e );
 
+			object parameter = null;
+
+			if( e.NavigationMode == NavigationMode.New )
+			{
+				if( this.breadcrumb != null )
+				{
+					parameter = this.breadcrumb.Parameters;
+					this.breadcrumb = null;
+				}
+				else
+				{
+					parameter = e.Parameter;
+
+					if( e.Parameter == null || e.Parameter is NavigationParameters )
+					{
+						CurrentApplication.PushBreadcrumb( GetType(), e.Parameter as NavigationParameters );
+					}
+				}
+			}
+
+			if( e.NavigationMode == NavigationMode.Back )
+			{
+				if( this.scope == null )
+				{
+					// Most probably we're unwinding
+
+					var breadcrumb = CurrentApplication.PeekBreadcrumb( GetType() );
+
+					parameter = breadcrumb.Parameters;
+				}
+			}
+
+			HandleNavigationToPage( parameter );
+		}
+
+		private void HandleNavigationToPage( object parameter )
+		{
 			if( this.scope == null )
 			{
 				this.scope = CurrentApplication.Scope.BeginLifetimeScope();
 
 				DataContext = CreateDataContext();
 
-				OnPageCreated();
+				OnPageCreated( parameter );
 
 				this.Scope.Resolve<IPageDecorationService>().AddDecoration( this );
 			}
@@ -126,12 +182,14 @@ namespace Digillect.Mvvm.UI
 		{
 			if( e.NavigationMode == NavigationMode.Back )
 			{
-				OnPageDestroyed();
+				CurrentApplication.PopBreadcrumb( GetType() );
 
-				this.Scope.Resolve<IPageDecorationService>().RemoveDecoration( this );
+				OnPageDestroyed();
 
 				if( this.scope != null )
 				{
+					this.scope.Resolve<IPageDecorationService>().RemoveDecoration( this );
+
 					this.scope.Dispose();
 					this.scope = null;
 				}
@@ -161,7 +219,7 @@ namespace Digillect.Mvvm.UI
 		/// This method is called when page is visited for the very first time. You should perform
 		/// initialization and create one-time initialized resources here.
 		/// </summary>
-		protected virtual void OnPageCreated()
+		protected virtual void OnPageCreated( object parameter )
 		{
 		}
 
@@ -279,6 +337,15 @@ namespace Digillect.Mvvm.UI
 
 			// Set the initial visual state of the control
 			VisualStateManager.GoToState( control, DetermineVisualState( ApplicationView.Value ), false );
+
+			// If we are restoring state during unwind - kick infrastructure creation
+			if( this.breadcrumb != null )
+			{
+				var parameter = this.breadcrumb.Parameters;
+				this.breadcrumb = null;
+
+				HandleNavigationToPage( parameter );
+			}
 		}
 
 		private void ViewStateChanged( ApplicationView sender, ApplicationViewStateChangedEventArgs e )

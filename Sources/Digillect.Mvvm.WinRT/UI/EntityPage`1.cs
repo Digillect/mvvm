@@ -13,32 +13,17 @@ namespace Digillect.Mvvm.UI
 	/// name <code>Id</code> that is used as entity id for view model. If that parameter is not found then <see cref="System.ArgumentException"/> will be thrown.</remarks>
 	[Windows.Foundation.Metadata.WebHostHidden]
 	public class EntityPage<TId, TEntity, TViewModel> : ViewModelPage<TViewModel>
-		where TId: IComparable<TId>, IEquatable<TId>
+		where TId: struct, IComparable<TId>, IEquatable<TId>
 		where TEntity: XObject<TId>
 		where TViewModel: EntityViewModel<TId, TEntity>
 	{
-		private TId entityId;
-
 		#region InitialLoadData
 		/// <summary>
 		/// Initials the load data.
 		/// </summary>
-		protected override void InitialLoadData()
+		protected override void InitialLoadData( NavigationParameters parameters )
 		{
-			this.ViewModel.Load( this.entityId );
-		}
-		#endregion
-		#region OnNavigatedTo
-		/// <summary>
-		/// Raises the <see cref="E:NavigatedTo"/> event. Used to extract entity identifier from query string.
-		/// </summary>
-		/// <param name="e">The <see cref="NavigationEventArgs"/> instance containing the event data.</param>
-		/// <exception cref="System.ArgumentException">when identifier can't be found in query string.</exception>
-		protected override void OnNavigatedTo( NavigationEventArgs e )
-		{
-			this.entityId = (TId) e.Parameter;
-
-			base.OnNavigatedTo( e );
+			this.ViewModel.Load( parameters.Get<TId>() );
 		}
 		#endregion
 	}
