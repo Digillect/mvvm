@@ -78,13 +78,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AsyncCtpLibrary_Phone, Version=1.1.4304.19911, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\AsyncCtp.1.0.0\lib\sl4-windowsphone71\AsyncCtpLibrary_Phone.dll</HintPath>
+      <HintPath>..\..\packages\AsyncCtp.1.0.0\lib\sl4-windowsphone71\AsyncCtpLibrary_Phone.dll</HintPath>
     </Reference>
     <Reference Include="Autofac, Version=2.6.1.841, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autofac.2.6.1.841\lib\SL4-WindowsPhone71\Autofac.dll</HintPath>
+      <HintPath>..\..\packages\Autofac.2.6.1.841\lib\SL4-WindowsPhone71\Autofac.dll</HintPath>
     </Reference>
     <Reference Include="Digillect, Version=4.0.0.0, Culture=neutral, PublicKeyToken=46fb24501f5dffcf, processorArchitecture=MSIL">
-      <HintPath>..\packages\DCL.Core.4.0.0.0\lib\sl4-windowsphone71\Digillect.dll</HintPath>
+      <HintPath>..\..\packages\DCL.Core.4.0.0-alpha-24\lib\sl4-windowsphone71\Digillect.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Contracts">
       <HintPath>C:\Program Files (x86)\Microsoft\Contracts\PublicAssemblies\Silverlight3\Microsoft.Contracts.dll</HintPath>
