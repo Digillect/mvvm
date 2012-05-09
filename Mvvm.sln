@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm", "Digillect.MVVM\Digillect.Mvvm.csproj", "{87238C3D-EF26-4DF2-BB3E-51DF75A07DC1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm", "Sources\Digillect.Mvvm\Digillect.Mvvm.csproj", "{87238C3D-EF26-4DF2-BB3E-51DF75A07DC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm (WP7)", "Digillect.MVVM\Digillect.Mvvm (WP7).csproj", "{5B1A2D09-CDC4-4210-A0D1-6C5DC9A2DF7B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm (WP7)", "Sources\Digillect.Mvvm\Digillect.Mvvm (WP7).csproj", "{5B1A2D09-CDC4-4210-A0D1-6C5DC9A2DF7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm.WindowsPhone", "Digillect.Mvvm.WindowsPhone\Digillect.Mvvm.WindowsPhone.csproj", "{39C2A7E3-74DE-4E02-A27E-E650ABAE6036}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm.WindowsPhone", "Sources\Digillect.Mvvm.WindowsPhone\Digillect.Mvvm.WindowsPhone.csproj", "{39C2A7E3-74DE-4E02-A27E-E650ABAE6036}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

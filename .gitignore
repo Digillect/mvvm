@@ -1,1 +1,5 @@
 Build/
+packages/
+*.suo
+*.user
+*.vsdoc
