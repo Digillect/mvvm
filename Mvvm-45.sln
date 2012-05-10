@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 11
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm (NET45)", "Sources\Digillect.Mvvm\Digillect.Mvvm (NET45).csproj", "{87238C3D-EF26-4DF2-BB3E-51DF75A07DC1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm (NET45)", "src\Digillect.Mvvm\Digillect.Mvvm (NET45).csproj", "{87238C3D-EF26-4DF2-BB3E-51DF75A07DC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm (WinRT)", "Sources\Digillect.Mvvm\Digillect.Mvvm (WinRT).csproj", "{A3037917-1B3D-4D99-A820-8D8C6121D8D1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm (WinRT)", "src\Digillect.Mvvm\Digillect.Mvvm (WinRT).csproj", "{A3037917-1B3D-4D99-A820-8D8C6121D8D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm.WinRT", "Sources\Digillect.Mvvm.WinRT\Digillect.Mvvm.WinRT.csproj", "{344778D6-EEB9-4302-ADDD-2027E4FFCDCE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm.WinRT", "src\Digillect.Mvvm.WinRT\Digillect.Mvvm.WinRT.csproj", "{344778D6-EEB9-4302-ADDD-2027E4FFCDCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

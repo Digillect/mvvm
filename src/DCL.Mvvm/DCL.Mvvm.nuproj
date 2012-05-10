@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+
+		<BuildPath>..\..\build\bin\$(Configuration)</BuildPath>
+		<OutputPath>..\..\build\package\$(Configuration)\$(MSBuildProjectName)</OutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<LibNet40 Include="$(BuildPath)\NET40\Digillect.Mvvm.*" Exclude="$(BuildPath)\**\*.xml.old"/>
+		<LibNet45 Include="$(BuildPath)\NET45\Digillect.*" Exclude="$(BuildPath)\**\*.xml.old"/>
+		<LibWinRT45 Include="$(BuildPath)\WinRT\Digillect.*" Exclude="$(BuildPath)\**\*.xml.old"/>
+		<LibWP71 Include="$(BuildPath)\WP7\Digillect.Mvvm.*" Exclude="$(BuildPath)\**\*.xml.old"/>
+	</ItemGroup>
+
+	<Import Project="..\..\packages\Digillect.NuGet.Packaging.1.0.0\content\NuGet.Project.Targets"/>
+</Project>
