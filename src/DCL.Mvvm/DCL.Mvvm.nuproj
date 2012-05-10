@@ -11,7 +11,7 @@
 	<ItemGroup>
 		<LibNet40 Include="$(BuildPath)\NET40\Digillect.Mvvm.*" Exclude="$(BuildPath)\**\*.xml.old"/>
 		<LibNet45 Include="$(BuildPath)\NET45\Digillect.*" Exclude="$(BuildPath)\**\*.xml.old"/>
-		<LibWinRT45 Include="$(BuildPath)\WinRT\Digillect.*" Exclude="$(BuildPath)\**\*.xml.old"/>
+		<LibWinRT45 Include="$(BuildPath)\WinRT\AnyCPU\Digillect.*" Exclude="$(BuildPath)\**\*.xml.old"/>
 		<LibWP71 Include="$(BuildPath)\WP7\Digillect.Mvvm.*" Exclude="$(BuildPath)\**\*.xml.old"/>
 	</ItemGroup>
 
