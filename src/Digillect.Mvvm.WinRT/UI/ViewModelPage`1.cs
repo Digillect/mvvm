@@ -14,7 +14,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-using Autofac;
+using MetroIoc;
 
 namespace Digillect.Mvvm.UI
 {
@@ -39,7 +39,7 @@ namespace Digillect.Mvvm.UI
 		#region CreateViewModel
 		protected override ViewModel CreateViewModel()
 		{
-			return this.Scope.Resolve<TViewModel>();
+			return this.Container.Resolve<TViewModel>();
 		}
 		#endregion
 	}

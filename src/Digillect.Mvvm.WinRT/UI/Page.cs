@@ -17,9 +17,11 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-using Autofac;
+using MetroIoc;
 
 using Digillect.Mvvm.Services;
+using Windows.UI.Core;
+using Windows.System;
 
 namespace Digillect.Mvvm.UI
 {
@@ -28,8 +30,7 @@ namespace Digillect.Mvvm.UI
 	/// </summary>
 	public class Page : Windows.UI.Xaml.Controls.Page, INotifyPropertyChanged
 	{
-		private ILifetimeScope scope;
-		private bool useFilledStateForNarrowWindow;
+		private IContainer container;
 		private List<Control> layoutAwareControls;
 		private Breadcrumb breadcrumb;
 
@@ -42,9 +43,39 @@ namespace Digillect.Mvvm.UI
 			if( Windows.ApplicationModel.DesignMode.DesignModeEnabled )
 				return;
 
-			// Map application view state to visual state for this page when it is part of the visual tree
-			this.Loaded += this.StartLayoutUpdates;
-			this.Unloaded += this.StopLayoutUpdates;
+			// When this page is part of the visual tree make two changes:
+			// 1) Map application view state to visual state for the page
+			// 2) Handle keyboard and mouse navigation requests
+			this.Loaded += ( sender, e ) =>
+			{
+				this.StartLayoutUpdates( sender, e );
+
+				// Keyboard and mouse navigation only apply when occupying the entire window
+				if( this.ActualHeight == Window.Current.Bounds.Height &&
+					this.ActualWidth == Window.Current.Bounds.Width )
+				{
+					// Listen to the window directly so focus isn't required
+					Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += CoreDispatcher_AcceleratorKeyActivated;
+					Window.Current.CoreWindow.PointerPressed += this.CoreWindow_PointerPressed;
+				}
+
+				// If we are restoring state during unwind - kick infrastructure creation
+				if( this.breadcrumb != null )
+				{
+					var parameter = this.breadcrumb.Parameters;
+					this.breadcrumb = null;
+
+					HandleNavigationToPage( parameter );
+				}
+			};
+
+			// Undo the same changes when the page is no longer visible
+			this.Unloaded += ( sender, e ) =>
+			{
+				this.StopLayoutUpdates( sender, e );
+				Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated -= CoreDispatcher_AcceleratorKeyActivated;
+				Window.Current.CoreWindow.PointerPressed -= this.CoreWindow_PointerPressed;
+			};
 
 			if( CurrentApplication.IsUnwinding )
 				this.breadcrumb = CurrentApplication.PeekBreadcrumb( GetType() );
@@ -52,9 +83,9 @@ namespace Digillect.Mvvm.UI
 		#endregion
 
 		#region Protected Properties
-		public ILifetimeScope Scope
+		public IContainer Container
 		{
-			get { return this.scope; }
+			get { return this.container; }
 		}
 
 		protected Digillect.Mvvm.UI.Application CurrentApplication
@@ -97,6 +128,50 @@ namespace Digillect.Mvvm.UI
 		#endregion
 
 		#region Navigation handling
+		/// <summary>
+		/// Invoked as an event handler to navigate backward in the page's associated
+		/// <see cref="Frame"/> until it reaches the top of the navigation stack.
+		/// </summary>
+		/// <param name="sender">Instance that triggered the event.</param>
+		/// <param name="e">Event data describing the conditions that led to the event.</param>
+		protected virtual void GoHome( object sender, RoutedEventArgs e )
+		{
+			// Use the navigation frame to return to the topmost page
+			if( this.Frame != null )
+			{
+				while( this.Frame.CanGoBack )
+					this.Frame.GoBack();
+			}
+		}
+
+		/// <summary>
+		/// Invoked as an event handler to navigate backward in the navigation stack
+		/// associated with this page's <see cref="Frame"/>.
+		/// </summary>
+		/// <param name="sender">Instance that triggered the event.</param>
+		/// <param name="e">Event data describing the conditions that led to the
+		/// event.</param>
+		protected virtual void GoBack( object sender, RoutedEventArgs e )
+		{
+			// Use the navigation frame to return to the previous page
+			if( this.Frame != null && this.Frame.CanGoBack )
+				this.Frame.GoBack();
+		}
+
+		/// <summary>
+		/// Invoked as an event handler to navigate forward in the navigation stack
+		/// associated with this page's <see cref="Frame"/>.
+		/// </summary>
+		/// <param name="sender">Instance that triggered the event.</param>
+		/// <param name="e">Event data describing the conditions that led to the
+		/// event.</param>
+		protected virtual void GoForward( object sender, RoutedEventArgs e )
+		{
+			// Use the navigation frame to move to the next page
+			if( this.Frame != null && this.Frame.CanGoForward )
+				this.Frame.GoForward();
+		}
+
 		protected void Navigate( Type pageType, NavigationParameters parameters = null )
 		{
 			Frame.Navigate( pageType, parameters );
@@ -143,7 +218,7 @@ namespace Digillect.Mvvm.UI
 
 			if( e.NavigationMode == NavigationMode.Back )
 			{
-				if( this.scope == null )
+				if( this.container == null )
 				{
 					// Most probably we're unwinding
 
@@ -156,17 +231,18 @@ namespace Digillect.Mvvm.UI
 			HandleNavigationToPage( parameter );
 		}
 
-		private void HandleNavigationToPage( object parameter )
+		protected void HandleNavigationToPage( object parameter )
 		{
-			if( this.scope == null )
+			if( this.container == null )
 			{
-				this.scope = CurrentApplication.Scope.BeginLifetimeScope();
+				this.container = CurrentApplication.Container;
+				//this.scope = CurrentApplication.Scope.BeginLifetimeScope();
 
 				DataContext = CreateDataContext();
 
 				OnPageCreated( parameter );
 
-				this.Scope.Resolve<IPageDecorationService>().AddDecoration( this );
+				this.Container.Resolve<IPageDecorationService>().AddDecoration( this );
 			}
 			else
 			{
@@ -186,12 +262,12 @@ namespace Digillect.Mvvm.UI
 
 				OnPageDestroyed();
 
-				if( this.scope != null )
+				if( this.container != null )
 				{
-					this.scope.Resolve<IPageDecorationService>().RemoveDecoration( this );
+					this.container.Resolve<IPageDecorationService>().RemoveDecoration( this );
 
-					this.scope.Dispose();
-					this.scope = null;
+					//this.scope.Dispose();
+					this.container = null;
 				}
 			}
 			else
@@ -210,9 +286,11 @@ namespace Digillect.Mvvm.UI
 		/// <returns>Data context that will be set to <see cref="DataContext"/> property.</returns>
 		protected virtual PageDataContext CreateDataContext()
 		{
-			var factory = this.Scope.Resolve<PageDataContext.Factory>();
+			var context = this.container.Resolve<PageDataContext>();
 
-			return factory( this );
+			context.Page = this;
+
+			return context;
 		}
 
 		/// <summary>
@@ -246,123 +324,121 @@ namespace Digillect.Mvvm.UI
 		}
 		#endregion
 
-		#region Layout
+		#region Keyboard & Mouse
 		/// <summary>
-		/// Gets or sets a value indicating whether visual states can be a loose interpretation
-		/// of the actual application view state.  This is often convenient when a page layout
-		/// is space constrained.
+		/// Invoked on every keystroke, including system keys such as Alt key combinations, when
+		/// this page is active and occupies the entire window.  Used to detect keyboard navigation
+		/// between pages even when the page itself doesn't have focus.
 		/// </summary>
-		/// <remarks>
-		/// The default value of false indicates that the visual state is identical to the view
-		/// state, meaning that Filled is only used when another application is snapped.  When
-		/// set to true FullScreenLandscape is used to indicate that at least 1366 virtual
-		/// pixels of horizontal real estate are available - even if another application is
-		/// snapped - and Filled indicates a lesser width, even if no other application is
-		/// snapped.  On a smaller display such as a 1024x768 panel this will result in the
-		/// visual state Filled whenever the device is in landscape orientation.
-		/// </remarks>
-		public bool UseFilledStateForNarrowWindow
+		/// <param name="sender">Instance that triggered the event.</param>
+		/// <param name="args">Event data describing the conditions that led to the event.</param>
+		private void CoreDispatcher_AcceleratorKeyActivated( CoreDispatcher sender, AcceleratorKeyEventArgs args )
 		{
-			get { return this.useFilledStateForNarrowWindow; }
-			set
-			{
-				this.useFilledStateForNarrowWindow = value;
+			var virtualKey = args.VirtualKey;
 
-				this.InvalidateVisualState();
+			// Only investigate further when Left, Right, or the dedicated Previous or Next keys
+			// are pressed
+			if( (args.EventType == CoreAcceleratorKeyEventType.SystemKeyDown ||
+				args.EventType == CoreAcceleratorKeyEventType.KeyDown) &&
+				(virtualKey == VirtualKey.Left || virtualKey == VirtualKey.Right ||
+				(int) virtualKey == 166 || (int) virtualKey == 167) )
+			{
+				var coreWindow = Window.Current.CoreWindow;
+				var downState = CoreVirtualKeyStates.Down;
+				bool menuKey = (coreWindow.GetKeyState( VirtualKey.Menu ) & downState) == downState;
+				bool controlKey = (coreWindow.GetKeyState( VirtualKey.Control ) & downState) == downState;
+				bool shiftKey = (coreWindow.GetKeyState( VirtualKey.Shift ) & downState) == downState;
+				bool noModifiers = !menuKey && !controlKey && !shiftKey;
+				bool onlyAlt = menuKey && !controlKey && !shiftKey;
+
+				if( ((int) virtualKey == 166 && noModifiers) ||
+					(virtualKey == VirtualKey.Left && onlyAlt) )
+				{
+					// When the previous key or Alt+Left are pressed navigate back
+					args.Handled = true;
+					this.GoBack( this, new RoutedEventArgs() );
+				}
+				else if( ((int) virtualKey == 167 && noModifiers) ||
+					(virtualKey == VirtualKey.Right && onlyAlt) )
+				{
+					// When the next key or Alt+Right are pressed navigate forward
+					args.Handled = true;
+					this.GoForward( this, new RoutedEventArgs() );
+				}
 			}
 		}
 
 		/// <summary>
-		/// Invoked as an event handler to navigate backward in the page's associated
-		/// <see cref="Frame"/> until it reaches the top of the navigation stack.
+		/// Invoked on every mouse click, touch screen tap, or equivalent interaction when this
+		/// page is active and occupies the entire window.  Used to detect browser-style next and
+		/// previous mouse button clicks to navigate between pages.
 		/// </summary>
 		/// <param name="sender">Instance that triggered the event.</param>
-		/// <param name="e">Event data describing the conditions that led to the event.</param>
-		protected virtual void GoHome( object sender, RoutedEventArgs e )
+		/// <param name="args">Event data describing the conditions that led to the event.</param>
+		private void CoreWindow_PointerPressed( CoreWindow sender, PointerEventArgs args )
 		{
-			// Use the navigation frame to return to the topmost page
-			if( this.Frame != null )
+			var properties = args.CurrentPoint.Properties;
+
+			// Ignore button chords with the left, right, and middle buttons
+			if( properties.IsLeftButtonPressed || properties.IsRightButtonPressed ||
+				properties.IsMiddleButtonPressed ) return;
+
+			// If back or foward are pressed (but not both) navigate appropriately
+			bool backPressed = properties.IsXButton1Pressed;
+			bool forwardPressed = properties.IsXButton2Pressed;
+			if( backPressed ^ forwardPressed )
 			{
-				while( this.Frame.CanGoBack )
-					this.Frame.GoBack();
+				args.Handled = true;
+				if( backPressed ) this.GoBack( this, new RoutedEventArgs() );
+				if( forwardPressed ) this.GoForward( this, new RoutedEventArgs() );
 			}
 		}
 
-		/// <summary>
-		/// Invoked as an event handler to navigate backward in the page's associated
-		/// <see cref="Frame"/> to go back one step on the navigation stack.
-		/// </summary>
-		/// <param name="sender">Instance that triggered the event.</param>
-		/// <param name="e">Event data describing the conditions that led to the
-		/// event.</param>
-		protected virtual void GoBack( object sender, RoutedEventArgs e )
-		{
-			// Use the navigation frame to return to the previous page
-			if( this.Frame != null && this.Frame.CanGoBack )
-				this.Frame.GoBack();
-		}
+		#endregion
 
+		#region Visual state switching
 		/// <summary>
-		/// Invoked as an event handler, typically on the <see cref="Loaded"/> event of a
-		/// <see cref="Control"/> within the page, to indicate that the sender should start
-		/// receiving visual state management changes that correspond to application view state
-		/// changes.
+		/// Invoked as an event handler, typically on the <see cref="FrameworkElement.Loaded"/>
+		/// event of a <see cref="Control"/> within the page, to indicate that the sender should
+		/// start receiving visual state management changes that correspond to application view
+		/// state changes.
 		/// </summary>
 		/// <param name="sender">Instance of <see cref="Control"/> that supports visual state
 		/// management corresponding to view states.</param>
 		/// <param name="e">Event data that describes how the request was made.</param>
 		/// <remarks>The current view state will immediately be used to set the corresponding
 		/// visual state when layout updates are requested.  A corresponding
-		/// <see cref="Unloaded"/> event handler connected to <see cref="StopLayoutUpdates"/>
-		/// is strongly encouraged.  Instances of <see cref="LayoutAwarePage"/> automatically
-		/// invoke these handlers in their Loaded and Unloaded events.</remarks>
+		/// <see cref="FrameworkElement.Unloaded"/> event handler connected to
+		/// <see cref="StopLayoutUpdates"/> is strongly encouraged.  Instances of
+		/// <see cref="LayoutAwarePage"/> automatically invoke these handlers in their Loaded and
+		/// Unloaded events.</remarks>
 		/// <seealso cref="DetermineVisualState"/>
 		/// <seealso cref="InvalidateVisualState"/>
 		public void StartLayoutUpdates( object sender, RoutedEventArgs e )
 		{
 			var control = sender as Control;
-			
-			if( control == null )
-				return;
-
+			if( control == null ) return;
 			if( this.layoutAwareControls == null )
 			{
 				// Start listening to view state changes when there are controls interested in updates
-				ApplicationView.GetForCurrentView().ViewStateChanged += this.ViewStateChanged;
 				Window.Current.SizeChanged += this.WindowSizeChanged;
 				this.layoutAwareControls = new List<Control>();
 			}
-
 			this.layoutAwareControls.Add( control );
 
 			// Set the initial visual state of the control
 			VisualStateManager.GoToState( control, DetermineVisualState( ApplicationView.Value ), false );
-
-			// If we are restoring state during unwind - kick infrastructure creation
-			if( this.breadcrumb != null )
-			{
-				var parameter = this.breadcrumb.Parameters;
-				this.breadcrumb = null;
-
-				HandleNavigationToPage( parameter );
-			}
 		}
 
-		private void ViewStateChanged( ApplicationView sender, ApplicationViewStateChangedEventArgs e )
+		private void WindowSizeChanged( object sender, WindowSizeChangedEventArgs e )
 		{
-			this.InvalidateVisualState( e.ViewState );
-		}
-
-		private void WindowSizeChanged( object sender, Windows.UI.Core.WindowSizeChangedEventArgs e )
-		{
-			if( this.useFilledStateForNarrowWindow )
-				InvalidateVisualState();
+			this.InvalidateVisualState();
 		}
 
 		/// <summary>
-		/// Invoked as an event handler, typically on the <see cref="Unloaded"/> event of a
-		/// <see cref="Control"/>, to indicate that the sender should start receiving visual
-		/// state management changes that correspond to application view state changes.
+		/// Invoked as an event handler, typically on the <see cref="FrameworkElement.Unloaded"/>
+		/// event of a <see cref="Control"/>, to indicate that the sender should start receiving
+		/// visual state management changes that correspond to application view state changes.
 		/// </summary>
 		/// <param name="sender">Instance of <see cref="Control"/> that supports visual state
 		/// management corresponding to view states.</param>
@@ -373,18 +449,12 @@ namespace Digillect.Mvvm.UI
 		public void StopLayoutUpdates( object sender, RoutedEventArgs e )
 		{
 			var control = sender as Control;
-			
-			if( control == null || this.layoutAwareControls == null )
-				return;
-
+			if( control == null || this.layoutAwareControls == null ) return;
 			this.layoutAwareControls.Remove( control );
-
 			if( this.layoutAwareControls.Count == 0 )
 			{
 				// Stop listening to view state changes when no controls are interested in updates
 				this.layoutAwareControls = null;
-
-				ApplicationView.GetForCurrentView().ViewStateChanged -= this.ViewStateChanged;
 				Window.Current.SizeChanged -= this.WindowSizeChanged;
 			}
 		}
@@ -400,17 +470,6 @@ namespace Digillect.Mvvm.UI
 		/// <seealso cref="InvalidateVisualState"/>
 		protected virtual string DetermineVisualState( ApplicationViewState viewState )
 		{
-			if( this.useFilledStateForNarrowWindow &&
-				(viewState == ApplicationViewState.Filled ||
-				viewState == ApplicationViewState.FullScreenLandscape) )
-			{
-				// Allow pages to request that the Filled state be used only for landscape layouts narrower
-				// than 1366 virtual pixels
-				var windowWidth = Window.Current.Bounds.Width;
-
-				viewState = windowWidth >= 1366 ? ApplicationViewState.FullScreenLandscape : ApplicationViewState.Filled;
-			}
-
 			return viewState.ToString();
 		}
 
@@ -423,14 +482,11 @@ namespace Digillect.Mvvm.UI
 		/// signal that a different value may be returned even though the view state has not
 		/// changed.
 		/// </remarks>
-		/// <param name="viewState">The desired view state, or null if the current view state
-		/// should be used.</param>
-		public void InvalidateVisualState( ApplicationViewState? viewState = null )
+		public void InvalidateVisualState()
 		{
 			if( this.layoutAwareControls != null )
 			{
-				string visualState = DetermineVisualState( viewState == null ? ApplicationView.Value : viewState.Value );
-
+				string visualState = DetermineVisualState( ApplicationView.Value );
 				foreach( var layoutAwareControl in this.layoutAwareControls )
 				{
 					VisualStateManager.GoToState( layoutAwareControl, visualState, false );

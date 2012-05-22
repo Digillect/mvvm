@@ -48,7 +48,7 @@
       <HintPath>..\..\packages\Autofac.2.6.1.841\lib\NET40\Autofac.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Digillect">
-      <HintPath>..\..\packages\DCL.Core.4.0.0-alpha-24\lib\net45\Digillect.dll</HintPath>
+      <HintPath>..\..\packages\DCL.Core.4.0.0-alpha-29\lib\net45\Digillect.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />

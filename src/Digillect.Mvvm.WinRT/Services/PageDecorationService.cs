@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 using Digillect.Mvvm.UI;
 
+using MetroIoc;
+
 namespace Digillect.Mvvm.Services
 {
 	/// <summary>
@@ -10,14 +12,12 @@ namespace Digillect.Mvvm.Services
 	/// </summary>
 	internal sealed class PageDecorationService : IPageDecorationService
 	{
-		private readonly List<IPageDecorator> decorators;
-
 		#region Constructors/Disposer
-		public PageDecorationService( IEnumerable<IPageDecorator> decorators )
+		public PageDecorationService()
 		{
-			this.decorators = new List<IPageDecorator>( decorators );
 		}
 		#endregion
+
 
 		#region Add/Remove Page decoration
 		/// <summary>
@@ -29,10 +29,9 @@ namespace Digillect.Mvvm.Services
 			if( page == null )
 				throw new ArgumentNullException( "page" );
 
-			if( this.decorators == null )
-				return;
+			var decorators = page.Container.ResolveAll<IPageDecorator>();
 
-			foreach( var decorator in this.decorators )
+			foreach( var decorator in decorators )
 				decorator.AddDecoration( page );
 		}
 
@@ -45,10 +44,9 @@ namespace Digillect.Mvvm.Services
 			if( page == null )
 				throw new ArgumentNullException( "page" );
 
-			if( this.decorators == null )
-				return;
+			var decorators = page.Container.ResolveAll<IPageDecorator>();
 
-			foreach( var decorator in this.decorators )
+			foreach( var decorator in decorators )
 				decorator.RemoveDecoration( page );
 		}
 		#endregion

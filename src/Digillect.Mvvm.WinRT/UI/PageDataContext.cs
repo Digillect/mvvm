@@ -22,7 +22,7 @@ namespace Digillect.Mvvm.UI
 		/// <returns></returns>
 		public delegate PageDataContext Factory( Page page );
 
-		private readonly Page page;
+		private Page page;
 		private readonly ObservableDictionary values = new ObservableDictionary();
 
 		#region Constructors/Disposer
@@ -31,9 +31,8 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		/// <param name="page">The page used in this context.</param>
 		/// <param name="networkAvailabilityService">The network availability service (provided by container).</param>
-		public PageDataContext( Page page )
+		public PageDataContext()
 		{
-			this.page = page;
 		}
 
 		/// <summary>
@@ -71,6 +70,7 @@ namespace Digillect.Mvvm.UI
 		public Page Page
 		{
 			get { return this.page; }
+			set { this.page = value; }
 		}
 
 		public IObservableMap<string, object> Values

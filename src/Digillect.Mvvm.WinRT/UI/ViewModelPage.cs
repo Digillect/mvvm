@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Autofac;
-
 namespace Digillect.Mvvm.UI
 {
 	public class ViewModelPage : Page
@@ -54,7 +52,12 @@ namespace Digillect.Mvvm.UI
 		{
 			this.viewModel = CreateViewModel();
 
-			return Scope.Resolve<ViewModelPageDataContext.Factory>()( this, this.viewModel );
+			var context = Container.Resolve<ViewModelPageDataContext>();
+
+			context.Page = this;
+			context.ViewModel = viewModel;
+
+			return context;
 		}
 		#endregion
 

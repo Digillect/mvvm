@@ -130,22 +130,21 @@
     <Compile Include="UI\ViewModelPageDataContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Digillect.MVVM\Digillect.Mvvm %28WinRT%29.csproj">
-      <Project>{a3037917-1b3d-4d99-a820-8d8c6121d8d1}</Project>
-      <Name>Digillect.Mvvm %28WinRT%29</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Autofac">
-      <HintPath>..\..\packages\Autofac.2.6.1.841\lib\winrt45\Autofac.dll</HintPath>
-    </Reference>
-    <Reference Include="Digillect, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\DCL.Core.4.0.0-alpha-24\lib\winrt45\Digillect.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\..\..\..\Libraries\MetroIoc\MetroIoc.csproj">
+      <Project>{29609a85-d395-473e-8f5a-3c9485fc3e13}</Project>
+      <Name>MetroIoc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\core\src\Digillect\Digillect %28WinRT%29.csproj">
+      <Project>{f213aeb9-82d4-43cb-bab1-c929db11e717}</Project>
+      <Name>Digillect %28WinRT%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Digillect.Mvvm\Digillect.Mvvm %28WinRT%29.csproj">
+      <Project>{a3037917-1b3d-4d99-a820-8d8c6121d8d1}</Project>
+      <Name>Digillect.Mvvm %28WinRT%29</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>

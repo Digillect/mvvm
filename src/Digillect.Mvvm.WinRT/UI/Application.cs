@@ -16,7 +16,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-using Autofac;
+using MetroIoc;
 using System.Text;
 
 namespace Digillect.Mvvm.UI
@@ -31,7 +31,7 @@ namespace Digillect.Mvvm.UI
 		/// Gets the application root frame.
 		/// </summary>
 		public Frame RootFrame { get; private set; }
-		public ILifetimeScope Scope { get; private set; }
+		public IContainer Container { get; private set; }
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -101,16 +101,18 @@ namespace Digillect.Mvvm.UI
 		#region IoC/Services
 		private void InitializeIoC()
 		{
-			var builder = new ContainerBuilder();
+			var container = new MetroContainer();
 
-			RegisterServices( builder );
+			RegisterServices( container );
 
-			this.Scope = builder.Build();
+			this.Container = container;
 		}
 
-		protected virtual void RegisterServices( ContainerBuilder builder )
+		protected virtual void RegisterServices( IContainer container )
 		{
-			builder.RegisterModule<Configuration.WinRTModule>();
+			var module = new Configuration.WinRTModule();
+
+			module.Load( container );
 		}
 		#endregion
 

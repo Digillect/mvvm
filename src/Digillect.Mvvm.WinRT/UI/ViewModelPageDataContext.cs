@@ -24,10 +24,8 @@ namespace Digillect.Mvvm.UI
 		/// <param name="page">The page used in this context.</param>
 		/// <param name="viewModel">The view model used in this context.</param>
 		/// <param name="networkAvailabilityService">The network availability service (provided by container).</param>
-		public ViewModelPageDataContext( Page page, ViewModel viewModel )
-			: base( page )
+		public ViewModelPageDataContext()
 		{
-			this.ViewModel = viewModel;
 		}
 		#endregion
 
@@ -35,7 +33,7 @@ namespace Digillect.Mvvm.UI
 		/// <summary>
 		/// Gets the view model.
 		/// </summary>
-		public ViewModel ViewModel { get; private set; }
+		public ViewModel ViewModel { get; set; }
 		#endregion
 	}
 }

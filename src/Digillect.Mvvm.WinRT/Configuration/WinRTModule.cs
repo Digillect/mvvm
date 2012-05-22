@@ -4,25 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Autofac;
-
 using Digillect.Mvvm.Services;
+
+using MetroIoc;
 
 namespace Digillect.Mvvm.Configuration
 {
 	public class WinRTModule : Module
 	{
-		protected override void Load( ContainerBuilder builder )
+		public override void Load( IContainer container )
 		{
-			base.Load( builder );
+			base.Load( container );
 
 			// Services
-			builder.RegisterType<NetworkAvailabilityService>().As<INetworkAvailabilityService>().SingleInstance();
-			builder.RegisterType<PageDecorationService>().As<IPageDecorationService>().SingleInstance();
+			container.Register<INetworkAvailabilityService, NetworkAvailabilityService>( lifecycle: new SingletonLifecycle() );
+			container.Register<IPageDecorationService, PageDecorationService>( lifecycle: new SingletonLifecycle() );
+			//builder.RegisterType<NetworkAvailabilityService>().As<INetworkAvailabilityService>().SingleInstance();
+			//builder.RegisterType<PageDecorationService>().As<IPageDecorationService>().SingleInstance();
 
 			// Data contexts
-			builder.RegisterType<UI.PageDataContext>().AsSelf();
-			builder.RegisterType<UI.ViewModelPageDataContext>().AsSelf();
+			container.Register<UI.PageDataContext>();
+			container.Register<UI.ViewModelPageDataContext>();
+			//builder.RegisterType<UI.PageDataContext>().AsSelf();
+			//builder.RegisterType<UI.ViewModelPageDataContext>().AsSelf();
 		}
 	}
 }

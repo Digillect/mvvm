@@ -111,7 +111,6 @@
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
     <Compile Include="Configuration\Module.cs" />
-    <Compile Include="Configuration\RegistrationExtensions.cs" />
     <Compile Include="EntitySession.cs" />
     <Compile Include="EntityViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -128,16 +127,17 @@
     <Compile Include="ViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Autofac">
-      <HintPath>..\..\packages\Autofac.2.6.1.841\lib\winrt45\Autofac.dll</HintPath>
-    </Reference>
-    <Reference Include="Digillect, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\DCL.Core.4.0.0-alpha-24\lib\winrt45\Digillect.dll</HintPath>
-    </Reference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\..\..\..\..\Libraries\MetroIoc\MetroIoc.csproj">
+      <Project>{29609a85-d395-473e-8f5a-3c9485fc3e13}</Project>
+      <Name>MetroIoc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\core\src\Digillect\Digillect %28WinRT%29.csproj">
+      <Project>{f213aeb9-82d4-43cb-bab1-c929db11e717}</Project>
+      <Name>Digillect %28WinRT%29</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
