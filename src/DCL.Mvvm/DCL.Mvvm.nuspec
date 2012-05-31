@@ -13,7 +13,6 @@
 		<tags>digillect mvvm</tags>
 		<dependencies>
 			<dependency id="DCL.Core" version="4.0.0-alpha-25"/>
-			<dependency id="Autofac" version="2.6.1.841"/>
 		</dependencies>
 	</metadata>
 </package>
