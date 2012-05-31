@@ -14,6 +14,8 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,7 +30,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\build\bin\Release\WinRT\AnyCPU\</OutputPath>
+    <OutputPath>..\..\build\bin\Release\WinRT\</OutputPath>
     <DefineConstants>TRACE;NET45;NETFX_CORE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -110,7 +112,6 @@
     <Compile Include="..\AssemblySharedInfo.cs">
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
-    <Compile Include="Configuration\Module.cs" />
     <Compile Include="EntitySession.cs" />
     <Compile Include="EntityViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -130,14 +131,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Libraries\MetroIoc\MetroIoc.csproj">
-      <Project>{29609a85-d395-473e-8f5a-3c9485fc3e13}</Project>
-      <Name>MetroIoc</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\core\src\Digillect\Digillect %28WinRT%29.csproj">
-      <Project>{f213aeb9-82d4-43cb-bab1-c929db11e717}</Project>
-      <Name>Digillect %28WinRT%29</Name>
-    </ProjectReference>
+    <Reference Include="Digillect, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\DCL.Core.4.0.0-alpha-31\lib\winrt45\Digillect.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>

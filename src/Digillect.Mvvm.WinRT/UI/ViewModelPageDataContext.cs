@@ -1,7 +1,5 @@
 using System;
 
-using Digillect.Mvvm.Services;
-
 namespace Digillect.Mvvm.UI
 {
 	/// <summary>
@@ -9,13 +7,7 @@ namespace Digillect.Mvvm.UI
 	/// </summary>
 	public class ViewModelPageDataContext : PageDataContext
 	{
-		/// <summary>
-		/// Factory that is used to create new instances.
-		/// </summary>
-		/// <param name="page">The page used in this context.</param>
-		/// <param name="viewModel">The view model used in this context.</param>
-		/// <returns></returns>
-		public new delegate ViewModelPageDataContext Factory( Page page, ViewModel viewModel );
+		private readonly ViewModel viewModel;
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -23,9 +15,10 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		/// <param name="page">The page used in this context.</param>
 		/// <param name="viewModel">The view model used in this context.</param>
-		/// <param name="networkAvailabilityService">The network availability service (provided by container).</param>
-		public ViewModelPageDataContext()
+		public ViewModelPageDataContext( Page page, ViewModel viewModel )
+			: base( page )
 		{
+			this.viewModel = viewModel;
 		}
 		#endregion
 
@@ -33,7 +26,10 @@ namespace Digillect.Mvvm.UI
 		/// <summary>
 		/// Gets the view model.
 		/// </summary>
-		public ViewModel ViewModel { get; set; }
+		public ViewModel ViewModel
+		{
+			get { return this.viewModel; }
+		}
 		#endregion
 	}
 }

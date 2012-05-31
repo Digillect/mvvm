@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Digillect.Mvvm.Services
 {
-	internal sealed class NetworkAvailabilityService : INetworkAvailabilityService
+	public sealed class NetworkAvailabilityService : INetworkAvailabilityService
 	{
 		public NetworkAvailabilityService()
 		{

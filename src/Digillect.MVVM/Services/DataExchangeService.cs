@@ -2,7 +2,7 @@
 
 namespace Digillect.Mvvm.Services
 {
-	internal class DataExchangeService : IDataExchangeService
+	public class DataExchangeService : IDataExchangeService
 	{
 		private readonly static object syncRoot = new object();
 

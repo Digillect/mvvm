@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Dynamic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
-using Digillect.Mvvm.Services;
 using Windows.Foundation.Collections;
 
 namespace Digillect.Mvvm.UI
@@ -15,14 +11,7 @@ namespace Digillect.Mvvm.UI
 	/// </summary>
 	public class PageDataContext : ObservableObject, IDisposable
 	{
-		/// <summary>
-		/// Factory to be used to create new instances.
-		/// </summary>
-		/// <param name="page">The page used in this context.</param>
-		/// <returns></returns>
-		public delegate PageDataContext Factory( Page page );
-
-		private Page page;
+		private readonly Page page;
 		private readonly ObservableDictionary values = new ObservableDictionary();
 
 		#region Constructors/Disposer
@@ -30,9 +19,10 @@ namespace Digillect.Mvvm.UI
 		/// Initializes a new instance of the <see cref="PageDataContext"/> class.
 		/// </summary>
 		/// <param name="page">The page used in this context.</param>
-		/// <param name="networkAvailabilityService">The network availability service (provided by container).</param>
-		public PageDataContext()
+		public PageDataContext( Page page )
 		{
+			this.page = page;
+			this.values["Loaded"] = false;
 		}
 
 		/// <summary>
@@ -70,7 +60,6 @@ namespace Digillect.Mvvm.UI
 		public Page Page
 		{
 			get { return this.page; }
-			set { this.page = value; }
 		}
 
 		public IObservableMap<string, object> Values
@@ -82,24 +71,10 @@ namespace Digillect.Mvvm.UI
 		#region ObservableDictionary
 		private class ObservableDictionary : IObservableMap<string, object>
 		{
-			private Dictionary<string, object> dictionary = new Dictionary<string, object>();
+			private readonly Dictionary<string, object> dictionary = new Dictionary<string, object>();
 
 			public event MapChangedEventHandler<string, object> MapChanged;
 
-			/*
-			public override bool TryGetMember( GetMemberBinder binder, out object result )
-			{
-				return this.dictionary.TryGetValue( binder.Name, out result );
-			}
-
-			public override bool TrySetMember( SetMemberBinder binder, object value )
-			{
-				this.dictionary[binder.Name] = value;
-				InvokeMapChanged( CollectionChange.ItemChanged, binder.Name );
-
-				return true;
-			}
-			*/
 			private void InvokeMapChanged( CollectionChange change, string key )
 			{
 				var eventHandler = MapChanged;

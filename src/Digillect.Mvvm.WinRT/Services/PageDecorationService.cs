@@ -3,14 +3,12 @@ using System.Collections.Generic;
 
 using Digillect.Mvvm.UI;
 
-using MetroIoc;
-
 namespace Digillect.Mvvm.Services
 {
 	/// <summary>
 	/// Default implementation of <see cref="IPageDecorationService"/>.
 	/// </summary>
-	internal sealed class PageDecorationService : IPageDecorationService
+	public sealed class PageDecorationService : IPageDecorationService
 	{
 		#region Constructors/Disposer
 		public PageDecorationService()

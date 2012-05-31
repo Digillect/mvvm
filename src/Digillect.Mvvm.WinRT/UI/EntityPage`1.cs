@@ -1,5 +1,4 @@
 ﻿using System;
-using Windows.UI.Xaml.Navigation;
 
 namespace Digillect.Mvvm.UI
 {
@@ -21,9 +20,11 @@ namespace Digillect.Mvvm.UI
 		/// <summary>
 		/// Initials the load data.
 		/// </summary>
-		protected override void InitialLoadData( NavigationParameters parameters )
+		protected override async void InitialLoadData( NavigationParameters parameters )
 		{
-			this.ViewModel.Load( parameters.Get<TId>() );
+			await this.ViewModel.Load( parameters.Get<TId>() );
+
+			Context.Values["Loaded"] = true;
 		}
 		#endregion
 	}

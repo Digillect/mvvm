@@ -31,7 +31,6 @@ namespace Digillect.Mvvm
 		/// <value>
 		/// The service used to indicate that data exchange is in the progress.
 		/// </value>
-		[MetroIoc.Inject]
 		public IDataExchangeService DataExchangeService { get; set; }
 		#endregion
 

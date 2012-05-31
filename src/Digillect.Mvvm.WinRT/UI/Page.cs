@@ -2,26 +2,16 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.IO;
 using System.Linq;
 
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Graphics.Display;
+using Windows.UI.Core;
+using Windows.System;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-using MetroIoc;
-
 using Digillect.Mvvm.Services;
-using Windows.UI.Core;
-using Windows.System;
 
 namespace Digillect.Mvvm.UI
 {
@@ -286,11 +276,7 @@ namespace Digillect.Mvvm.UI
 		/// <returns>Data context that will be set to <see cref="DataContext"/> property.</returns>
 		protected virtual PageDataContext CreateDataContext()
 		{
-			var context = this.container.Resolve<PageDataContext>();
-
-			context.Page = this;
-
-			return context;
+			return new PageDataContext( this );
 		}
 
 		/// <summary>

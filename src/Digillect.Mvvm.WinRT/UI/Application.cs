@@ -1,23 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-using MetroIoc;
-using System.Text;
+using Digillect.Mvvm.Services;
 
 namespace Digillect.Mvvm.UI
 {
@@ -25,7 +17,7 @@ namespace Digillect.Mvvm.UI
 	/// Base class for Windows Metro applications. Implements <see cref="Digillect.Mvvm.ILifetimeScopeProvider"/> and performs registration of services and components.
 	/// </summary>
 	[Windows.Foundation.Metadata.WebHostHidden]
-	public class Application : Windows.UI.Xaml.Application
+	public abstract class Application : Windows.UI.Xaml.Application
 	{
 		/// <summary>
 		/// Gets the application root frame.
@@ -39,7 +31,7 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		public Application()
 		{
-			InitializeIoC();
+			Container = CreateContainer();
 			this.Suspending += ( s, e ) => HandleSuspension( e );
 		}
 		#endregion
@@ -99,21 +91,7 @@ namespace Digillect.Mvvm.UI
 		#endregion
 
 		#region IoC/Services
-		private void InitializeIoC()
-		{
-			var container = new MetroContainer();
-
-			RegisterServices( container );
-
-			this.Container = container;
-		}
-
-		protected virtual void RegisterServices( IContainer container )
-		{
-			var module = new Configuration.WinRTModule();
-
-			module.Load( container );
-		}
+		protected abstract IContainer CreateContainer();
 		#endregion
 
 		#region Breadcrumbing
