@@ -98,7 +98,7 @@
     <Compile Include="..\AssemblySharedInfo.cs">
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
-    <Compile Include="Configuration\WindowsPhoneModule.cs" />
+    <Compile Include="Services\IContainer.cs" />
     <Compile Include="UI\EntityPage.cs" />
     <Compile Include="Services\IPageDecorator.cs" />
     <Compile Include="UI\NavigationServiceExtensions.cs" />

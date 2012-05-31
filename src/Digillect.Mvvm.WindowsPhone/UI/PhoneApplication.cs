@@ -4,23 +4,23 @@ using System.Windows.Navigation;
 
 using Microsoft.Phone.Controls;
 
-using Autofac;
+using Digillect.Mvvm.Services;
 
 namespace Digillect.Mvvm.UI
 {
 	/// <summary>
 	/// Base class for Windows Phone 7 applications.
 	/// </summary>
-	public class PhoneApplication : Application
+	public abstract class PhoneApplication : Application
 	{
 		/// <summary>
 		/// Gets the application root frame.
 		/// </summary>
 		public PhoneApplicationFrame RootFrame { get; private set; }
 		/// <summary>
-		/// Gets the IoC scope.
+		/// Gets the IoC container.
 		/// </summary>
-		public ILifetimeScope Scope { get; private set; }
+		public IContainer Container { get; private set; }
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -28,8 +28,8 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		public PhoneApplication()
 		{
+			Container = CreateContainer();
 			InitializePhoneApplication();
-			InitializeIoC();
 		}
 		#endregion
 
@@ -87,23 +87,10 @@ namespace Digillect.Mvvm.UI
 		#endregion
 
 		#region IoC Support
-		private void InitializeIoC()
-		{
-			var builder = new ContainerBuilder();
-
-			RegisterServices( builder );
-
-			this.Scope = builder.Build();
-		}
-
 		/// <summary>
-		/// Registers available services.
+		/// Creates implementation of <see cref="Digillect.Mvvm.Services.IContainer"/>.
 		/// </summary>
-		/// <param name="builder">The builder.</param>
-		protected virtual void RegisterServices( ContainerBuilder builder )
-		{
-			builder.RegisterModule<Configuration.WindowsPhoneModule>();
-		}
+		protected abstract IContainer CreateContainer();
 		#endregion
 	}
 }

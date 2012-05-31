@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-
-using System.Windows;
-using System.Windows.Navigation;
-
-using Autofac;
 
 namespace Digillect.Mvvm.UI
 {
@@ -40,7 +34,6 @@ namespace Digillect.Mvvm.UI
 
 			if( !IsInDesignMode )
 			{
-				this.viewModel = this.Scope.Resolve<TViewModel>();
 				InitialLoadData();
 			}
 		}
@@ -55,9 +48,17 @@ namespace Digillect.Mvvm.UI
 
 			if( !IsInDesignMode )
 			{
-				this.viewModel = this.Scope.Resolve<TViewModel>();
 				InitialLoadData();
 			}
+		}
+
+		/// <summary>
+		/// Creates the view model.
+		/// </summary>
+		/// <returns>View model for this page.</returns>
+		protected virtual TViewModel CreateViewModel()
+		{
+			return Container.Resolve<TViewModel>();
 		}
 
 		/// <summary>
@@ -68,7 +69,9 @@ namespace Digillect.Mvvm.UI
 		/// </returns>
 		protected override PageDataContext CreateDataContext()
 		{
-			return this.Scope.Resolve<ViewModelPageDataContext.Factory>()( this, this.viewModel );
+			this.viewModel = CreateViewModel();
+
+			return new ViewModelPageDataContext( this, this.viewModel );
 		}
 		#endregion
 

@@ -11,18 +11,6 @@ namespace Digillect.Mvvm.Services
 	public interface IPageDecorationService
 	{
 		/// <summary>
-		/// Adds the decorator to collection of active decorators.
-		/// </summary>
-		/// <param name="decorator">The decorator.</param>
-		void AddDecorator( IPageDecorator decorator );
-		
-		/// <summary>
-		/// Removes the decorator from collection of active decorators.
-		/// </summary>
-		/// <param name="decorator">The decorator.</param>
-		void RemoveDecorator( IPageDecorator decorator );
-
-		/// <summary>
 		/// Performs decoration of the page.
 		/// </summary>
 		/// <param name="page">The page.</param>

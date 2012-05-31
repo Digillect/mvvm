@@ -3,8 +3,6 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
 
-using Autofac;
-
 using Digillect.Mvvm.Services;
 
 namespace Digillect.Mvvm.UI
@@ -16,7 +14,7 @@ namespace Digillect.Mvvm.UI
 	{
 		private const string RessurectionMark = "__mark$mark__";
 
-		private ILifetimeScope scope;
+		private IContainer container;
 
 		#region Constructor
 		/// <summary>
@@ -38,11 +36,11 @@ namespace Digillect.Mvvm.UI
 		}
 
 		/// <summary>
-		/// Gets the IoC scope.
+		/// Gets the IoC container.
 		/// </summary>
-		public ILifetimeScope Scope
+		public IContainer Container
 		{
-			get { return this.scope; }
+			get { return this.container; }
 		}
 		#endregion
 
@@ -55,9 +53,9 @@ namespace Digillect.Mvvm.UI
 		{
 			base.OnNavigatedTo( e );
 
-			if( this.scope == null )
+			if( this.container == null )
 			{
-				this.scope = CurrentApplication.Scope.BeginLifetimeScope();
+				this.container = CurrentApplication.Container;
 
 				if( State.ContainsKey( RessurectionMark ) )
 					OnPageResurrected();
@@ -68,7 +66,7 @@ namespace Digillect.Mvvm.UI
 
 				try
 				{
-					this.Scope.Resolve<IPageDecorationService>().AddDecoration( this );
+					this.Container.Resolve<IPageDecorationService>().AddDecoration( this );
 				}
 				catch
 				{
@@ -86,18 +84,17 @@ namespace Digillect.Mvvm.UI
 			{
 				OnPageDestroyed();
 
-				try
+				if( this.container != null )
 				{
-					this.Scope.Resolve<IPageDecorationService>().RemoveDecoration( this );
-				}
-				catch
-				{
-				}
+					try
+					{
+						this.container.Resolve<IPageDecorationService>().RemoveDecoration( this );
+					}
+					catch
+					{
+					}
 
-				if( this.scope != null )
-				{
-					this.scope.Dispose();
-					this.scope = null;
+					this.container = null;
 				}
 			}
 			else
@@ -117,7 +114,7 @@ namespace Digillect.Mvvm.UI
 		/// <returns>Data context that will be set to <see cref="System.Windows.FrameworkElement.DataContext"/> property.</returns>
 		protected virtual PageDataContext CreateDataContext()
 		{
-			return this.Scope.Resolve<PageDataContext.Factory>()( this );
+			return new PageDataContext( this );
 		}
 
 		/// <summary>

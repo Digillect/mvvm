@@ -10,34 +10,6 @@ namespace Digillect.Mvvm.Services
 	/// </summary>
 	internal sealed class PageDecorationService : IPageDecorationService
 	{
-		private readonly List<IPageDecorator> decorators = new List<IPageDecorator>();
-
-		#region Add/Remove Decorators
-		/// <summary>
-		/// Adds the decorator to collection of active decorators.
-		/// </summary>
-		/// <param name="decorator">The decorator.</param>
-		public void AddDecorator( IPageDecorator decorator )
-		{
-			if( decorator == null )
-				throw new ArgumentNullException( "decorator" );
-
-			decorators.Add( decorator );
-		}
-
-		/// <summary>
-		/// Removes the decorator from collection of active decorators.
-		/// </summary>
-		/// <param name="decorator">The decorator.</param>
-		public void RemoveDecorator( IPageDecorator decorator )
-		{
-			if( decorator == null )
-				throw new ArgumentNullException( "decorator" );
-
-			decorators.Remove( decorator );
-		}
-		#endregion
-
 		#region Add/Remove Page decoration
 		/// <summary>
 		/// Performs decoration of the page.
@@ -48,7 +20,10 @@ namespace Digillect.Mvvm.Services
 			if( page == null )
 				throw new ArgumentNullException( "page" );
 
-			decorators.ForEach( d => d.AddDecoration( page ) );
+			var decorators = page.Container.ResolveAll<IPageDecorator>();
+
+			foreach( var decorator in decorators )
+				decorator.AddDecoration( page );
 		}
 
 		/// <summary>
@@ -60,7 +35,10 @@ namespace Digillect.Mvvm.Services
 			if( page == null )
 				throw new ArgumentNullException( "page" );
 
-			decorators.ForEach( d => d.RemoveDecoration( page ) );
+			var decorators = page.Container.ResolveAll<IPageDecorator>();
+
+			foreach( var decorator in decorators )
+				decorator.RemoveDecoration( page );
 		}
 		#endregion
 	}
