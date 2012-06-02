@@ -57,12 +57,12 @@ namespace Digillect.Mvvm.UI
 			{
 				this.container = CurrentApplication.Container;
 
+				this.DataContext = CreateDataContext();
+
 				if( State.ContainsKey( RessurectionMark ) )
 					OnPageResurrected();
 				else
 					OnPageCreated();
-
-				this.DataContext = CreateDataContext();
 
 				try
 				{
