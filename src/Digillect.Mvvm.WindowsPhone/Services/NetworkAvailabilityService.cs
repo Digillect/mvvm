@@ -9,7 +9,7 @@ namespace Digillect.Mvvm.Services
 	/// <summary>
 	/// Default implementation of <see cref="Digillect.Mvvm.Services.INetworkAvailabilityService"/> for Windows Phone 7.
 	/// </summary>
-	internal sealed class NetworkAvailabilityService : INetworkAvailabilityService
+	public sealed class NetworkAvailabilityService : INetworkAvailabilityService
 	{
 		#region Constructors/Disposer
 		/// <summary>
