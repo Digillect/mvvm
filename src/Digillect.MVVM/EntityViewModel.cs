@@ -50,8 +50,11 @@ namespace Digillect.Mvvm
 		/// <param name="loader">Loader to handle specified part.</param>
 		protected void RegisterPart( string part, Func<EntitySession<TId>, Task> loader )
 		{
-			Contract.Assert( part != null );
-			Contract.Assert( loader != null );
+			if( part == null )
+				throw new ArgumentNullException( "part" );
+
+			if( loader == null )
+				throw new ArgumentNullException( "loader" );
 
 			this.parts[part] = loader;
 		}
@@ -64,8 +67,6 @@ namespace Digillect.Mvvm
 		/// <returns><see cref="System.Threading.Tasks.Task{T}"/> that can be awaited and will return <see cref="Digillect.Mvvm.Session"/>.</returns>
 		public Task<Session> Load( TId id )
 		{
-			Contract.Ensures( Contract.Result<Task<Session>>() != null );
-
 			var session = new EntitySession<TId>( id );
 
 			return Load( session );
@@ -78,8 +79,6 @@ namespace Digillect.Mvvm
 		/// <returns><see cref="System.Threading.Tasks.Task{T}"/> that can be awaited.</returns>
 		public Task<Session> LoadEntity( TId id )
 		{
-			Contract.Ensures( Contract.Result<Task<Session>>() != null );
-
 			var session = new EntitySession<TId>( id, EntitySession<TId>.Entity );
 
 			return Load( session );

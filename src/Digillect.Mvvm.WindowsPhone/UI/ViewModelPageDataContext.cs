@@ -19,7 +19,8 @@ namespace Digillect.Mvvm.UI
 		public ViewModelPageDataContext( PhoneApplicationPage page, ViewModel viewModel )
 			: base( page )
 		{
-			Contract.Requires( page != null );
+			if( page == null )
+				throw new ArgumentNullException( "page" );
 
 			ViewModel = viewModel;
 		}

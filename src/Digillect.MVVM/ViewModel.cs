@@ -90,8 +90,8 @@ namespace Digillect.Mvvm
 		[EditorBrowsable( EditorBrowsableState.Never )]
 		public async Task<Session> Load( Session session )
 		{
-			Contract.Requires( session != null );
-			Contract.Ensures( Contract.Result<Task<Session>>() != null );
+			if( session == null )
+				throw new ArgumentNullException( "session" );
 
 			if( !ShouldLoadSession( session ) )
 			{
@@ -225,8 +225,6 @@ namespace Digillect.Mvvm
 		/// <returns><c>true</c> if view model should proceed with loading session; otherwise, <c>false</c>.</returns>
 		protected virtual bool ShouldLoadSession( Session session )
 		{
-			Contract.Requires( session != null );
-
 			return true;
 		}
 
@@ -236,7 +234,6 @@ namespace Digillect.Mvvm
 		/// <param name="session">The session.</param>
 		protected virtual void LoadSession( Session session )
 		{
-			Contract.Requires( session != null );
 		}
 		#endregion
 	}

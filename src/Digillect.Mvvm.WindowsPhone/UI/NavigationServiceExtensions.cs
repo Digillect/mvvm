@@ -35,8 +35,6 @@ namespace Digillect.Mvvm.UI
 			var pageType = typeof( TPage );
 			var applicationType = Application.Current.GetType();
 
-			Contract.Assume( applicationType.Namespace != null );
-
 			if( !pageType.Namespace.StartsWith( applicationType.Namespace ) )
 				throw new InvalidOperationException( "Page must be in the child namespace relative to Application's namespace." );
 

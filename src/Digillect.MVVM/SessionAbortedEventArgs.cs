@@ -20,7 +20,8 @@ namespace Digillect.Mvvm
 		public SessionAbortedEventArgs( Session session, Exception exception )
 			: base( session )
 		{
-			Contract.Requires( session != null );
+			if( session == null )
+				throw new ArgumentNullException( "session" );
 
 			this.exception = exception;
 		}

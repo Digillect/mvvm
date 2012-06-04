@@ -34,7 +34,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\..\build\bin\Debug\WP7\Digillect.Mvvm.xml</DocumentationFile>
     <NoWarn>1591,1607</NoWarn>
-    <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
+    <CodeContractsEnableRuntimeChecking>False</CodeContractsEnableRuntimeChecking>
     <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
     <CodeContractsRuntimeThrowOnFailure>False</CodeContractsRuntimeThrowOnFailure>
     <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
@@ -79,7 +79,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\..\build\bin\Release\WP7\Digillect.Mvvm.xml</DocumentationFile>
     <NoWarn>1591,1607</NoWarn>
-    <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
+    <CodeContractsEnableRuntimeChecking>False</CodeContractsEnableRuntimeChecking>
     <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
     <CodeContractsRuntimeThrowOnFailure>False</CodeContractsRuntimeThrowOnFailure>
     <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>

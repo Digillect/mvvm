@@ -21,7 +21,8 @@ namespace Digillect.Mvvm
 		/// <param name="canExecute">Function that indicates whether command can be executed or not.</param>
 		public RelayCommand( Action<T> execute, Func<T, bool> canExecute = null )
 		{
-			Contract.Requires( execute != null );
+			if( execute == null )
+				throw new ArgumentNullException( "execute" );
 
 			this.execute = execute;
 			this.canExecute = canExecute;

@@ -120,7 +120,8 @@ namespace Digillect.Mvvm
 		/// <returns>Parameter value, casted to <typeparamref name="T"/>.</returns>
 		public T GetParameter<T>( string name )
 		{
-			Contract.Requires( !string.IsNullOrEmpty( name ) );
+			if( string.IsNullOrEmpty( name ) )
+				throw new ArgumentNullException( "name", "Parameter can't be null or empty string." );
 
 			return (T) this.parameters[name];
 		}

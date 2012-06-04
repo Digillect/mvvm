@@ -77,7 +77,8 @@ namespace Digillect.Mvvm
 		/// <exception cref="System.ArgumentNullException">if part is <c>null</c>.</exception>
 		public bool Includes( string part )
 		{
-			Contract.Requires( part != null );
+			if( part == null )
+				throw new ArgumentNullException( "part" );
 
 			if( this.part == null )
 				return true;

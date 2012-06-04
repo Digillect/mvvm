@@ -20,7 +20,8 @@ namespace Digillect.Mvvm.UI
 		/// <param name="page">The page used in this context.</param>
 		public PageDataContext( PhoneApplicationPage page )
 		{
-			Contract.Requires( page != null );
+			if( page == null )
+				throw new ArgumentNullException( "page" );
 
 			this.page = page;
 		}
