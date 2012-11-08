@@ -11,6 +11,8 @@ namespace Digillect.Mvvm.UI
 	/// </summary>
 	public class PageDataContext : ObservableObject, IDisposable
 	{
+		public delegate PageDataContext Factory( PhoneApplicationPage page );
+
 		private readonly PhoneApplicationPage page;
 
 		#region Constructors/Disposer

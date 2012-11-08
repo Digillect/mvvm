@@ -4,6 +4,8 @@ using System.Windows.Navigation;
 
 using Microsoft.Phone.Controls;
 
+using Autofac;
+
 using Digillect.Mvvm.Services;
 
 namespace Digillect.Mvvm.UI
@@ -20,7 +22,7 @@ namespace Digillect.Mvvm.UI
 		/// <summary>
 		/// Gets the IoC container.
 		/// </summary>
-		public IContainer Container { get; private set; }
+		public ILifetimeScope Scope { get; private set; }
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -28,7 +30,7 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		public PhoneApplication()
 		{
-			Container = CreateContainer();
+			InitializeIoC();
 			InitializePhoneApplication();
 		}
 		#endregion
@@ -87,10 +89,19 @@ namespace Digillect.Mvvm.UI
 		#endregion
 
 		#region IoC Support
-		/// <summary>
-		/// Creates implementation of <see cref="Digillect.Mvvm.Services.IContainer"/>.
-		/// </summary>
-		protected abstract IContainer CreateContainer();
+		private void InitializeIoC()
+		{
+			var builder = new ContainerBuilder();
+
+			RegisterServices( builder );
+
+			this.Scope = builder.Build();
+		}
+
+		protected virtual void RegisterServices( ContainerBuilder builder )
+		{
+			builder.RegisterModule<WindowsPhoneModule>();
+		}
 		#endregion
 	}
 }

@@ -9,6 +9,8 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
+using Autofac;
+
 using Digillect.Mvvm.Services;
 
 namespace Digillect.Mvvm.UI
@@ -23,7 +25,7 @@ namespace Digillect.Mvvm.UI
 		/// Gets the application root frame.
 		/// </summary>
 		public Frame RootFrame { get; private set; }
-		public IContainer Container { get; private set; }
+		public ILifetimeScope Scope { get; private set; }
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -31,7 +33,7 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		public Application()
 		{
-			Container = CreateContainer();
+			InitializeIoC();
 			this.Suspending += ( s, e ) => HandleSuspension( e );
 		}
 		#endregion
@@ -91,7 +93,17 @@ namespace Digillect.Mvvm.UI
 		#endregion
 
 		#region IoC/Services
-		protected abstract IContainer CreateContainer();
+		private void InitializeIoC()
+		{
+			var builder = new ContainerBuilder();
+
+			this.Scope = builder.Build();
+		}
+
+		protected virtual void RegisterServices( ContainerBuilder builder )
+		{
+			builder.RegisterModule<Windows8Module>();
+		}
 		#endregion
 
 		#region Breadcrumbing

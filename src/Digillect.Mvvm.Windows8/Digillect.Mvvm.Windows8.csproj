@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Digillect.Mvvm</RootNamespace>
-    <AssemblyName>Digillect.Mvvm.WinRT</AssemblyName>
+    <AssemblyName>Digillect.Mvvm.Windows8</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -21,22 +21,20 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\build\bin\Debug\WinRT\AnyCPU\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET45;NETFX_CORE</DefineConstants>
+    <OutputPath>..\..\target\Debug\win8\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET45;WINDOWS8</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>..\..\target\Debug\win8\Digillect.Mvvm.Windows8.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\build\bin\Release\WinRT\</OutputPath>
-    <DefineConstants>TRACE;NET45;NETFX_CORE</DefineConstants>
+    <OutputPath>..\..\target\Release\win8\</OutputPath>
+    <DefineConstants>TRACE;NET45;WINDOWS8</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>..\..\target\Release\win8\Digillect.Mvvm.Windows8.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\AssemblySharedInfo.cs">
@@ -46,6 +44,7 @@
     <Compile Include="Services\IPageDecorationService.cs" />
     <Compile Include="Services\IPageDecorator.cs" />
     <Compile Include="Services\PageDecorationService.cs" />
+    <Compile Include="Services\Windows8Module.cs" />
     <Compile Include="UI\Application.cs" />
     <Compile Include="UI\Breadcrumb.cs" />
     <Compile Include="UI\EntityPage`1.cs" />
@@ -58,19 +57,24 @@
     <Compile Include="UI\ViewModelPageDataContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Digillect.Mvvm\Digillect.Mvvm %28WinRT%29.csproj">
+    <ProjectReference Include="..\Digillect.Mvvm\Digillect.Mvvm %28win8%29.csproj">
       <Project>{a3037917-1b3d-4d99-a820-8d8c6121d8d1}</Project>
-      <Name>Digillect.Mvvm %28WinRT%29</Name>
+      <Name>Digillect.Mvvm %28win8%29</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Digillect, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\DCL.Core.4.0.0-alpha-31\lib\winrt45\Digillect.dll</HintPath>
+    <Reference Include="Autofac">
+      <HintPath>..\..\packages\Autofac.3.0.0-beta\lib\portable-win+net40+sl50+wp8\Autofac.dll</HintPath>
+      <Private>False</Private>
     </Reference>
+    <Reference Include="Digillect">
+      <HintPath>..\..\packages\DCL.Core.4.0.0.16\lib\win8\Digillect.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>

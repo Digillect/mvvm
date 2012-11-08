@@ -2,15 +2,12 @@
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
+using Autofac;
+
 namespace Digillect.Mvvm.Services
 {
-	public sealed class NetworkAvailabilityService : INetworkAvailabilityService
+	public sealed class NetworkAvailabilityService : INetworkAvailabilityService, IStartable
 	{
-		public NetworkAvailabilityService()
-		{
-			Start();
-		}
-
 		public void Start()
 		{
 			NetworkAvailable = true;

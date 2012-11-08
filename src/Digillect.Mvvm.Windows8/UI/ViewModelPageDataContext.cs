@@ -7,6 +7,7 @@ namespace Digillect.Mvvm.UI
 	/// </summary>
 	public class ViewModelPageDataContext : PageDataContext
 	{
+		public new delegate ViewModelPageDataContext Factory( Page page, ViewModel viewModel );
 		private readonly ViewModel viewModel;
 
 		#region Constructors/Disposer

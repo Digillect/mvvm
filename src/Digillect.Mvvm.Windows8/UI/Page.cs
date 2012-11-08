@@ -11,6 +11,8 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
+using Autofac;
+
 using Digillect.Mvvm.Services;
 
 namespace Digillect.Mvvm.UI
@@ -20,7 +22,7 @@ namespace Digillect.Mvvm.UI
 	/// </summary>
 	public class Page : Windows.UI.Xaml.Controls.Page, INotifyPropertyChanged
 	{
-		private IContainer container;
+		private ILifetimeScope scope;
 		private List<Control> layoutAwareControls;
 		private Breadcrumb breadcrumb;
 
@@ -72,10 +74,10 @@ namespace Digillect.Mvvm.UI
 		}
 		#endregion
 
-		#region Protected Properties
-		public IContainer Container
+		#region Properties
+		public ILifetimeScope Scope
 		{
-			get { return this.container; }
+			get { return this.scope; }
 		}
 
 		protected Digillect.Mvvm.UI.Application CurrentApplication
@@ -208,7 +210,7 @@ namespace Digillect.Mvvm.UI
 
 			if( e.NavigationMode == NavigationMode.Back )
 			{
-				if( this.container == null )
+				if( this.scope == null )
 				{
 					// Most probably we're unwinding
 
@@ -223,16 +225,20 @@ namespace Digillect.Mvvm.UI
 
 		protected void HandleNavigationToPage( object parameter )
 		{
-			if( this.container == null )
+			if( this.scope == null )
 			{
-				this.container = CurrentApplication.Container;
-				//this.scope = CurrentApplication.Scope.BeginLifetimeScope();
+				this.scope = CurrentApplication.Scope.BeginLifetimeScope();
 
 				DataContext = CreateDataContext();
 
 				OnPageCreated( parameter );
 
-				this.Container.Resolve<IPageDecorationService>().AddDecoration( this );
+				IPageDecorationService pageDecorationService = null;
+
+				if( this.scope.TryResolve<IPageDecorationService>( out pageDecorationService ) )
+				{
+					pageDecorationService.AddDecoration( this );
+				}
 			}
 			else
 			{
@@ -252,12 +258,17 @@ namespace Digillect.Mvvm.UI
 
 				OnPageDestroyed();
 
-				if( this.container != null )
+				if( this.scope != null )
 				{
-					this.container.Resolve<IPageDecorationService>().RemoveDecoration( this );
+					IPageDecorationService pageDecorationService = null;
 
-					//this.scope.Dispose();
-					this.container = null;
+					if( this.scope.TryResolve<IPageDecorationService>( out pageDecorationService ) )
+					{
+						pageDecorationService.RemoveDecoration( this );
+					}
+
+					this.scope.Dispose();
+					this.scope = null;
 				}
 			}
 			else
@@ -276,7 +287,7 @@ namespace Digillect.Mvvm.UI
 		/// <returns>Data context that will be set to <see cref="DataContext"/> property.</returns>
 		protected virtual PageDataContext CreateDataContext()
 		{
-			return new PageDataContext( this );
+			return this.Scope.Resolve<PageDataContext.Factory>()( this );
 		}
 
 		/// <summary>

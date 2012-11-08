@@ -1,8 +1,5 @@
 using System;
 
-using Digillect.Mvvm.Services;
-using System.Diagnostics.Contracts;
-
 namespace Digillect.Mvvm.UI
 {
 	/// <summary>
@@ -10,6 +7,8 @@ namespace Digillect.Mvvm.UI
 	/// </summary>
 	public class ViewModelPageDataContext : PageDataContext
 	{
+		public delegate PageDataContext Factory( PhoneApplicationPage page, ViewModel viewModel );
+
 		#region Constructors/Disposer
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ViewModelPageDataContext"/> class.
@@ -20,7 +19,9 @@ namespace Digillect.Mvvm.UI
 			: base( page )
 		{
 			if( page == null )
+			{
 				throw new ArgumentNullException( "page" );
+			}
 
 			ViewModel = viewModel;
 		}

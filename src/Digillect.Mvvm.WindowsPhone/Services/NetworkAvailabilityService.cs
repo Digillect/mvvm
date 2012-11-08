@@ -4,12 +4,14 @@ using System.Threading.Tasks;
 
 using Microsoft.Phone.Net.NetworkInformation;
 
+using Autofac;
+
 namespace Digillect.Mvvm.Services
 {
 	/// <summary>
-	/// Default implementation of <see cref="Digillect.Mvvm.Services.INetworkAvailabilityService"/> for Windows Phone 7.
+	/// Default implementation of <see cref="Digillect.Mvvm.Services.INetworkAvailabilityService"/> for Windows Phone 7/8.
 	/// </summary>
-	public sealed class NetworkAvailabilityService : INetworkAvailabilityService
+	public sealed class NetworkAvailabilityService : INetworkAvailabilityService, IStartable
 	{
 		#region Constructors/Disposer
 		/// <summary>
@@ -17,7 +19,6 @@ namespace Digillect.Mvvm.Services
 		/// </summary>
 		public NetworkAvailabilityService()
 		{
-			Start();
 		}
 		#endregion
 		/// <summary>
@@ -25,10 +26,14 @@ namespace Digillect.Mvvm.Services
 		/// </summary>
 		public void Start()
 		{
+#if !WINDOWS_PHONE_8
 			NetworkAvailable = true;
 			NetworkChange.NetworkAddressChanged += NetworkChange_NetworkAddressChanged;
 
 			NetworkChange_NetworkAddressChanged( null, EventArgs.Empty );
+#else
+			DeviceNetworkInformation.NetworkAvailabilityChanged += DeviceNetworkInformation_NetworkAvailabilityChanged;
+#endif
 		}
 
 		/// <summary>
@@ -43,12 +48,24 @@ namespace Digillect.Mvvm.Services
 		/// </summary>
 		public event EventHandler NetworkAvailabilityChanged;
 
+#if WINDOWS_PHONE_8
+		void DeviceNetworkInformation_NetworkAvailabilityChanged( object sender, NetworkNotificationEventArgs e )
+		{
+			var oldNetworkAvailable = NetworkAvailable;
+
+			NetworkAvailable = DeviceNetworkInformation.IsNetworkAvailable;
+
+			if( NetworkAvailable != oldNetworkAvailable && NetworkAvailabilityChanged != null )
+				NetworkAvailabilityChanged( this, EventArgs.Empty );
+		}
+#endif
+
+#if !WINDOWS_PHONE_8
 		private async void NetworkChange_NetworkAddressChanged( object sender, EventArgs e )
 		{
 			var oldNetworkAvailable = NetworkAvailable;
 
-
-			NetworkAvailable = await TaskEx.Run<bool>( InspectNetwork );
+			NetworkAvailable = await TaskEx.Run<bool>( (Func<bool>) InspectNetwork );
 
 			if( NetworkAvailable != oldNetworkAvailable && NetworkAvailabilityChanged != null )
 				NetworkAvailabilityChanged( this, EventArgs.Empty );
@@ -70,5 +87,6 @@ namespace Digillect.Mvvm.Services
 
 			return false;
 		}
+#endif
 	}
 }

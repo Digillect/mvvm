@@ -3,7 +3,7 @@
 <package>
 	<metadata>
 		<id>DCL.Mvvm</id>
-		<version>2.0.0-alpha</version>
+		<version>2.0.0.0</version>
 		<authors>Gregory Nickonov</authors>
 		<owners>Gregory Nickonov</owners>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -12,7 +12,22 @@
 		<copyright>Copyright © 2011-2012 Actis Systems. All rights reserved.</copyright>
 		<tags>digillect mvvm</tags>
 		<dependencies>
-			<dependency id="DCL.Core" version="4.0.0-alpha-25"/>
+			<group targetFramework="net45">
+				<dependency id="DCL.Core" version="4.0.0.0"/>
+				<dependency id="Autofac" version="3.0.0-beta"/>
+			</group>
+			<group targetFramework="wp71">
+				<dependency id="DCL.Core" version="4.0.0.0"/>
+				<dependency id="Autofac" version="2.6.3.862"/>
+			</group>
+			<group targetFramework="wp80">
+				<dependency id="DCL.Core" version="4.0.0.0"/>
+				<dependency id="Autofac" version="3.0.0-beta"/>
+			</group>
+			<group targetFramework="windows8">
+				<dependency id="DCL.Core" version="4.0.0.0"/>
+				<dependency id="Autofac" version="3.0.0-beta"/>
+			</group>
 		</dependencies>
 	</metadata>
 </package>

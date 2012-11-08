@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion(AssemblyInfo.FileVersion)]
 [assembly: AssemblyInformationalVersion(AssemblyInfo.ProductVersion)]
 
-#if !NETFX_CORE
+#if !WINDOWS8
 [assembly: CLSCompliant(true)]
 #else
 [assembly: CLSCompliant(false)]
@@ -31,11 +31,11 @@ internal static class AssemblyInfo
 {
 	public const string Major = "2";
 	public const string Minor = "0";
-	public const string Patch = "0";
-	public const string SemVerSuffix = "";
+	public const string Revision = "0";
+	public const string BuildNumber = "0";
 
-	public const string Version = Major + "." + Minor + "." + Patch;
-	public const string FileVersion = Major + "." + Minor + "." + Patch + SemVerSuffix;
+	public const string Version = Major + "." + Minor + "." + Revision + "." + BuildNumber;
+	public const string FileVersion = Major + "." + Minor + "." + Revision + "." + BuildNumber;
 	public const string ProductVersion = Major + "." + Minor;
 	public const string SatelliteContractVersion = Major + "." + Minor + ".0.0";
 }

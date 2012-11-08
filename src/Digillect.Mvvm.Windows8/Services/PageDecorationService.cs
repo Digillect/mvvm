@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Autofac;
+
 using Digillect.Mvvm.UI;
 
 namespace Digillect.Mvvm.Services
@@ -10,13 +12,6 @@ namespace Digillect.Mvvm.Services
 	/// </summary>
 	public sealed class PageDecorationService : IPageDecorationService
 	{
-		#region Constructors/Disposer
-		public PageDecorationService()
-		{
-		}
-		#endregion
-
-
 		#region Add/Remove Page decoration
 		/// <summary>
 		/// Performs decoration of the page.
@@ -25,12 +20,14 @@ namespace Digillect.Mvvm.Services
 		public void AddDecoration( Page page )
 		{
 			if( page == null )
+			{
 				throw new ArgumentNullException( "page" );
+			}
 
-			var decorators = page.Container.ResolveAll<IPageDecorator>();
-
-			foreach( var decorator in decorators )
+			foreach( var decorator in page.Scope.Resolve<IEnumerable<IPageDecorator>>() )
+			{
 				decorator.AddDecoration( page );
+			}
 		}
 
 		/// <summary>
@@ -40,12 +37,14 @@ namespace Digillect.Mvvm.Services
 		public void RemoveDecoration( Page page )
 		{
 			if( page == null )
+			{
 				throw new ArgumentNullException( "page" );
+			}
 
-			var decorators = page.Container.ResolveAll<IPageDecorator>();
-
-			foreach( var decorator in decorators )
+			foreach( var decorator in page.Scope.Resolve<IEnumerable<IPageDecorator>>() )
+			{
 				decorator.RemoveDecoration( page );
+			}
 		}
 		#endregion
 	}

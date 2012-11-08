@@ -11,6 +11,8 @@ namespace Digillect.Mvvm.UI
 	/// </summary>
 	public class PageDataContext : ObservableObject, IDisposable
 	{
+		public delegate PageDataContext Factory( Page page );
+
 		private readonly Page page;
 		private readonly ObservableDictionary values = new ObservableDictionary();
 

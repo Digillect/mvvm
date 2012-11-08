@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Autofac;
+
 namespace Digillect.Mvvm.UI
 {
 	/// <summary>
@@ -59,7 +61,7 @@ namespace Digillect.Mvvm.UI
 		{
 			this.viewModel = CreateViewModel();
 
-			return new ViewModelPageDataContext( this, this.viewModel );
+			return Scope.Resolve<ViewModelPageDataContext.Factory>()( this, this.viewModel );
 		}
 		#endregion
 
@@ -70,7 +72,7 @@ namespace Digillect.Mvvm.UI
 		/// <returns>Instance of view model.</returns>
 		protected virtual TViewModel CreateViewModel()
 		{
-			return Container.Resolve<TViewModel>();
+			return Scope.Resolve<TViewModel>();
 		}
 		#endregion
 

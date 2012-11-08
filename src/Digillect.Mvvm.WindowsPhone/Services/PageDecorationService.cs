@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Autofac;
+
 using Digillect.Mvvm.UI;
 
 namespace Digillect.Mvvm.Services
@@ -20,9 +22,7 @@ namespace Digillect.Mvvm.Services
 			if( page == null )
 				throw new ArgumentNullException( "page" );
 
-			var decorators = page.Container.ResolveAll<IPageDecorator>();
-
-			foreach( var decorator in decorators )
+			foreach( var decorator in page.Scope.Resolve<IEnumerable<IPageDecorator>>() )
 				decorator.AddDecoration( page );
 		}
 
@@ -35,9 +35,7 @@ namespace Digillect.Mvvm.Services
 			if( page == null )
 				throw new ArgumentNullException( "page" );
 
-			var decorators = page.Container.ResolveAll<IPageDecorator>();
-
-			foreach( var decorator in decorators )
+			foreach( var decorator in page.Scope.Resolve<IEnumerable<IPageDecorator>>() )
 				decorator.RemoveDecoration( page );
 		}
 		#endregion

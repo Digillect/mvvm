@@ -5,6 +5,8 @@ using System.Windows.Markup;
 
 using Digillect.Mvvm.Services;
 
+using Autofac;
+
 namespace Digillect.Mvvm.UI
 {
 	/// <summary>
@@ -14,7 +16,7 @@ namespace Digillect.Mvvm.UI
 	{
 		private const string RessurectionMark = "__mark$mark__";
 
-		private IContainer container;
+		private ILifetimeScope scope;
 
 		#region Constructor
 		/// <summary>
@@ -36,11 +38,11 @@ namespace Digillect.Mvvm.UI
 		}
 
 		/// <summary>
-		/// Gets the IoC container.
+		/// Gets the IoC lifetime scope.
 		/// </summary>
-		public IContainer Container
+		public ILifetimeScope Scope
 		{
-			get { return this.container; }
+			get { return this.scope; }
 		}
 		#endregion
 
@@ -53,10 +55,9 @@ namespace Digillect.Mvvm.UI
 		{
 			base.OnNavigatedTo( e );
 
-			if( this.container == null )
+			if( this.scope == null )
 			{
-				this.container = CurrentApplication.Container;
-
+				this.scope = CurrentApplication.Scope.BeginLifetimeScope();
 				this.DataContext = CreateDataContext();
 
 				if( State.ContainsKey( RessurectionMark ) )
@@ -64,12 +65,11 @@ namespace Digillect.Mvvm.UI
 				else
 					OnPageCreated();
 
-				try
+				IPageDecorationService pageDecorationService = null;
+
+				if( this.Scope.TryResolve<IPageDecorationService>( out pageDecorationService ) )
 				{
-					this.Container.Resolve<IPageDecorationService>().AddDecoration( this );
-				}
-				catch
-				{
+					pageDecorationService.AddDecoration( this );
 				}
 			}
 		}
@@ -84,17 +84,17 @@ namespace Digillect.Mvvm.UI
 			{
 				OnPageDestroyed();
 
-				if( this.container != null )
+				if( this.scope != null )
 				{
-					try
+					IPageDecorationService pageDecorationService = null;
+
+					if( this.Scope.TryResolve<IPageDecorationService>( out pageDecorationService ) )
 					{
-						this.container.Resolve<IPageDecorationService>().RemoveDecoration( this );
-					}
-					catch
-					{
+						pageDecorationService.RemoveDecoration( this );
 					}
 
-					this.container = null;
+					this.scope.Dispose();
+					this.scope = null;
 				}
 			}
 			else
@@ -114,7 +114,7 @@ namespace Digillect.Mvvm.UI
 		/// <returns>Data context that will be set to <see cref="System.Windows.FrameworkElement.DataContext"/> property.</returns>
 		protected virtual PageDataContext CreateDataContext()
 		{
-			return new PageDataContext( this );
+			return this.scope.Resolve<PageDataContext.Factory>()( this );
 		}
 
 		/// <summary>

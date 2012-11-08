@@ -32,6 +32,13 @@ namespace Digillect.Mvvm
 		/// The service used to indicate that data exchange is in the progress.
 		/// </value>
 		public IDataExchangeService DataExchangeService { get; set; }
+		/// <summary>
+		/// Gets or sets view model exception handling service.
+		/// </summary>
+		/// <value>
+		/// The service used to report any exceptions occured while view model loads a session.
+		/// </value>
+		public IViewModelExceptionHandlingService ViewModelExceptionHandlingService { get; set; }
 		#endregion
 
 		#region Data-Exchange notifications
@@ -153,7 +160,12 @@ namespace Digillect.Mvvm
 				RaiseSessionAborted( eventArgs );
 
 				if( !canceled && !eventArgs.Handled )
-					throw;
+				{
+					if( ViewModelExceptionHandlingService == null || !ViewModelExceptionHandlingService.HandleException( this, session, ex ) )
+					{
+						throw;
+					}
+				}
 
 				return session;
 			}
@@ -201,7 +213,12 @@ namespace Digillect.Mvvm
 				RaiseSessionAborted( eventArgs );
 
 				if( !canceled && !eventArgs.Handled )
-					throw;
+				{
+					if( ViewModelExceptionHandlingService == null || !ViewModelExceptionHandlingService.HandleException( this, session, aex ) )
+					{
+						throw;
+					}
+				}
 			}
 			finally
 			{
