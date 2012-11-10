@@ -16,6 +16,8 @@
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Digillect.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -69,7 +71,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Digillect">
-      <HintPath>..\..\packages\DCL.Core.4.0.0.16\lib\win8\Digillect.dll</HintPath>
+      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-2\lib\win8\Digillect.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

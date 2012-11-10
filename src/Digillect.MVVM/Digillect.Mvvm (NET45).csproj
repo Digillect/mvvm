@@ -10,11 +10,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Digillect.Mvvm</RootNamespace>
     <AssemblyName>Digillect.Mvvm</AssemblyName>
-    <KeyContainerName>Digillect.Key</KeyContainerName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Digillect.snk</AssemblyOriginatorKeyFile>
     <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">obj\net45\</BaseIntermediateOutputPath>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -113,7 +114,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Digillect">
-      <HintPath>..\..\packages\DCL.Core.4.0.0.16\lib\net45\Digillect.dll</HintPath>
+      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-2\lib\net45\Digillect.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />

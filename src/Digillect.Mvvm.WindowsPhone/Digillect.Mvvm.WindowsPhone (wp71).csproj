@@ -19,6 +19,8 @@
     <ValidateXaml>true</ValidateXaml>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
     <CodeContractsAssemblyMode>0</CodeContractsAssemblyMode>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Digillect.snk</AssemblyOriginatorKeyFile>
     <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">obj\wp71\</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -116,7 +118,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Digillect">
-      <HintPath>..\..\packages\DCL.Core.4.0.0.16\lib\wp71\Digillect.dll</HintPath>
+      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-2\lib\wp71\Digillect.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Contracts">
