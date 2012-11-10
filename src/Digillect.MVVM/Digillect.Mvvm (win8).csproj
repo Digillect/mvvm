@@ -70,8 +70,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Digillect">
-      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-2\lib\win8\Digillect.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-4\lib\win8\Digillect.dll</HintPath>
     </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">

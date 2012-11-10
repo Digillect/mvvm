@@ -97,6 +97,8 @@ namespace Digillect.Mvvm.UI
 		{
 			var builder = new ContainerBuilder();
 
+			RegisterServices( builder );
+
 			this.Scope = builder.Build();
 		}
 
