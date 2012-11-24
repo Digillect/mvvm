@@ -70,9 +70,9 @@
       <HintPath>..\..\packages\Autofac.3.0.0-beta\lib\portable-win+net40+sl50+wp8\Autofac.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Digillect, Version=4.0.0.9, Culture=neutral, PublicKeyToken=46fb24501f5dffcf, processorArchitecture=MSIL">
+    <Reference Include="Digillect">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-9\lib\win8\Digillect.dll</HintPath>
+      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-10\lib\win8\Digillect.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

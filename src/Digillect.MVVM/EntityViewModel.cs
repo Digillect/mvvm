@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,7 +16,7 @@ namespace Digillect.Mvvm
 	/// <typeparam name="TEntity">The type of the entity.</typeparam>
 	public abstract class EntityViewModel<TId, TEntity> : ViewModel
 		where TId : IComparable<TId>, IEquatable<TId>
-		where TEntity : XObject<TId>
+		where TEntity : class, IXIdentified<TId>
 	{
 		private TEntity entity;
 		private readonly Dictionary<string, Func<EntitySession<TId>, Task>> parts = new Dictionary<string, Func<EntitySession<TId>, Task>>();
