@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Digillect.Mvvm.UI
 {
@@ -15,36 +16,32 @@ namespace Digillect.Mvvm.UI
 		where TEntity: XObject<TId>
 		where TViewModel: EntityViewModel<TId, TEntity>
 	{
-		private TId entityId;
-
 		#region InitialLoadData
 		/// <summary>
 		/// Initials the load data.
 		/// </summary>
 		protected override void InitialLoadData()
 		{
-			this.ViewModel.Load( this.entityId );
+			ViewModel.Load( Parameters.Get<TId>( "Id" ) );
 		}
 		#endregion
-		#region OnNavigatedTo
-		/// <summary>
-		/// Raises the <see cref="E:NavigatedTo"/> event. Used to extract entity identifier from query string.
-		/// </summary>
-		/// <param name="e">The <see cref="System.Windows.Navigation.NavigationEventArgs"/> instance containing the event data.</param>
-		/// <exception cref="System.ArgumentException">when identifier can't be found in query string.</exception>
-		protected override void OnNavigatedTo( System.Windows.Navigation.NavigationEventArgs e )
+
+		protected override void ParseParameters( IDictionary<string, string> queryString )
 		{
-			if( this.NavigationContext.QueryString.ContainsKey( "Id" ) )
+			base.ParseParameters( queryString );
+
+			string stringId = null;
+
+			if( queryString.TryGetValue( "Id", out stringId ) )
 			{
-				this.entityId = (TId) Convert.ChangeType( NavigationContext.QueryString["Id"], typeof( TId ), null );
+				Parameters.Add( "Id", (TId) Services.NavigationService.DecodeValue( stringId, typeof( TId ) ) );
+
+				queryString.Remove( "Id" );
 			}
 			else
 			{
-				throw new ArgumentException( "Entity identifier is not passed in query string." );
+				throw new ArgumentException( "Entity identifier is not passed in query string.", "Id" );
 			}
-
-			base.OnNavigatedTo( e );
 		}
-		#endregion
 	}
 }

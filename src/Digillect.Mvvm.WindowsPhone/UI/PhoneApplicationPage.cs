@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
@@ -17,6 +20,7 @@ namespace Digillect.Mvvm.UI
 		private const string RessurectionMark = "__mark$mark__";
 
 		private ILifetimeScope scope;
+		private readonly Parameters _parameters = new Parameters();
 
 		#region Constructor
 		/// <summary>
@@ -44,6 +48,11 @@ namespace Digillect.Mvvm.UI
 		{
 			get { return this.scope; }
 		}
+
+		public Parameters Parameters
+		{
+			get { return _parameters; }
+		}
 		#endregion
 
 		#region Navigation handling
@@ -58,6 +67,8 @@ namespace Digillect.Mvvm.UI
 			if( this.scope == null )
 			{
 				this.scope = CurrentApplication.Scope.BeginLifetimeScope();
+
+				ParseParameters();
 				this.DataContext = CreateDataContext();
 
 				if( State.ContainsKey( RessurectionMark ) )
@@ -173,6 +184,46 @@ namespace Digillect.Mvvm.UI
 					isInDesignMode = System.ComponentModel.DesignerProperties.IsInDesignTool;
 
 				return isInDesignMode.Value;
+			}
+		}
+		#endregion
+
+		#region Parameters Parsing
+		private void ParseParameters()
+		{
+			var queryString = new Dictionary<string, string>( NavigationContext.QueryString, StringComparer.OrdinalIgnoreCase );
+
+			ParseParameters( queryString );
+		}
+
+		protected virtual void ParseParameters( IDictionary<string, string> queryString )
+		{
+			var pageType = GetType();
+
+			foreach( var attribute in pageType.GetCustomAttributes( typeof( ViewParameterAttribute ), true ).Cast<ViewParameterAttribute>() )
+			{
+				string stringValue = null;
+				object parameterValue = null;
+
+				if( queryString.TryGetValue( attribute.Name, out stringValue ) )
+				{
+					parameterValue = Digillect.Mvvm.Services.NavigationService.DecodeValue( stringValue, attribute.Type );
+
+					if( parameterValue != null )
+					{
+						_parameters.Add( attribute.Name, parameterValue );
+					}
+
+					queryString.Remove( attribute.Name );
+				}
+
+				if( parameterValue == null )
+				{
+					if( attribute.Required )
+					{
+						throw new ArgumentException( string.Format( "Page {0} requires argument {1} of type {2}.", pageType, attribute.Name, attribute.Type ), attribute.Name );
+					}
+				}
 			}
 		}
 		#endregion

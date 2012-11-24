@@ -11,7 +11,7 @@ namespace Digillect.Mvvm
 	/// </summary>
 	public class Session : IDisposable
 	{
-		private readonly Dictionary<string, object> parameters = new Dictionary<string, object>();
+		private readonly Parameters parameters = new Parameters();
 		private readonly List<Task> tasks = new List<Task>();
 		private readonly CancellationTokenSource tokenSource = new CancellationTokenSource();
 
@@ -59,7 +59,7 @@ namespace Digillect.Mvvm
 		/// <summary>
 		/// Gets the parameters.
 		/// </summary>
-		public IDictionary<string, object> Parameters
+		public Parameters Parameters
 		{
 			get { return this.parameters; }
 		}
@@ -118,12 +118,10 @@ namespace Digillect.Mvvm
 		/// <typeparam name="T">Parameter type.</typeparam>
 		/// <param name="name">Parameter name</param>
 		/// <returns>Parameter value, casted to <typeparamref name="T"/>.</returns>
+		[Obsolete( "Use Parameters.Get<T>() instead." )]
 		public T GetParameter<T>( string name )
 		{
-			if( string.IsNullOrEmpty( name ) )
-				throw new ArgumentNullException( "name", "Parameter can't be null or empty string." );
-
-			return (T) this.parameters[name];
+			return this.parameters.Get<T>( name );
 		}
 
 		/// <summary>
@@ -133,17 +131,15 @@ namespace Digillect.Mvvm
 		/// <param name="name">Parameter name.</param>
 		/// <param name="defaultValue">Default value.</param>
 		/// <returns>Parameter value or <paramref name="defaultValue"/> if parameter with corresponding <paramref name="name"/> is not found, casted to <typeparamref name="T"/>.</returns>
+		[Obsolete( "Use Parameters.GetParameter<T>() instead." )]
 		public T GetParameter<T>( string name, T defaultValue )
 		{
-			if( !this.Parameters.ContainsKey( name ) )
-				return defaultValue;
-
-			return (T) this.Parameters[name];
+			return this.parameters.Get<T>( name, defaultValue );
 		}
 
 		public Session AddParameter( string name, object value )
 		{
-			this.Parameters[name] = value;
+			this.parameters.Add( name, value );
 
 			return this;
 		}

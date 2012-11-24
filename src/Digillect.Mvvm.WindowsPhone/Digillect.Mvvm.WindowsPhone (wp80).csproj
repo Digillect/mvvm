@@ -126,16 +126,13 @@
       <HintPath>..\..\packages\DCL.Core.4.0.0-dev-4\lib\wp8\Digillect.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.Contracts">
-      <HintPath>C:\Program Files (x86)\Microsoft\Contracts\PublicAssemblies\Silverlight3\Microsoft.Contracts.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\AssemblySharedInfo.cs">
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
-    <Compile Include="Services\IContainer.cs" />
+    <Compile Include="Services\INavigationServiceContext.cs" />
+    <Compile Include="Services\NavigationService.cs" />
     <Compile Include="Services\WindowsPhoneModule.cs" />
     <Compile Include="UI\EntityPage.cs" />
     <Compile Include="Services\IPageDecorator.cs" />

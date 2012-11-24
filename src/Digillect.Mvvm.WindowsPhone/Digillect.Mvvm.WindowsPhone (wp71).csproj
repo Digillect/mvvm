@@ -157,6 +157,8 @@
     <Compile Include="..\AssemblySharedInfo.cs">
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
+    <Compile Include="Services\INavigationServiceContext.cs" />
+    <Compile Include="Services\NavigationService.cs" />
     <Compile Include="Services\WindowsPhoneModule.cs" />
     <Compile Include="UI\EntityPage.cs" />
     <Compile Include="Services\IPageDecorator.cs" />

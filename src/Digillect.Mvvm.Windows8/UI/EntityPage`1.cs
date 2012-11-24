@@ -22,7 +22,7 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		protected override async void InitialLoadData( NavigationParameters parameters )
 		{
-			await this.ViewModel.Load( parameters.Get<TId>() );
+			await this.ViewModel.Load( parameters.Get<TId>( "value" ) );
 
 			Context.Values["Loaded"] = true;
 		}

@@ -171,13 +171,13 @@ namespace Digillect.Mvvm.UI
 
 		protected void Navigate( Type pageType, string parameter )
 		{
-			Frame.Navigate( pageType, NavigationParameters.From( parameter ) );
+			Frame.Navigate( pageType, NavigationParameters.From( "value", parameter ) );
 		}
 
 		protected void Navigate<T>( Type pageType, T parameter )
 			where T : struct
 		{
-			Frame.Navigate( pageType, NavigationParameters.From<T>( parameter ) );
+			Frame.Navigate( pageType, NavigationParameters.From<T>( "value", parameter ) );
 		}
 
 		/// <summary>

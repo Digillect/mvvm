@@ -88,7 +88,7 @@ namespace Digillect.Mvvm
 
 		public new EntitySession<TId> AddParameter( string name, object value )
 		{
-			this.Parameters[name] = value;
+			Parameters.Add( name, value );
 
 			return this;
 		}
