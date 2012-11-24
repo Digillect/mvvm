@@ -13,7 +13,7 @@ namespace Digillect.Mvvm.UI
 	/// name <c>Id</c> that is used as entity id for view model. If that parameter is not found then <see cref="System.ArgumentException"/> will be thrown.</remarks>
 	public class EntityPage<TId, TEntity, TViewModel> : ViewModelPage<TViewModel>
 		where TId: IComparable<TId>, IEquatable<TId>
-		where TEntity: XObject<TId>
+		where TEntity: class, IXIdentified<TId>
 		where TViewModel: EntityViewModel<TId, TEntity>
 	{
 		#region InitialLoadData

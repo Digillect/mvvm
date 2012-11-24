@@ -13,7 +13,7 @@ namespace Digillect.Mvvm.UI
 	[Windows.Foundation.Metadata.WebHostHidden]
 	public class EntityPage<TId, TEntity, TViewModel> : ViewModelPage<TViewModel>
 		where TId: struct, IComparable<TId>, IEquatable<TId>
-		where TEntity: XObject<TId>
+		where TEntity: class, IXIdentified<TId>
 		where TViewModel: EntityViewModel<TId, TEntity>
 	{
 		#region InitialLoadData
