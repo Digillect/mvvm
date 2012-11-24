@@ -32,7 +32,7 @@ internal static class AssemblyInfo
 	public const string Major = "2";
 	public const string Minor = "0";
 	public const string Revision = "0";
-	public const string BuildNumber = "2";
+	public const string BuildNumber = "0";
 
 	public const string Version = Major + "." + Minor + "." + Revision + "." + BuildNumber;
 	public const string FileVersion = Major + "." + Minor + "." + Revision + "." + BuildNumber;
