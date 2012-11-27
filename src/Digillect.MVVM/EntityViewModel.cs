@@ -18,8 +18,16 @@ namespace Digillect.Mvvm
 		where TId : IComparable<TId>, IEquatable<TId>
 		where TEntity : class, IXIdentified<TId>
 	{
-		private TEntity entity;
-		private readonly Dictionary<string, Func<EntitySession<TId>, Task>> parts = new Dictionary<string, Func<EntitySession<TId>, Task>>();
+		public const string EntityPart = "Entity";
+
+		private TEntity _entity;
+
+		#region Constructors/Disposer
+		public EntityViewModel()
+		{
+			RegisterPart( EntityPart, (session, part) => LoadEntity( (EntitySession<TId>) session ), (session, part) => ShouldLoadEntity( (EntitySession<TId>) session ) );
+		}
+		#endregion
 
 		#region Public Properties
 		/// <summary>
@@ -30,35 +38,13 @@ namespace Digillect.Mvvm
 		/// </value>
 		public TEntity Entity
 		{
-			get { return this.entity; }
-
+			get { return _entity; }
 			protected set
 			{
-				if( this.entity != value )
-				{
-					OnPropertyChanging( "Entity", this.entity, value );
-					this.entity = value;
-					OnPropertyChanged( "Entity" );
-				}
+				SetProperty( ref _entity, value, "Entity" );
 			}
 		}
 		#endregion
-
-		/// <summary>
-		/// Registers handler of multipart loader.
-		/// </summary>
-		/// <param name="part">Part identifier.</param>
-		/// <param name="loader">Loader to handle specified part.</param>
-		protected void RegisterPart( string part, Func<EntitySession<TId>, Task> loader )
-		{
-			if( part == null )
-				throw new ArgumentNullException( "part" );
-
-			if( loader == null )
-				throw new ArgumentNullException( "loader" );
-
-			this.parts[part] = loader;
-		}
 
 		#region Load
 		/// <summary>
@@ -80,53 +66,9 @@ namespace Digillect.Mvvm
 		/// <returns><see cref="System.Threading.Tasks.Task{T}"/> that can be awaited.</returns>
 		public Task<Session> LoadEntity( TId id )
 		{
-			var session = new EntitySession<TId>( id, EntitySession<TId>.Entity );
+			var session = new EntitySession<TId>( id, EntityPart );
 
 			return Load( session );
-		}
-
-		/// <summary>
-		/// If entity loading is involved in this session ensures that entity with specified id
-		/// is not yet loaded.
-		/// </summary>
-		/// <param name="session">The session to check.</param>
-		/// <returns>
-		///   <c>true</c> if view model should proceed with loading session; otherwise, <c>false</c>.
-		/// </returns>
-		protected override bool ShouldLoadSession( Session session )
-		{
-			if( !base.ShouldLoadSession( session ) )
-				return false;
-
-			var entitySession = (EntitySession<TId>) session;
-
-			if( this.Entity != null && entitySession.IsEntity && object.Equals( entitySession.Id, Entity.Id ) )
-				return false;
-
-			return true;
-		}
-
-		/// <summary>
-		/// If entity loading is involved in this session creates <see cref="System.Threading.Tasks.Task{T}"/> to load entity
-		/// and adds it to session.
-		/// </summary>
-		/// <param name="session">The session.</param>
-		protected override void LoadSession( Session session )
-		{
-			base.LoadSession( session );
-
-			var entitySession = (EntitySession<TId>) session;
-
-			if( entitySession.IsEntity )
-				entitySession.Tasks.Add( LoadEntity( entitySession ) );
-
-			foreach( var pair in this.parts )
-			{
-				if( entitySession.Includes( pair.Key ) )
-				{
-					entitySession.Tasks.Add( pair.Value( entitySession ) );
-				}
-			}
 		}
 
 		/// <summary>
@@ -135,6 +77,10 @@ namespace Digillect.Mvvm
 		/// <param name="session">The session.</param>
 		/// <returns><see cref="System.Threading.Tasks.Task"/> that can be awaited.</returns>
 		protected abstract Task LoadEntity( EntitySession<TId> session );
+		protected virtual bool ShouldLoadEntity( EntitySession<TId> session )
+		{
+			return _entity == null || !object.Equals( ((EntitySession<TId>) session).Id, _entity.Id );
+		}
 		#endregion
 	}
 }

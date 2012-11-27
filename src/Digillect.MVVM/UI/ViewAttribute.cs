@@ -11,7 +11,7 @@ namespace Digillect.Mvvm.UI
 		private readonly string _path;
 
 		#region Constructors/Disposer
-		public ViewAttribute( string name, string path = null )
+		public ViewAttribute( string name = null, string path = null )
 		{
 			_name = name;
 			_path = path;

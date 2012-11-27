@@ -13,19 +13,19 @@
 		<tags>digillect mvvm</tags>
 		<dependencies>
 			<group targetFramework="net45">
-				<dependency id="DCL.Core" version="4.0.0-dev-2"/>
+				<dependency id="DCL.Core" version="4.0.0-dev-11"/>
 				<dependency id="Autofac" version="3.0.0-beta"/>
 			</group>
 			<group targetFramework="wp71">
-				<dependency id="DCL.Core" version="4.0.0-dev-2"/>
+				<dependency id="DCL.Core" version="4.0.0-dev-11"/>
 				<dependency id="Autofac" version="2.6.3.862"/>
 			</group>
 			<group targetFramework="wp80">
-				<dependency id="DCL.Core" version="4.0.0-dev-2"/>
+				<dependency id="DCL.Core" version="4.0.0-dev-11"/>
 				<dependency id="Autofac" version="3.0.0-beta"/>
 			</group>
 			<group targetFramework="windows8">
-				<dependency id="DCL.Core" version="4.0.0-dev-2"/>
+				<dependency id="DCL.Core" version="4.0.0-dev-11"/>
 				<dependency id="Autofac" version="3.0.0-beta"/>
 			</group>
 		</dependencies>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,9 +12,10 @@ namespace Digillect.Mvvm
 	/// </summary>
 	public class Session : IDisposable
 	{
-		private readonly Parameters parameters = new Parameters();
-		private readonly List<Task> tasks = new List<Task>();
-		private readonly CancellationTokenSource tokenSource = new CancellationTokenSource();
+		private readonly Parameters _parameters = new Parameters();
+		private readonly List<Task> _tasks = new List<Task>();
+		private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
+		private readonly string[] _parts;
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -21,7 +23,12 @@ namespace Digillect.Mvvm
 		/// </summary>
 		public Session()
 		{
-			this.State = SessionState.Created;
+			State = SessionState.Created;
+		}
+
+		public Session( params string[] parts )
+		{
+			_parts = parts;
 		}
 
 		/// <summary>
@@ -50,7 +57,7 @@ namespace Digillect.Mvvm
 		{
 			if( disposing )
 			{
-				this.tokenSource.Dispose();
+				_tokenSource.Dispose();
 			}
 		}
 		#endregion
@@ -61,7 +68,7 @@ namespace Digillect.Mvvm
 		/// </summary>
 		public Parameters Parameters
 		{
-			get { return this.parameters; }
+			get { return _parameters; }
 		}
 
 		/// <summary>
@@ -69,7 +76,24 @@ namespace Digillect.Mvvm
 		/// </summary>
 		public IList<Task> Tasks
 		{
-			get { return this.tasks; }
+			get { return _tasks; }
+		}
+		/// <summary>
+		/// Gets logical part for multipart requests.
+		/// </summary>
+		public IEnumerable<string> Parts
+		{
+			get { return _parts; }
+		}
+		/// <summary>
+		/// Gets a value indicating whether this instance is partial.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is partial; otherwise, <c>false</c>.
+		/// </value>
+		public bool IsPartial
+		{
+			get { return _parts != null && _parts.Length > 0; }
 		}
 
 		/// <summary>
@@ -91,7 +115,7 @@ namespace Digillect.Mvvm
 		/// </value>
 		public bool IsCancellationRequested
 		{
-			get { return this.tokenSource.IsCancellationRequested; }
+			get { return _tokenSource.IsCancellationRequested; }
 		}
 
 		/// <summary>
@@ -99,7 +123,7 @@ namespace Digillect.Mvvm
 		/// </summary>
 		public CancellationToken Token
 		{
-			get { return this.tokenSource.Token; }
+			get { return _tokenSource.Token; }
 		}
 
 		/// <summary>
@@ -107,7 +131,7 @@ namespace Digillect.Mvvm
 		/// </summary>
 		public void Cancel()
 		{
-			this.tokenSource.Cancel();
+			_tokenSource.Cancel();
 			State = SessionState.Canceled;
 		}
 		#endregion
@@ -121,7 +145,7 @@ namespace Digillect.Mvvm
 		[Obsolete( "Use Parameters.Get<T>() instead." )]
 		public T GetParameter<T>( string name )
 		{
-			return this.parameters.Get<T>( name );
+			return _parameters.Get<T>( name );
 		}
 
 		/// <summary>
@@ -134,14 +158,32 @@ namespace Digillect.Mvvm
 		[Obsolete( "Use Parameters.GetParameter<T>() instead." )]
 		public T GetParameter<T>( string name, T defaultValue )
 		{
-			return this.parameters.Get<T>( name, defaultValue );
+			return _parameters.Get<T>( name, defaultValue );
 		}
 
 		public Session AddParameter( string name, object value )
 		{
-			this.parameters.Add( name, value );
+			_parameters.Add( name, value );
 
 			return this;
+		}
+		#endregion
+		#region Parts
+		/// <summary>
+		/// Checks that session is used to load specified logical part.
+		/// </summary>
+		/// <param name="part">Part to check, can't be <c>null</c>.</param>
+		/// <returns><c>true</c> if specified part is loading; otherwise, <c>false</c>.</returns>
+		/// <exception cref="System.ArgumentNullException">if part is <c>null</c>.</exception>
+		public bool Includes( string part )
+		{
+			if( part == null )
+				throw new ArgumentNullException( "part" );
+
+			if( _parts == null )
+				return true;
+
+			return _parts.Contains( part );
 		}
 		#endregion
 	}

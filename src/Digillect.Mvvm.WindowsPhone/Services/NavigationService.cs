@@ -24,14 +24,15 @@ namespace Digillect.Mvvm.Services
 			{
 				string typeName = type.FullName.StartsWith( rootNamespace ) ? type.FullName.Substring( rootNamespace.Length + 1 ) : type.FullName;
 				var viewAttribute = type.GetCustomAttributes( typeof( ViewAttribute ), false ).Cast<ViewAttribute>().FirstOrDefault();
-				
+				var viewName = viewAttribute.Name ?? type.Name;
+
 				if( viewAttribute.Path != null )
 				{
-					_views.Add( viewAttribute.Name, viewAttribute.Path );
+					_views.Add( viewName, viewAttribute.Path );
 				}
 				else
 				{
-					_views.Add( viewAttribute.Name, typeName.Replace( '.', '/' ) + ".xaml" );
+					_views.Add( viewName, typeName.Replace( '.', '/' ) + ".xaml" );
 				}
 			}
 		}

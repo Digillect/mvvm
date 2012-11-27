@@ -15,6 +15,8 @@ namespace Digillect.Mvvm
 	/// </summary>
 	public class ViewModel : ObservableObject
 	{
+		private readonly Dictionary<string, PartInfo> _parts = new Dictionary<string, PartInfo>();
+
 		#region Constructors/Disposer
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ViewModel"/> class.
@@ -242,7 +244,29 @@ namespace Digillect.Mvvm
 		/// <returns><c>true</c> if view model should proceed with loading session; otherwise, <c>false</c>.</returns>
 		protected virtual bool ShouldLoadSession( Session session )
 		{
-			return true;
+			bool result = false;
+
+			foreach( var pair in _parts )
+			{
+				if( session.Includes( pair.Key ) )
+				{
+					if( pair.Value.Checker != null )
+					{
+						result |= pair.Value.Checker( session, pair.Key );
+					}
+					else
+					{
+						result = true;
+					}
+				}
+
+				if( result )
+				{
+					break;
+				}
+			}
+
+			return result;
 		}
 
 		/// <summary>
@@ -251,6 +275,45 @@ namespace Digillect.Mvvm
 		/// <param name="session">The session.</param>
 		protected virtual void LoadSession( Session session )
 		{
+			foreach( var pair in _parts )
+			{
+				if( session.Includes( pair.Key ) )
+				{
+					if( pair.Value.Checker == null || pair.Value.Checker( session, pair.Key ) )
+					{
+						session.Tasks.Add( pair.Value.Loader( session, pair.Key ) );
+					}
+				}
+			}
+		}
+		#endregion
+
+		#region Parts
+		/// <summary>
+		/// Registers handler of multipart loader.
+		/// </summary>
+		/// <param name="part">Part identifier.</param>
+		/// <param name="loader">Function to load specified part.</param>
+		/// <param name="checker">Function to check if the specified part should be loaded.</param>
+		protected void RegisterPart( string part, Func<Session, string, Task> loader, Func<Session, string, bool> checker = null )
+		{
+			if( part == null )
+			{
+				throw new ArgumentNullException( "part" );
+			}
+
+			if( loader == null )
+			{
+				throw new ArgumentNullException( "loader" );
+			}
+
+			_parts[part] = new PartInfo() { Loader = loader, Checker = checker };
+		}
+
+		private class PartInfo
+		{
+			public Func<Session, string, Task> Loader { get; set; }
+			public Func<Session, string, bool> Checker { get; set; }
 		}
 		#endregion
 	}
