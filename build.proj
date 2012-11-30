@@ -13,10 +13,14 @@
 	<ItemGroup>
 		<!--ProjectReference Include="src\Digillect.Mvvm\Digillect.Mvvm (net40).csproj"/-->
 		<ProjectReference Include="src\Digillect.Mvvm\Digillect.Mvvm (net45).csproj"/>
-		<ProjectReference Include="src\Digillect.Mvvm\Digillect.Mvvm (win8).csproj"/>
+		<ProjectReference Include="src\Digillect.Mvvm\Digillect.Mvvm (win8).csproj">
+			<AdditionalProperties>VisualStudioVersion=11.0</AdditionalProperties>
+		</ProjectReference>
 		<ProjectReference Include="src\Digillect.Mvvm\Digillect.Mvvm (wp71).csproj"/>
 		<ProjectReference Include="src\Digillect.Mvvm\Digillect.Mvvm (wp80).csproj"/>
-		<ProjectReference Include="src\Digillect.Mvvm.Windows8\Digillect.Mvvm.Windows8.csproj"/>
+		<ProjectReference Include="src\Digillect.Mvvm.Windows8\Digillect.Mvvm.Windows8.csproj">
+			<AdditionalProperties>VisualStudioVersion=11.0</AdditionalProperties>
+		</ProjectReference>
 		<ProjectReference Include="src\Digillect.Mvvm.WindowsPhone\Digillect.Mvvm.WindowsPhone (wp71).csproj"/>
 		<ProjectReference Include="src\Digillect.Mvvm.WindowsPhone\Digillect.Mvvm.WindowsPhone (wp80).csproj"/>
 	</ItemGroup>
