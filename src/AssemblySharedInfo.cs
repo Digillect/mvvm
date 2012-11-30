@@ -1,4 +1,4 @@
-ï»¿using System;
+using System;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
@@ -9,8 +9,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("Retail")]
 #endif
 [assembly: AssemblyCompany( "Actis Systems" )]
-[assembly: AssemblyProduct("Digillectï¿½ Common Libraries")]
-[assembly: AssemblyCopyright("ï¿½ 2011-2012 Actis Systems. All rights reserved.")]
+[assembly: AssemblyProduct("Digillect® Common Libraries")]
+[assembly: AssemblyCopyright("© 2011-2012 Actis Systems. All rights reserved.")]
 [assembly: AssemblyTrademark("Digillect is a registered trademark of Actis Systems.")]
 
 [assembly: AssemblyVersion(AssemblyInfo.Version)]
