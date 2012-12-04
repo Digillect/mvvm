@@ -105,7 +105,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Digillect">
-      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-10\lib\net40\Digillect.dll</HintPath>
+      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-16\lib\net40\Digillect.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Threading.Tasks">

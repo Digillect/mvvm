@@ -72,7 +72,7 @@
     </Reference>
     <Reference Include="Digillect">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-11\lib\win8\Digillect.dll</HintPath>
+      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-16\lib\win8\Digillect.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

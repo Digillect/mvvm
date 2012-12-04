@@ -120,7 +120,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Digillect">
-      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-11\lib\wp71\Digillect.dll</HintPath>
+      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-16\lib\wp71\Digillect.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Contracts">
