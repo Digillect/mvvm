@@ -180,9 +180,6 @@ namespace Digillect.Mvvm
 			if( part == null )
 				throw new ArgumentNullException( "part" );
 
-			if( _parts == null )
-				return true;
-
 			return _parts.Contains( part );
 		}
 		#endregion
