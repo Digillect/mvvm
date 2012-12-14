@@ -178,7 +178,14 @@ namespace Digillect.Mvvm
 		public bool Includes( string part )
 		{
 			if( part == null )
+			{
 				throw new ArgumentNullException( "part" );
+			}
+
+			if( _parts == null )
+			{
+				return false;
+			}
 
 			return _parts.Contains( part );
 		}
