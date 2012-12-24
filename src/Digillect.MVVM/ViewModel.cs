@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Digillect.Mvvm.Services;
 
 namespace Digillect.Mvvm
@@ -60,7 +60,7 @@ namespace Digillect.Mvvm
 		/// Raises the session started event.
 		/// </summary>
 		/// <param name="e">The <see cref="Digillect.Mvvm.SessionEventArgs"/> instance containing the event data.</param>
-		protected void RaiseSessionStarted( SessionEventArgs e )
+		protected virtual void OnSessionStarted( SessionEventArgs e )
 		{
 			if( SessionStarted != null )
 			{
@@ -72,7 +72,7 @@ namespace Digillect.Mvvm
 		/// Raises the session complete event.
 		/// </summary>
 		/// <param name="e">The <see cref="Digillect.Mvvm.SessionEventArgs"/> instance containing the event data.</param>
-		protected void RaiseSessionComplete( SessionEventArgs e )
+		protected virtual void OnSessionComplete( SessionEventArgs e )
 		{
 			if( SessionComplete != null )
 			{
@@ -84,14 +84,13 @@ namespace Digillect.Mvvm
 		/// Raises the session aborted event.
 		/// </summary>
 		/// <param name="e">The <see cref="Digillect.Mvvm.SessionAbortedEventArgs"/> instance containing the event data.</param>
-		protected void RaiseSessionAborted( SessionAbortedEventArgs e )
+		protected virtual void OnSessionAborted( SessionAbortedEventArgs e )
 		{
 			if( SessionAborted != null )
 			{
 				SessionAborted( this, e );
 			}
 		}
-
 		#endregion
 
 		#region Loading/Sessions
@@ -133,7 +132,7 @@ namespace Digillect.Mvvm
 				_sessions.Add( session );
 			}
 
-			RaiseSessionStarted( new SessionEventArgs( session ) );
+			OnSessionStarted( new SessionEventArgs( session ) );
 
 			if( session.IsCancellationRequested )
 			{
@@ -171,7 +170,7 @@ namespace Digillect.Mvvm
 				var canceled = ex is OperationCanceledException;
 				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
 
-				RaiseSessionAborted( eventArgs );
+				OnSessionAborted( eventArgs );
 
 				if( !canceled && !eventArgs.Handled )
 				{
@@ -198,7 +197,7 @@ namespace Digillect.Mvvm
 					DataExchangeService.EndDataExchange();
 				}
 
-				RaiseSessionComplete( new SessionEventArgs( session ) );
+				OnSessionComplete( new SessionEventArgs( session ) );
 
 				return session;
 			}
@@ -213,7 +212,7 @@ namespace Digillect.Mvvm
 
 				session.State = SessionState.Complete;
 
-				RaiseSessionComplete( new SessionEventArgs( session ) );
+				OnSessionComplete( new SessionEventArgs( session ) );
 			}
 			catch( Exception ex )
 			{
@@ -225,7 +224,7 @@ namespace Digillect.Mvvm
 					canceled = ((AggregateException) ex).InnerExceptions.OfType<OperationCanceledException>().Any();
 				}
 
-				RaiseSessionAborted( eventArgs );
+				OnSessionAborted( eventArgs );
 
 				if( !canceled && !eventArgs.Handled )
 				{
@@ -259,6 +258,13 @@ namespace Digillect.Mvvm
 		/// <returns><c>true</c> if view model should proceed with loading session; otherwise, <c>false</c>.</returns>
 		protected virtual bool ShouldLoadSession( Session session )
 		{
+			if( session == null )
+			{
+				throw new ArgumentNullException( "session" );
+			}
+			
+			Contract.EndContractBlock();
+
 			var result = false;
 
 			foreach( var pair in _parts )
@@ -290,6 +296,13 @@ namespace Digillect.Mvvm
 		/// <param name="session">The session.</param>
 		protected virtual void LoadSession( Session session )
 		{
+			if( session == null )
+			{
+				throw new ArgumentNullException( "session" );
+			}
+			
+			Contract.EndContractBlock();
+
 			foreach( var pair in _parts )
 			{
 				if( (session.Parts == null && pair.Value.Default) || session.Includes( pair.Key ) )
@@ -301,17 +314,38 @@ namespace Digillect.Mvvm
 				}
 			}
 		}
-
 		#endregion
 
 		#region Parts
 		/// <summary>
+        /// Registers handler of multipart loader.
+        /// </summary>
+        /// <param name="part">Part identifier.</param>
+        /// <param name="loader">Function to load specified part.</param>
+        protected void RegisterPart( string part, Func<Session, string, Task> loader )
+        {
+        	RegisterPart( part, loader, null, true );
+        }
+
+        /// <summary>
+        /// Registers handler of multipart loader.
+        /// </summary>
+        /// <param name="part">Part identifier.</param>
+        /// <param name="loader">Function to load specified part.</param>
+        /// <param name="checker">Function to check if the specified part should be loaded.</param>
+        protected void RegisterPart( string part, Func<Session, string, Task> loader, Func<Session, string, bool> checker )
+        {
+        	RegisterPart( part, loader, checker, true );
+        }
+
+        /// <summary>
 		/// Registers handler of multipart loader.
 		/// </summary>
 		/// <param name="part">Part identifier.</param>
 		/// <param name="loader">Function to load specified part.</param>
 		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		protected void RegisterPart( string part, Func<Session, string, Task> loader, Func<Session, string, bool> checker = null, bool @default = true )
+		/// <param name="default"><c>true</c> if this part loads when no parts specified for the session.</param>
+		protected void RegisterPart( string part, Func<Session, string, Task> loader, Func<Session, string, bool> checker, bool @default )
 		{
 			if( part == null )
 			{
@@ -323,9 +357,12 @@ namespace Digillect.Mvvm
 				throw new ArgumentNullException( "loader" );
 			}
 
-			_parts[part] = new PartInfo() { Loader = loader,
-					Checker = checker,
-					Default = @default };
+			_parts[part] = new PartInfo()
+			{
+				Loader = loader,
+				Checker = checker,
+				Default = @default
+			};
 		}
 
 		private class PartInfo

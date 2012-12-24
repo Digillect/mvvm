@@ -26,6 +26,11 @@ namespace Digillect.Mvvm.UI
 		}
 		#endregion
 
+		/// <summary>
+		/// Parses the parameters.
+		/// </summary>
+		/// <param name="queryString">The query string.</param>
+		/// <exception cref="System.ArgumentException">Entity identifier is not passed in query string.</exception>
 		protected override void ParseParameters( IDictionary<string, string> queryString )
 		{
 			base.ParseParameters( queryString );

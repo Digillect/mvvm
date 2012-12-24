@@ -21,20 +21,26 @@ namespace Digillect.Mvvm.Services
 		{
 		}
 		#endregion
+
+		#region Start
 		/// <summary>
 		/// Initializes a new instance of the <see cref="NetworkAvailabilityService"/> class.
 		/// </summary>
 		public void Start()
 		{
-#if !WINDOWS_PHONE_8
 			NetworkAvailable = true;
+
+#if !WINDOWS_PHONE_8
 			NetworkChange.NetworkAddressChanged += NetworkChange_NetworkAddressChanged;
 
-			NetworkChange_NetworkAddressChanged( null, EventArgs.Empty );
+			NetworkChange_NetworkAddressChanged( null, null );
 #else
 			DeviceNetworkInformation.NetworkAvailabilityChanged += DeviceNetworkInformation_NetworkAvailabilityChanged;
+
+			DeviceNetworkInformation_NetworkAvailabilityChanged( null, null );
 #endif
 		}
+		#endregion
 
 		/// <summary>
 		/// Gets a value indicating whether network connection is available.
@@ -56,7 +62,9 @@ namespace Digillect.Mvvm.Services
 			NetworkAvailable = DeviceNetworkInformation.IsNetworkAvailable;
 
 			if( NetworkAvailable != oldNetworkAvailable && NetworkAvailabilityChanged != null )
+			{
 				NetworkAvailabilityChanged( this, EventArgs.Empty );
+			}
 		}
 #endif
 
@@ -68,7 +76,9 @@ namespace Digillect.Mvvm.Services
 			NetworkAvailable = await TaskEx.Run<bool>( (Func<bool>) InspectNetwork );
 
 			if( NetworkAvailable != oldNetworkAvailable && NetworkAvailabilityChanged != null )
+			{
 				NetworkAvailabilityChanged( this, EventArgs.Empty );
+			}
 		}
 
 		private static bool InspectNetwork()

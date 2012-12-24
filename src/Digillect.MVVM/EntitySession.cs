@@ -46,6 +46,12 @@ namespace Digillect.Mvvm
 		#endregion
 
 		#region Parameters
+		/// <summary>
+		/// Adds the parameter to session parameters.
+		/// </summary>
+		/// <param name="name">Parameter name.</param>
+		/// <param name="value">Parameter value.</param>
+		/// <returns>Current session.</returns>
 		public new EntitySession<TId> AddParameter( string name, object value )
 		{
 			Parameters.Add( name, value );

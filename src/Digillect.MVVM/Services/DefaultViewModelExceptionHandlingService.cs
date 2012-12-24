@@ -4,8 +4,17 @@ using System.Linq;
 
 namespace Digillect.Mvvm.Services
 {
+	/// <summary>
+	/// Default implementation of <see cref="IViewModelExceptionHandlingService"/>.
+	/// </summary>
 	public class DefaultViewModelExceptionHandlingService : IViewModelExceptionHandlingService
 	{
+		/// <summary>
+		/// Gets or sets the exception handling service.
+		/// </summary>
+		/// <value>
+		/// The exception handling service.
+		/// </value>
 		public IExceptionHandlingService ExceptionHandlingService { get; set; }
 
 		/// <summary>

@@ -4,14 +4,12 @@ using System.Linq;
 
 using Autofac;
 
-using Digillect.Mvvm.UI;
-
 namespace Digillect.Mvvm.Services
 {
 	/// <summary>
 	/// Autofac module that registers default and system services.
 	/// </summary>
-	public class Windows8Module : MvvmModule
+	public class MvvmModule : Module
 	{
 		/// <summary>
 		/// Override to add registrations to the container.
@@ -25,11 +23,7 @@ namespace Digillect.Mvvm.Services
 		{
 			base.Load( builder );
 
-			builder.RegisterType<NetworkAvailabilityService>().As<INetworkAvailabilityService, IStartable>().SingleInstance();
-			builder.RegisterType<PageDecorationService>().As<IPageDecorationService>().SingleInstance();
-
-			builder.RegisterType<PageDataContext>().AsSelf();
-			builder.RegisterType<ViewModelPageDataContext>().AsSelf();
+			builder.RegisterType<DataExchangeService>().As<IDataExchangeService>().SingleInstance();
 		}
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
-
 using Windows.Foundation.Collections;
 
 namespace Digillect.Mvvm.UI
@@ -11,10 +11,16 @@ namespace Digillect.Mvvm.UI
 	/// </summary>
 	public class PageDataContext : ObservableObject, IDisposable
 	{
+		/// <summary>
+		/// Factory delegate to create instance of this class through Autofac.
+		/// </summary>
+		/// <param name="page">The page.</param>
+		/// <returns>Instance of context.</returns>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible" )]
 		public delegate PageDataContext Factory( Page page );
 
-		private readonly Page page;
-		private readonly ObservableDictionary values = new ObservableDictionary();
+		private readonly Page _page;
+		private readonly ObservableDictionary _values = new ObservableDictionary();
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -23,8 +29,8 @@ namespace Digillect.Mvvm.UI
 		/// <param name="page">The page used in this context.</param>
 		public PageDataContext( Page page )
 		{
-			this.page = page;
-			this.values["Loaded"] = false;
+			_page = page;
+			_values["Loaded"] = false;
 		}
 
 		/// <summary>
@@ -34,7 +40,6 @@ namespace Digillect.Mvvm.UI
 		~PageDataContext()
 		{
 			Dispose( false );
-			GC.SuppressFinalize( this );
 		}
 
 		/// <summary>
@@ -61,47 +66,54 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		public Page Page
 		{
-			get { return this.page; }
+			get { return _page; }
 		}
 
+		/// <summary>
+		/// Gets the values bag.
+		/// </summary>
+		/// <value>
+		/// The values.
+		/// </value>
 		public IObservableMap<string, object> Values
 		{
-			get { return this.values; }
+			get { return _values; }
 		}
 		#endregion
 
 		#region ObservableDictionary
 		private class ObservableDictionary : IObservableMap<string, object>
 		{
-			private readonly Dictionary<string, object> dictionary = new Dictionary<string, object>();
+			private readonly Dictionary<string, object> _dictionary = new Dictionary<string, object>();
 
 			public event MapChangedEventHandler<string, object> MapChanged;
 
 			private void InvokeMapChanged( CollectionChange change, string key )
 			{
 				var eventHandler = MapChanged;
+
 				if( eventHandler != null )
 				{
-					eventHandler( this, new ObservableDictionaryChangedEventArgs( CollectionChange.ItemInserted, key ) );
+					eventHandler( this, new ObservableDictionaryChangedEventArgs( change, key ) );
 				}
 			}
 
 			public void Add( string key, object value )
 			{
-				this.dictionary.Add( key, value );
-				this.InvokeMapChanged( CollectionChange.ItemInserted, key );
+				_dictionary.Add( key, value );
+				InvokeMapChanged( CollectionChange.ItemInserted, key );
 			}
 
 			public void Add( KeyValuePair<string, object> item )
 			{
-				this.Add( item.Key, item.Value );
+				Add( item.Key, item.Value );
 			}
 
 			public bool Remove( string key )
 			{
-				if( this.dictionary.Remove( key ) )
+				if( _dictionary.Remove( key ) )
 				{
-					this.InvokeMapChanged( CollectionChange.ItemRemoved, key );
+					InvokeMapChanged( CollectionChange.ItemRemoved, key );
 					return true;
 				}
 
@@ -112,10 +124,10 @@ namespace Digillect.Mvvm.UI
 			{
 				object currentValue;
 
-				if( this.dictionary.TryGetValue( item.Key, out currentValue ) &&
-					Object.Equals( item.Value, currentValue ) && this.dictionary.Remove( item.Key ) )
+				if( _dictionary.TryGetValue( item.Key, out currentValue ) &&
+					Object.Equals( item.Value, currentValue ) && _dictionary.Remove( item.Key ) )
 				{
-					this.InvokeMapChanged( CollectionChange.ItemRemoved, item.Key );
+					InvokeMapChanged( CollectionChange.ItemRemoved, item.Key );
 					return true;
 				}
 
@@ -124,54 +136,62 @@ namespace Digillect.Mvvm.UI
 
 			public object this[string key]
 			{
-				get { return this.dictionary[key]; }
+				get { return _dictionary[key]; }
 				set
 				{
-					this.dictionary[key] = value;
-					this.InvokeMapChanged( CollectionChange.ItemChanged, key );
+					_dictionary[key] = value;
+					InvokeMapChanged( CollectionChange.ItemChanged, key );
 				}
 			}
 
 			public void Clear()
 			{
-				var priorKeys = this.dictionary.Keys.ToArray();
+				var priorKeys = _dictionary.Keys.ToArray();
 
-				this.dictionary.Clear();
+				_dictionary.Clear();
 
 				foreach( var key in priorKeys )
 				{
-					this.InvokeMapChanged( CollectionChange.ItemRemoved, key );
+					InvokeMapChanged( CollectionChange.ItemRemoved, key );
 				}
 			}
 
 			public ICollection<string> Keys
 			{
-				get { return this.dictionary.Keys; }
+				get { return _dictionary.Keys; }
 			}
 
 			public bool ContainsKey( string key )
 			{
-				return this.dictionary.ContainsKey( key );
+				var result = _dictionary.ContainsKey( key );
+
+				Contract.Assume( !result || (Count > 0) );
+
+				return result;
 			}
 
 			public bool TryGetValue( string key, out object value )
 			{
-				return this.dictionary.TryGetValue( key, out value );
+				return _dictionary.TryGetValue( key, out value );
 			}
 
 			public ICollection<object> Values
 			{
-				get { return this.dictionary.Values; }
+				get { return _dictionary.Values; }
 			}
 
 			public bool Contains( KeyValuePair<string, object> item )
 			{
-				return this.dictionary.Contains( item );
+				var result = _dictionary.Contains( item );
+
+				Contract.Assume( !result || (Count > 0) );
+
+				return result;
 			}
 
 			public int Count
 			{
-				get { return this.dictionary.Count; }
+				get { return _dictionary.Count; }
 			}
 
 			public bool IsReadOnly
@@ -181,21 +201,31 @@ namespace Digillect.Mvvm.UI
 
 			public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
 			{
-				return this.dictionary.GetEnumerator();
+				return _dictionary.GetEnumerator();
 			}
 
 			System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			{
-				return this.dictionary.GetEnumerator();
+				return _dictionary.GetEnumerator();
 			}
 
 			public void CopyTo( KeyValuePair<string, object>[] array, int arrayIndex )
 			{
-				int arraySize = array.Length;
-
-				foreach( var pair in this.dictionary )
+				if( array == null )
 				{
-					if( arrayIndex >= arraySize ) break;
+					throw new ArgumentNullException( "array" );
+				}
+
+				Contract.EndContractBlock();
+
+				var arraySize = array.Length;
+
+				foreach( var pair in _dictionary )
+				{
+					if( arrayIndex >= arraySize )
+					{
+						break;
+					}
 					array[arrayIndex++] = pair;
 				}
 			}
@@ -205,8 +235,8 @@ namespace Digillect.Mvvm.UI
 			{
 				public ObservableDictionaryChangedEventArgs( CollectionChange change, string key )
 				{
-					this.CollectionChange = change;
-					this.Key = key;
+					CollectionChange = change;
+					Key = key;
 				}
 
 				public CollectionChange CollectionChange { get; private set; }

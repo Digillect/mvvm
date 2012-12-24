@@ -2,48 +2,53 @@
 
 namespace Digillect.Mvvm.Services
 {
-	public class DataExchangeService : IDataExchangeService
+	[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses" )]
+	internal sealed class DataExchangeService : IDataExchangeService
 	{
 		private readonly static object syncRoot = new object();
 
 		public event EventHandler DataExchangeStarted;
 		public event EventHandler DataExchangeComplete;
 
-		private int dataExchangeCount = 0;
+		private int _dataExchangeCount = 0;
 
 		public int DataExchangeCount
 		{
-			get { return this.dataExchangeCount; }
+			get { return _dataExchangeCount; }
 		}
 
 		public void BeginDataExchange()
 		{
 			lock( syncRoot )
 			{
-				this.dataExchangeCount++;
+				_dataExchangeCount++;
 			}
 
-			if( this.dataExchangeCount == 1 )
+			if( _dataExchangeCount == 1 )
 			{
 				var handler = DataExchangeStarted;
 
 				if( handler != null )
+				{
 					handler( this, EventArgs.Empty );
+				}
 			}
 		}
 
 		public void EndDataExchange()
 		{
-			if( dataExchangeCount > 0 )
+			if( _dataExchangeCount > 0 )
 			{
-				bool fire = false;
+				var fire = false;
 
 				lock( syncRoot )
 				{
-					if( dataExchangeCount > 0 )
+					if( _dataExchangeCount > 0 )
 					{
-						if( --dataExchangeCount == 0 )
+						if( --_dataExchangeCount == 0 )
+						{
 							fire = true;
+						}
 					}
 				}
 
@@ -52,7 +57,9 @@ namespace Digillect.Mvvm.Services
 					var handler = DataExchangeComplete;
 
 					if( handler != null )
+					{
 						handler( this, EventArgs.Empty );
+					}
 				}
 			}
 		}

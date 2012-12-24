@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
-using Windows.UI.Core;
 using Windows.System;
+using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -22,9 +23,9 @@ namespace Digillect.Mvvm.UI
 	/// </summary>
 	public class Page : Windows.UI.Xaml.Controls.Page, INotifyPropertyChanged
 	{
-		private ILifetimeScope scope;
-		private List<Control> layoutAwareControls;
-		private Breadcrumb breadcrumb;
+		private ILifetimeScope _scope;
+		private List<Control> _layoutAwareControls;
+		private Breadcrumb _breadcrumb;
 
 		#region Constructor
 		/// <summary>
@@ -33,58 +34,82 @@ namespace Digillect.Mvvm.UI
 		public Page()
 		{
 			if( Windows.ApplicationModel.DesignMode.DesignModeEnabled )
+			{
 				return;
-
+			}
+			
 			// When this page is part of the visual tree make two changes:
 			// 1) Map application view state to visual state for the page
 			// 2) Handle keyboard and mouse navigation requests
-			this.Loaded += ( sender, e ) =>
+			Loaded += ( sender, e ) =>
 			{
-				this.StartLayoutUpdates( sender, e );
+				StartLayoutUpdates( sender );
 
 				// Keyboard and mouse navigation only apply when occupying the entire window
-				if( this.ActualHeight == Window.Current.Bounds.Height &&
-					this.ActualWidth == Window.Current.Bounds.Width )
+				if( ActualHeight == Window.Current.Bounds.Height &&
+					ActualWidth == Window.Current.Bounds.Width )
 				{
 					// Listen to the window directly so focus isn't required
 					Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += CoreDispatcher_AcceleratorKeyActivated;
-					Window.Current.CoreWindow.PointerPressed += this.CoreWindow_PointerPressed;
+					Window.Current.CoreWindow.PointerPressed += CoreWindow_PointerPressed;
 				}
 
 				// If we are restoring state during unwind - kick infrastructure creation
-				if( this.breadcrumb != null )
+				if( _breadcrumb != null )
 				{
-					var parameter = this.breadcrumb.Parameters;
-					this.breadcrumb = null;
+					var parameter = _breadcrumb.Parameters;
+					_breadcrumb = null;
 
 					HandleNavigationToPage( parameter );
 				}
 			};
 
 			// Undo the same changes when the page is no longer visible
-			this.Unloaded += ( sender, e ) =>
+			Unloaded += ( sender, e ) =>
 			{
-				this.StopLayoutUpdates( sender, e );
+				StopLayoutUpdates( sender );
+
 				Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated -= CoreDispatcher_AcceleratorKeyActivated;
-				Window.Current.CoreWindow.PointerPressed -= this.CoreWindow_PointerPressed;
+				Window.Current.CoreWindow.PointerPressed -= CoreWindow_PointerPressed;
 			};
 
 			if( CurrentApplication.IsUnwinding )
-				this.breadcrumb = CurrentApplication.PeekBreadcrumb( GetType() );
+			{
+				_breadcrumb = CurrentApplication.PeekBreadcrumb( GetType() );
+			}
 		}
+
 		#endregion
 
 		#region Properties
+		/// <summary>
+		/// Autofac scope associated with this page.
+		/// </summary>
+		/// <value>
+		/// The scope.
+		/// </value>
 		public ILifetimeScope Scope
 		{
-			get { return this.scope; }
+			get { return _scope; }
 		}
 
-		protected Digillect.Mvvm.UI.Application CurrentApplication
+		/// <summary>
+		/// Gets the current application.
+		/// </summary>
+		/// <value>
+		/// The current application.
+		/// </value>
+		protected static Digillect.Mvvm.UI.Application CurrentApplication
 		{
 			get { return (Digillect.Mvvm.UI.Application) Application.Current; }
 		}
 
+		/// <summary>
+		/// Gets the context for the current page.
+		/// </summary>
+		/// <value>
+		/// The context.
+		/// </value>
 		public PageDataContext Context
 		{
 			get { return (dynamic) DataContext; }
@@ -92,12 +117,27 @@ namespace Digillect.Mvvm.UI
 		#endregion
 
 		#region INotifyPropertyChanged support
+		/// <summary>
+		/// Occurs when value of any of the page properties has been changed.
+		/// </summary>
 		public event PropertyChangedEventHandler PropertyChanged;
 
+		/// <summary>
+		/// Sets the property and raises an event to notify about property value changes.
+		/// </summary>
+		/// <typeparam name="T">Property value type</typeparam>
+		/// <param name="storage">The storage.</param>
+		/// <param name="value">The value.</param>
+		/// <param name="propertyName">Name of the property.</param>
+		/// <returns><c>true</c> if storage content was changed, otherwise <c>false</c>.</returns>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed" ),
+		System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "0#" )]
 		protected bool SetProperty<T>( ref T storage, T value, [CallerMemberName] string propertyName = null )
 		{
 			if( object.Equals( storage, value ) )
+			{
 				return false;
+			}
 
 			storage = value;
 			OnPropertyChanged( new PropertyChangedEventArgs( propertyName ) );
@@ -105,18 +145,29 @@ namespace Digillect.Mvvm.UI
 			return true;
 		}
 
+		/// <summary>
+		/// Called when value of property <paramref name="propertyName"/> has been changed.
+		/// </summary>
+		/// <param name="propertyName">Name of the property.</param>
 		protected void OnPropertyChanged( string propertyName )
 		{
 			OnPropertyChanged( new PropertyChangedEventArgs( propertyName ) );
 		}
 
-		protected virtual void OnPropertyChanged( PropertyChangedEventArgs e )
+		/// <summary>
+		/// Raises the <see cref="E:PropertyChanged" /> event.
+		/// </summary>
+		/// <param name="eventArgs">The <see cref="PropertyChangedEventArgs" /> instance containing the event data.</param>
+		protected virtual void OnPropertyChanged( PropertyChangedEventArgs eventArgs )
 		{
 			var handler = PropertyChanged;
 
 			if( handler != null )
-				handler( this, e );
+			{
+				handler( this, eventArgs );
+			}
 		}
+
 		#endregion
 
 		#region Navigation handling
@@ -125,14 +176,16 @@ namespace Digillect.Mvvm.UI
 		/// <see cref="Frame"/> until it reaches the top of the navigation stack.
 		/// </summary>
 		/// <param name="sender">Instance that triggered the event.</param>
-		/// <param name="e">Event data describing the conditions that led to the event.</param>
-		protected virtual void GoHome( object sender, RoutedEventArgs e )
+		/// <param name="eventArgs">Event data describing the conditions that led to the event.</param>
+		protected virtual void GoHome( object sender, RoutedEventArgs eventArgs )
 		{
 			// Use the navigation frame to return to the topmost page
-			if( this.Frame != null )
+			if( Frame != null )
 			{
-				while( this.Frame.CanGoBack )
-					this.Frame.GoBack();
+				while( Frame.CanGoBack )
+				{
+					Frame.GoBack();
+				}
 			}
 		}
 
@@ -141,13 +194,15 @@ namespace Digillect.Mvvm.UI
 		/// associated with this page's <see cref="Frame"/>.
 		/// </summary>
 		/// <param name="sender">Instance that triggered the event.</param>
-		/// <param name="e">Event data describing the conditions that led to the
+		/// <param name="eventArgs">Event data describing the conditions that led to the
 		/// event.</param>
-		protected virtual void GoBack( object sender, RoutedEventArgs e )
+		protected virtual void GoBack( object sender, RoutedEventArgs eventArgs )
 		{
 			// Use the navigation frame to return to the previous page
-			if( this.Frame != null && this.Frame.CanGoBack )
-				this.Frame.GoBack();
+			if( Frame != null && Frame.CanGoBack )
+			{
+				Frame.GoBack();
+			}
 		}
 
 		/// <summary>
@@ -155,27 +210,54 @@ namespace Digillect.Mvvm.UI
 		/// associated with this page's <see cref="Frame"/>.
 		/// </summary>
 		/// <param name="sender">Instance that triggered the event.</param>
-		/// <param name="e">Event data describing the conditions that led to the
+		/// <param name="eventArgs">Event data describing the conditions that led to the
 		/// event.</param>
-		protected virtual void GoForward( object sender, RoutedEventArgs e )
+		protected virtual void GoForward( object sender, RoutedEventArgs eventArgs )
 		{
 			// Use the navigation frame to move to the next page
-			if( this.Frame != null && this.Frame.CanGoForward )
-				this.Frame.GoForward();
+			if( Frame != null && Frame.CanGoForward )
+			{
+				Frame.GoForward();
+			}
 		}
 
-		protected void Navigate( Type pageType, NavigationParameters parameters = null )
+		/// <summary>
+		/// Navigates to the the specified page.
+		/// </summary>
+		/// <param name="pageType">Type of the page.</param>
+		protected void Navigate( Type pageType )
+		{
+			Navigate( pageType, (NavigationParameters) null );
+		}
+
+		/// <summary>
+		/// Navigates to the specified page with parameters.
+		/// </summary>
+		/// <param name="pageType">Type of the page.</param>
+		/// <param name="parameters">The parameters.</param>
+		protected void Navigate( Type pageType, NavigationParameters parameters )
 		{
 			Frame.Navigate( pageType, parameters );
 		}
 
+		/// <summary>
+		/// Navigates to the specified page with single string parameter named <c>value</c>.
+		/// </summary>
+		/// <param name="pageType">Type of the page.</param>
+		/// <param name="parameter">The parameter.</param>
 		protected void Navigate( Type pageType, string parameter )
 		{
 			Frame.Navigate( pageType, NavigationParameters.From( "value", parameter ) );
 		}
 
+		/// <summary>
+		/// Navigates to the specified page with single parameter named <c>value</c>.
+		/// </summary>
+		/// <typeparam name="T">Parameter type.</typeparam>
+		/// <param name="pageType">Type of the page.</param>
+		/// <param name="parameter">The parameter.</param>
 		protected void Navigate<T>( Type pageType, T parameter )
-			where T : struct
+			where T: struct
 		{
 			Frame.Navigate( pageType, NavigationParameters.From<T>( "value", parameter ) );
 		}
@@ -188,19 +270,23 @@ namespace Digillect.Mvvm.UI
 		{
 			base.OnNavigatedTo( e );
 
+			if( e == null )
+			{
+				return;
+			}
+
 			object parameter = null;
 
 			if( e.NavigationMode == NavigationMode.New )
 			{
-				if( this.breadcrumb != null )
+				if( _breadcrumb != null )
 				{
-					parameter = this.breadcrumb.Parameters;
-					this.breadcrumb = null;
+					parameter = _breadcrumb.Parameters;
+					_breadcrumb = null;
 				}
 				else
 				{
 					parameter = e.Parameter;
-
 					if( e.Parameter == null || e.Parameter is NavigationParameters )
 					{
 						CurrentApplication.PushBreadcrumb( GetType(), e.Parameter as NavigationParameters );
@@ -210,7 +296,7 @@ namespace Digillect.Mvvm.UI
 
 			if( e.NavigationMode == NavigationMode.Back )
 			{
-				if( this.scope == null )
+				if( _scope == null )
 				{
 					// Most probably we're unwinding
 
@@ -223,19 +309,23 @@ namespace Digillect.Mvvm.UI
 			HandleNavigationToPage( parameter );
 		}
 
+		/// <summary>
+		/// Handles the navigation to page.
+		/// </summary>
+		/// <param name="parameter">The parameter.</param>
 		protected void HandleNavigationToPage( object parameter )
 		{
-			if( this.scope == null )
+			if( _scope == null )
 			{
-				this.scope = CurrentApplication.Scope.BeginLifetimeScope();
+				_scope = CurrentApplication.Scope.BeginLifetimeScope();
 
 				DataContext = CreateDataContext();
 
 				OnPageCreated( parameter );
 
-				IPageDecorationService pageDecorationService = null;
+				var pageDecorationService = (IPageDecorationService ) null;
 
-				if( this.scope.TryResolve<IPageDecorationService>( out pageDecorationService ) )
+				if( _scope.TryResolve<IPageDecorationService>( out pageDecorationService ) )
 				{
 					pageDecorationService.AddDecoration( this );
 				}
@@ -252,42 +342,46 @@ namespace Digillect.Mvvm.UI
 		/// <param name="e">An object that contains the event data.</param>
 		protected override void OnNavigatedFrom( NavigationEventArgs e )
 		{
-			if( e.NavigationMode == NavigationMode.Back )
+			if( e != null )
 			{
-				CurrentApplication.PopBreadcrumb( GetType() );
-
-				OnPageDestroyed();
-
-				if( this.scope != null )
+				if( e.NavigationMode == NavigationMode.Back )
 				{
-					IPageDecorationService pageDecorationService = null;
+					CurrentApplication.PopBreadcrumb( GetType() );
 
-					if( this.scope.TryResolve<IPageDecorationService>( out pageDecorationService ) )
+					OnPageDestroyed();
+
+					if( _scope != null )
 					{
-						pageDecorationService.RemoveDecoration( this );
-					}
+						var pageDecorationService = (IPageDecorationService) null;
 
-					this.scope.Dispose();
-					this.scope = null;
+						if( _scope.TryResolve<IPageDecorationService>( out pageDecorationService ) )
+						{
+							pageDecorationService.RemoveDecoration( this );
+						}
+
+						_scope.Dispose();
+						_scope = null;
+					}
 				}
-			}
-			else
-			{
-				OnPageAsleep();
+				else
+				{
+					OnPageAsleep();
+				}
 			}
 
 			base.OnNavigatedFrom( e );
 		}
+
 		#endregion
 
 		#region Page Lifecycle handlers
 		/// <summary>
 		/// Creates data context to be set for the page. Override to create your own data context.
 		/// </summary>
-		/// <returns>Data context that will be set to <see cref="DataContext"/> property.</returns>
+		/// <returns>Data context that will be set to <see cref="Windows.UI.Xaml.FrameworkElement.DataContext"/> property.</returns>
 		protected virtual PageDataContext CreateDataContext()
 		{
-			return this.Scope.Resolve<PageDataContext.Factory>()( this );
+			return Scope.Resolve<PageDataContext.Factory>()( this );
 		}
 
 		/// <summary>
@@ -319,6 +413,7 @@ namespace Digillect.Mvvm.UI
 		protected virtual void OnPageDestroyed()
 		{
 		}
+
 		#endregion
 
 		#region Keyboard & Mouse
@@ -342,25 +437,28 @@ namespace Digillect.Mvvm.UI
 			{
 				var coreWindow = Window.Current.CoreWindow;
 				var downState = CoreVirtualKeyStates.Down;
-				bool menuKey = (coreWindow.GetKeyState( VirtualKey.Menu ) & downState) == downState;
-				bool controlKey = (coreWindow.GetKeyState( VirtualKey.Control ) & downState) == downState;
-				bool shiftKey = (coreWindow.GetKeyState( VirtualKey.Shift ) & downState) == downState;
-				bool noModifiers = !menuKey && !controlKey && !shiftKey;
-				bool onlyAlt = menuKey && !controlKey && !shiftKey;
+				var menuKey = (coreWindow.GetKeyState( VirtualKey.Menu ) & downState) == downState;
+				var controlKey = (coreWindow.GetKeyState( VirtualKey.Control ) & downState) == downState;
+				var shiftKey = (coreWindow.GetKeyState( VirtualKey.Shift ) & downState) == downState;
+				var noModifiers = !menuKey && !controlKey && !shiftKey;
+				var onlyAlt = menuKey && !controlKey && !shiftKey;
 
 				if( ((int) virtualKey == 166 && noModifiers) ||
 					(virtualKey == VirtualKey.Left && onlyAlt) )
 				{
 					// When the previous key or Alt+Left are pressed navigate back
 					args.Handled = true;
-					this.GoBack( this, new RoutedEventArgs() );
+					GoBack( this, new RoutedEventArgs() );
 				}
-				else if( ((int) virtualKey == 167 && noModifiers) ||
-					(virtualKey == VirtualKey.Right && onlyAlt) )
+				else
 				{
-					// When the next key or Alt+Right are pressed navigate forward
-					args.Handled = true;
-					this.GoForward( this, new RoutedEventArgs() );
+					if( ((int) virtualKey == 167 && noModifiers) ||
+					(virtualKey == VirtualKey.Right && onlyAlt) )
+					{
+						// When the next key or Alt+Right are pressed navigate forward
+						args.Handled = true;
+						GoForward( this, new RoutedEventArgs() );
+					}
 				}
 			}
 		}
@@ -378,16 +476,23 @@ namespace Digillect.Mvvm.UI
 
 			// Ignore button chords with the left, right, and middle buttons
 			if( properties.IsLeftButtonPressed || properties.IsRightButtonPressed ||
-				properties.IsMiddleButtonPressed ) return;
-
-			// If back or foward are pressed (but not both) navigate appropriately
-			bool backPressed = properties.IsXButton1Pressed;
-			bool forwardPressed = properties.IsXButton2Pressed;
+				properties.IsMiddleButtonPressed )
+			{
+				return;
+			}	// If back or foward are pressed (but not both) navigate appropriately
+			var backPressed = properties.IsXButton1Pressed;
+			var forwardPressed = properties.IsXButton2Pressed;
 			if( backPressed ^ forwardPressed )
 			{
 				args.Handled = true;
-				if( backPressed ) this.GoBack( this, new RoutedEventArgs() );
-				if( forwardPressed ) this.GoForward( this, new RoutedEventArgs() );
+				if( backPressed )
+				{
+					GoBack( this, new RoutedEventArgs() );
+				}
+				if( forwardPressed )
+				{
+					GoForward( this, new RoutedEventArgs() );
+				}
 			}
 		}
 
@@ -402,26 +507,31 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		/// <param name="sender">Instance of <see cref="Control"/> that supports visual state
 		/// management corresponding to view states.</param>
-		/// <param name="e">Event data that describes how the request was made.</param>
 		/// <remarks>The current view state will immediately be used to set the corresponding
 		/// visual state when layout updates are requested.  A corresponding
 		/// <see cref="FrameworkElement.Unloaded"/> event handler connected to
 		/// <see cref="StopLayoutUpdates"/> is strongly encouraged.  Instances of
-		/// <see cref="LayoutAwarePage"/> automatically invoke these handlers in their Loaded and
-		/// Unloaded events.</remarks>
 		/// <seealso cref="DetermineVisualState"/>
 		/// <seealso cref="InvalidateVisualState"/>
-		public void StartLayoutUpdates( object sender, RoutedEventArgs e )
+		/// </remarks>
+		public void StartLayoutUpdates( object sender )
 		{
 			var control = sender as Control;
-			if( control == null ) return;
-			if( this.layoutAwareControls == null )
+
+			if( control == null )
+			{
+				return;
+			}
+
+			if( _layoutAwareControls == null )
 			{
 				// Start listening to view state changes when there are controls interested in updates
-				Window.Current.SizeChanged += this.WindowSizeChanged;
-				this.layoutAwareControls = new List<Control>();
+				Window.Current.SizeChanged += WindowSizeChanged;
+				
+				_layoutAwareControls = new List<Control>();
 			}
-			this.layoutAwareControls.Add( control );
+
+			_layoutAwareControls.Add( control );
 
 			// Set the initial visual state of the control
 			VisualStateManager.GoToState( control, DetermineVisualState( ApplicationView.Value ), false );
@@ -429,7 +539,7 @@ namespace Digillect.Mvvm.UI
 
 		private void WindowSizeChanged( object sender, WindowSizeChangedEventArgs e )
 		{
-			this.InvalidateVisualState();
+			InvalidateVisualState();
 		}
 
 		/// <summary>
@@ -439,20 +549,26 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		/// <param name="sender">Instance of <see cref="Control"/> that supports visual state
 		/// management corresponding to view states.</param>
-		/// <param name="e">Event data that describes how the request was made.</param>
 		/// <remarks>The current view state will immediately be used to set the corresponding
 		/// visual state when layout updates are requested.</remarks>
 		/// <seealso cref="StartLayoutUpdates"/>
-		public void StopLayoutUpdates( object sender, RoutedEventArgs e )
+		public void StopLayoutUpdates( object sender )
 		{
 			var control = sender as Control;
-			if( control == null || this.layoutAwareControls == null ) return;
-			this.layoutAwareControls.Remove( control );
-			if( this.layoutAwareControls.Count == 0 )
+			
+			if( control == null || _layoutAwareControls == null )
+			{
+				return;
+			}
+			
+			_layoutAwareControls.Remove( control );
+			
+			if( _layoutAwareControls.Count == 0 )
 			{
 				// Stop listening to view state changes when no controls are interested in updates
-				this.layoutAwareControls = null;
-				Window.Current.SizeChanged -= this.WindowSizeChanged;
+				_layoutAwareControls = null;
+				
+				Window.Current.SizeChanged -= WindowSizeChanged;
 			}
 		}
 
@@ -481,10 +597,11 @@ namespace Digillect.Mvvm.UI
 		/// </remarks>
 		public void InvalidateVisualState()
 		{
-			if( this.layoutAwareControls != null )
+			if( _layoutAwareControls != null )
 			{
-				string visualState = DetermineVisualState( ApplicationView.Value );
-				foreach( var layoutAwareControl in this.layoutAwareControls )
+				var visualState = DetermineVisualState( ApplicationView.Value );
+
+				foreach( var layoutAwareControl in _layoutAwareControls )
 				{
 					VisualStateManager.GoToState( layoutAwareControl, visualState, false );
 				}

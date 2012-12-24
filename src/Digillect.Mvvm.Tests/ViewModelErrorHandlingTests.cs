@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using Machine.Specifications;
@@ -137,7 +136,7 @@ namespace Digillect.Mvvm.Tests
 		{
 			base.LoadSession( session );
 
-			if( session.GetParameter<bool>( "ThrowSync" ) )
+			if( session.Parameters.Get<bool>( "ThrowSync" ) )
 			{
 				throw new NotImplementedException();
 			}
@@ -147,7 +146,7 @@ namespace Digillect.Mvvm.Tests
 		{
 			await Task.Delay( 1000 );
 
-			if( session.GetParameter<bool>( "ThrowAsync" ) )
+			if( session.Parameters.Get<bool>( "ThrowAsync" ) )
 			{
 				throw new NotImplementedException();
 			}

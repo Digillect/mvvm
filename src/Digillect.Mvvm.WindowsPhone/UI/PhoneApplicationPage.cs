@@ -49,6 +49,12 @@ namespace Digillect.Mvvm.UI
 			get { return this.scope; }
 		}
 
+		/// <summary>
+		/// Gets the page parameters.
+		/// </summary>
+		/// <value>
+		/// The parameters.
+		/// </value>
 		public Parameters Parameters
 		{
 			get { return _parameters; }
@@ -196,6 +202,11 @@ namespace Digillect.Mvvm.UI
 			ParseParameters( queryString );
 		}
 
+		/// <summary>
+		/// Parses the parameters.
+		/// </summary>
+		/// <param name="queryString">The query string.</param>
+		/// <exception cref="System.ArgumentException"></exception>
 		protected virtual void ParseParameters( IDictionary<string, string> queryString )
 		{
 			var pageType = GetType();
@@ -205,23 +216,23 @@ namespace Digillect.Mvvm.UI
 				string stringValue = null;
 				object parameterValue = null;
 
-				if( queryString.TryGetValue( attribute.Name, out stringValue ) )
+				if( queryString.TryGetValue( attribute.ParameterName, out stringValue ) )
 				{
-					parameterValue = Digillect.Mvvm.Services.NavigationService.DecodeValue( stringValue, attribute.Type );
+					parameterValue = Digillect.Mvvm.Services.NavigationService.DecodeValue( stringValue, attribute.ParameterType );
 
 					if( parameterValue != null )
 					{
-						_parameters.Add( attribute.Name, parameterValue );
+						_parameters.Add( attribute.ParameterName, parameterValue );
 					}
 
-					queryString.Remove( attribute.Name );
+					queryString.Remove( attribute.ParameterName );
 				}
 
 				if( parameterValue == null )
 				{
 					if( attribute.Required )
 					{
-						throw new ArgumentException( string.Format( "Page {0} requires argument {1} of type {2}.", pageType, attribute.Name, attribute.Type ), attribute.Name );
+						throw new ArgumentException( string.Format( "Page {0} requires argument {1} of type {2}.", pageType, attribute.ParameterName, attribute.ParameterType ), attribute.ParameterName );
 					}
 				}
 			}

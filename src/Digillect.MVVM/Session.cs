@@ -26,6 +26,10 @@ namespace Digillect.Mvvm
 			State = SessionState.Created;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Session" /> class.
+		/// </summary>
+		/// <param name="parts">Parts to load.</param>
 		public Session( params string[] parts )
 		{
 			_parts = parts;
@@ -161,6 +165,12 @@ namespace Digillect.Mvvm
 			return _parameters.Get<T>( name, defaultValue );
 		}
 
+		/// <summary>
+		/// Adds the parameter value to the current session.
+		/// </summary>
+		/// <param name="name">Parameter name.</param>
+		/// <param name="value">Parameter value.</param>
+		/// <returns>Current session.</returns>
 		public Session AddParameter( string name, object value )
 		{
 			_parameters.Add( name, value );

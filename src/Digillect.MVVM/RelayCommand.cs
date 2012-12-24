@@ -9,23 +9,37 @@ namespace Digillect.Mvvm
 	/// </summary>
 	public class RelayCommand : ICommand
 	{
-		private readonly Action execute;
-		private readonly Func<bool> canExecute;
+		private readonly Action _execute;
+		private readonly Func<bool> _canExecute;
 
 		#region Constructors/Disposer
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RelayCommand"/> class.
 		/// </summary>
 		/// <param name="execute">Action that will be used for command execution.</param>
+		public RelayCommand( Action execute )
+			: this( execute, null )
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="RelayCommand"/> class.
+		/// </summary>
+		/// <param name="execute">Action that will be used for command execution.</param>
 		/// <param name="canExecute">Function that indicates whether command can be executed or not.</param>
-		public RelayCommand( Action execute, Func<bool> canExecute = null )
+		public RelayCommand( Action execute, Func<bool> canExecute )
 		{
 			if( execute == null )
+			{
 				throw new ArgumentNullException( "execute" );
+			}
 
-			this.execute = execute;
-			this.canExecute = canExecute;
+			Contract.EndContractBlock();
+
+			_execute = execute;
+			_canExecute = canExecute;
 		}
+
 		#endregion
 
 		/// <summary>
@@ -36,12 +50,15 @@ namespace Digillect.Mvvm
 		/// <summary>
 		/// Raises event that indicates that <see cref="CanExecute"/> return value has been changed.
 		/// </summary>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA1030:UseEventsWhereAppropriate" )]
 		public void RaiseCanExecuteChanged()
 		{
 			var handler = CanExecuteChanged;
 
 			if( handler != null )
+			{
 				handler( this, EventArgs.Empty );
+			}
 		}
 
 		/// <summary>
@@ -53,7 +70,7 @@ namespace Digillect.Mvvm
 		/// </returns>
 		public bool CanExecute( object parameter )
 		{
-			return canExecute == null ? true : canExecute();
+			return _canExecute == null ? true : _canExecute();
 		}
 
 		/// <summary>
@@ -63,7 +80,9 @@ namespace Digillect.Mvvm
 		public void Execute( object parameter )
 		{
 			if( CanExecute( parameter ) )
-				execute();
+			{
+				_execute();
+			}
 		}
 	}
 }

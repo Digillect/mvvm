@@ -11,6 +11,11 @@ namespace Digillect.Mvvm.UI
 	/// </summary>
 	public class PageDataContext : ObservableObject, IDisposable
 	{
+		/// <summary>
+		/// Factory that is used to create instances of context.
+		/// </summary>
+		/// <param name="page">The page.</param>
+		/// <returns>Instance of the context.</returns>
 		public delegate PageDataContext Factory( PhoneApplicationPage page );
 
 		private readonly PhoneApplicationPage page;
@@ -35,7 +40,6 @@ namespace Digillect.Mvvm.UI
 		~PageDataContext()
 		{
 			Dispose( false );
-			GC.SuppressFinalize( this );
 		}
 
 		/// <summary>

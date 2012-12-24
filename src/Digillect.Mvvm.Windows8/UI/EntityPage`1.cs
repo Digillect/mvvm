@@ -10,7 +10,7 @@ namespace Digillect.Mvvm.UI
 	/// <typeparam name="TViewModel">The type of the view model.</typeparam>
 	/// <remarks>Instance of this class performs lookup of the query string upon navigation to find and extract parameter with
 	/// name <code>Id</code> that is used as entity id for view model. If that parameter is not found then <see cref="System.ArgumentException"/> will be thrown.</remarks>
-	[Windows.Foundation.Metadata.WebHostHidden]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA1005:AvoidExcessiveParametersOnGenericTypes" ), Windows.Foundation.Metadata.WebHostHidden]
 	public class EntityPage<TId, TEntity, TViewModel> : ViewModelPage<TViewModel>
 		where TId: struct, IComparable<TId>, IEquatable<TId>
 		where TEntity: class, IXIdentified<TId>

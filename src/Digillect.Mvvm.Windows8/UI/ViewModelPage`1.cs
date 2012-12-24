@@ -12,9 +12,9 @@ namespace Digillect.Mvvm.UI
 	/// <typeparam name="TViewModel">The type of the view model.</typeparam>
 	[Windows.Foundation.Metadata.WebHostHidden]
 	public class ViewModelPage<TViewModel> : Page
-		where TViewModel : ViewModel
+		where TViewModel: ViewModel
 	{
-		private TViewModel viewModel;
+		private TViewModel _viewModel;
 
 		#region Public Properties
 		/// <summary>
@@ -22,7 +22,7 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		public TViewModel ViewModel
 		{
-			get { return this.viewModel; }
+			get { return _viewModel; }
 		}
 		#endregion
 
@@ -37,16 +37,21 @@ namespace Digillect.Mvvm.UI
 
 			if( !Windows.ApplicationModel.DesignMode.DesignModeEnabled )
 			{
-				if( parameter == null || parameter is NavigationParameters )
+				var parameters = parameter as NavigationParameters;
+
+				if( parameter == null || parameters != null )
 				{
-					InitialLoadData( (NavigationParameters) parameter );
+					InitialLoadData( parameters );
 				}
 			}
 		}
 
+		/// <summary>
+		/// This method is called when page is being destroyed, usually after user presses Back key.
+		/// </summary>
 		protected override void OnPageDestroyed()
 		{
-			this.viewModel = null;
+			_viewModel = null;
 
 			base.OnPageDestroyed();
 		}
@@ -55,14 +60,15 @@ namespace Digillect.Mvvm.UI
 		/// Creates data context to be set for the page. Override to create your own data context.
 		/// </summary>
 		/// <returns>
-		/// Data context that will be set to <see cref="System.Windows.FrameworkElement.DataContext"/> property.
+		/// Data context that will be set to <see cref="Windows.UI.Xaml.FrameworkElement.DataContext"/> property.
 		/// </returns>
 		protected override PageDataContext CreateDataContext()
 		{
-			this.viewModel = CreateViewModel();
+			_viewModel = CreateViewModel();
 
-			return Scope.Resolve<ViewModelPageDataContext.Factory>()( this, this.viewModel );
+			return Scope.Resolve<ViewModelPageDataContext.Factory>()( this, _viewModel );
 		}
+
 		#endregion
 
 		#region Creates new view model
@@ -74,6 +80,7 @@ namespace Digillect.Mvvm.UI
 		{
 			return Scope.Resolve<TViewModel>();
 		}
+
 		#endregion
 
 		#region InitialLoadData
@@ -82,7 +89,7 @@ namespace Digillect.Mvvm.UI
 		/// or resurrected from thombstombing if no other state-saving scenario exists. Default implementation
 		/// does nothing.
 		/// </summary>
-		protected virtual void InitialLoadData( NavigationParameters parameter )
+		protected virtual void InitialLoadData( NavigationParameters parameters )
 		{
 			Context.Values["Loaded"] = true;
 		}

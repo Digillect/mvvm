@@ -16,7 +16,7 @@ using Digillect.Mvvm.Services;
 namespace Digillect.Mvvm.UI
 {
 	/// <summary>
-	/// Base class for Windows Metro applications. Implements <see cref="Digillect.Mvvm.ILifetimeScopeProvider"/> and performs registration of services and components.
+	/// Base class for Windows Metro applications.
 	/// </summary>
 	[Windows.Foundation.Metadata.WebHostHidden]
 	public abstract class Application : Windows.UI.Xaml.Application
@@ -25,47 +25,79 @@ namespace Digillect.Mvvm.UI
 		/// Gets the application root frame.
 		/// </summary>
 		public Frame RootFrame { get; private set; }
+		/// <summary>
+		/// Gets the lifetime scope used to create components.
+		/// </summary>
+		/// <value>
+		/// The scope.
+		/// </value>
 		public ILifetimeScope Scope { get; private set; }
 
 		#region Constructors/Disposer
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Application"/> class.
 		/// </summary>
-		public Application()
+		[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors" )]
+		protected Application()
 		{
 			InitializeIoC();
-			this.Suspending += ( s, e ) => HandleSuspension( e );
+
+			Suspending += ( s, e ) => HandleSuspension( e );
 		}
+
 		#endregion
 
 		#region Application Lifecycle handlers
+		/// <summary>
+		/// Invoked when the application is launched. Override this method to perform application initialization and to display initial content in the associated Window.
+		/// </summary>
+		/// <param name="args">Event data for the event.</param>
 		protected override void OnLaunched( LaunchActivatedEventArgs args )
 		{
-			this.RootFrame = CreateRootFrame();
+			RootFrame = CreateRootFrame();
 
 			HandleLaunch( args );
 
-			Window.Current.Content = this.RootFrame;
+			RootFrame.NavigationFailed += RootFrame_NavigationFailed;
+
+			Window.Current.Content = RootFrame;
 			Window.Current.Activate();
 		}
 
-		protected virtual void HandleSuspension( SuspendingEventArgs e )
+		/// <summary>
+		/// Handles the suspension.
+		/// </summary>
+		/// <param name="eventArgs">The <see cref="SuspendingEventArgs" /> instance containing the event data.</param>
+		protected virtual void HandleSuspension( SuspendingEventArgs eventArgs )
 		{
 		}
 
-		protected virtual void HandleLaunch( LaunchActivatedEventArgs e )
+		/// <summary>
+		/// Handles the launch.
+		/// </summary>
+		/// <param name="eventArgs">The <see cref="LaunchActivatedEventArgs" /> instance containing the event data.</param>
+		protected virtual void HandleLaunch( LaunchActivatedEventArgs eventArgs )
 		{
 		}
 
+		/// <summary>
+		/// Saves the state.
+		/// </summary>
 		protected void SaveState()
 		{
 			SaveBreadcrumbs();
 		}
 
+		/// <summary>
+		/// Restores the state or navigates to the landing page.
+		/// </summary>
+		/// <param name="pageType">Type of the landing page.</param>
 		protected void RestoreStateOrGoToLandingPage( Type pageType )
 		{
 			if( !RestoreBreadcrumbs() )
+			{
 				RootFrame.Navigate( pageType );
+			}
 		}
 
 		/// <summary>
@@ -88,8 +120,10 @@ namespace Digillect.Mvvm.UI
 		/// <summary>
 		/// Executes when navigation has been failed. Override to provide your own handling.
 		/// </summary>
-		/// <param name="e">The <see cref="System.Windows.Navigation.NavigationFailedEventArgs"/> instance containing the event data.</param>
-		protected virtual void HandleNavigationFailed( NavigationFailedEventArgs e ) { }
+		/// <param name="eventArgs">The <see cref="Windows.UI.Xaml.Navigation.NavigationFailedEventArgs"/> instance containing the event data.</param>
+		protected virtual void HandleNavigationFailed( NavigationFailedEventArgs eventArgs )
+		{
+		}
 		#endregion
 
 		#region IoC/Services
@@ -99,9 +133,13 @@ namespace Digillect.Mvvm.UI
 
 			RegisterServices( builder );
 
-			this.Scope = builder.Build();
+			Scope = builder.Build();
 		}
 
+		/// <summary>
+		/// Called to registers services in container.
+		/// </summary>
+		/// <param name="builder">The builder.</param>
 		protected virtual void RegisterServices( ContainerBuilder builder )
 		{
 			builder.RegisterModule<Windows8Module>();
@@ -109,25 +147,27 @@ namespace Digillect.Mvvm.UI
 		#endregion
 
 		#region Breadcrumbing
-		private readonly Stack<Breadcrumb> breadcrumbs = new Stack<Breadcrumb>();
+		private readonly Stack<Breadcrumb> _breadcrumbs = new Stack<Breadcrumb>();
 
 		internal bool IsUnwinding { get; private set; }
 
 		internal void PushBreadcrumb( Type type, NavigationParameters parameters = null )
 		{
-			this.breadcrumbs.Push( new Breadcrumb( type, parameters ) );
+			_breadcrumbs.Push( new Breadcrumb( type, parameters ) );
 		}
 
 		internal Breadcrumb PopBreadcrumb( Type pageType )
 		{
-			if( this.breadcrumbs.Count == 0 )
+			if( _breadcrumbs.Count == 0 )
+			{
 				return null;
+			}
 
-			var bc = this.breadcrumbs.Peek();
+			var bc = _breadcrumbs.Peek();
 
 			if( bc.Type == pageType )
 			{
-				this.breadcrumbs.Pop();
+				_breadcrumbs.Pop();
 
 				return bc;
 			}
@@ -137,10 +177,12 @@ namespace Digillect.Mvvm.UI
 
 		internal Breadcrumb PeekBreadcrumb( Type pageType )
 		{
-			if( this.breadcrumbs.Count == 0 )
+			if( _breadcrumbs.Count == 0 )
+			{
 				return null;
+			}
 
-			var bc = this.breadcrumbs.Peek();
+			var bc = _breadcrumbs.Peek();
 
 			if( bc.Type == pageType )
 			{
@@ -158,27 +200,28 @@ namespace Digillect.Mvvm.UI
 			{
 				using( var stream = new System.IO.MemoryStream() )
 				{
-					using( var writer = new System.IO.BinaryWriter(stream) )
+					var writer = new System.IO.BinaryWriter( stream );
+
+					writer.Write( RootFrame.GetNavigationState() );
+					writer.Write( _breadcrumbs.Count );
+
+					foreach( var breadcrumb in _breadcrumbs )
 					{
-						writer.Write( RootFrame.GetNavigationState() );
-						writer.Write( this.breadcrumbs.Count );
+						writer.Write( breadcrumb.Type.AssemblyQualifiedName );
+						writer.Write( breadcrumb.Parameters != null );
 
-						foreach( var breadcrumb in this.breadcrumbs )
+						if( breadcrumb.Parameters != null )
 						{
-							writer.Write( breadcrumb.Type.AssemblyQualifiedName );
-							writer.Write( breadcrumb.Parameters != null );
-
-							if( breadcrumb.Parameters != null )
-								breadcrumb.Parameters.WriteTo( writer );
+							breadcrumb.Parameters.WriteTo( writer );
 						}
-
-						writer.Flush();
-
-						history = Convert.ToBase64String( stream.ToArray() );
 					}
+
+					writer.Flush();
+
+					history = Convert.ToBase64String( stream.ToArray() );
 				}
 			}
-			catch
+			catch( System.IO.IOException )
 			{
 			}
 
@@ -188,7 +231,9 @@ namespace Digillect.Mvvm.UI
 		internal bool RestoreBreadcrumbs( bool clearOnSuccess = true )
 		{
 			if( !ApplicationData.Current.RoamingSettings.Values.ContainsKey( "Breadcrumbs" ) )
+			{
 				return false;
+			}
 
 			Stack<Breadcrumb> unwind = new Stack<Breadcrumb>();
 			string state = null;
@@ -199,55 +244,59 @@ namespace Digillect.Mvvm.UI
 
 				using( var stream = new System.IO.MemoryStream(Convert.FromBase64String( history )) )
 				{
-					using( var reader = new System.IO.BinaryReader(stream) )
+					var reader = new System.IO.BinaryReader( stream );
+
+					state = reader.ReadString();
+					int count = reader.ReadInt32();
+
+					while( count-- > 0 )
 					{
-						state = reader.ReadString();
-						int count = reader.ReadInt32();
+						var pageTypeName = reader.ReadString();
+						var hasParameters = reader.ReadBoolean();
+						var pageType = Type.GetType( pageTypeName );
+						NavigationParameters parameters = null;
 
-						while( count-- > 0 )
+						if( hasParameters )
 						{
-							var pageTypeName = reader.ReadString();
-							var hasParameters = reader.ReadBoolean();
-							var pageType = Type.GetType( pageTypeName );
-							NavigationParameters parameters = null;
+							parameters = new NavigationParameters();
 
-							if( hasParameters )
-							{
-								parameters = new NavigationParameters();
-
-								parameters.ReadFrom( reader );
-							}
-
-							var breadcrumb = new Breadcrumb( pageType, parameters );
-
-							unwind.Push( breadcrumb );
+							parameters.ReadFrom( reader );
 						}
+
+						var breadcrumb = new Breadcrumb( pageType, parameters );
+
+						unwind.Push( breadcrumb );
 					}
 				}
 
 				if( unwind.Count == 0 )
+				{
 					return false;
+				}
 			}
-			catch
+			catch( System.IO.IOException )
 			{
 				return false;
 			}
 
 			foreach( var bc in unwind )
-				this.breadcrumbs.Push( bc );
+			{
+				_breadcrumbs.Push( bc );
+			}
 
-			this.IsUnwinding = true;
+			IsUnwinding = true;
 
 			RootFrame.SetNavigationState( state );
 
-			this.IsUnwinding = false;
+			IsUnwinding = false;
 
 			if( clearOnSuccess )
+			{
 				ApplicationData.Current.RoamingSettings.Values["Breadcrumbs"] = null;
+			}
 
 			return true;
 		}
 		#endregion
 	}
-
 }

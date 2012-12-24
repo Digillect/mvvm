@@ -6,7 +6,8 @@ using Autofac;
 
 namespace Digillect.Mvvm.Services
 {
-	public sealed class NetworkAvailabilityService : INetworkAvailabilityService, IStartable
+	[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses" )]
+	internal sealed class NetworkAvailabilityService : INetworkAvailabilityService, IStartable
 	{
 		public void Start()
 		{

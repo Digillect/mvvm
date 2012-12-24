@@ -3,12 +3,19 @@ using System;
 namespace Digillect.Mvvm.UI
 {
 	/// <summary>
-	/// Instances of this class are used by <see cref="Digillect.Mvvm.ViewModelPage{TViewModel}"/> and descendants to provide data binding support.
+	/// Instances of this class are used by <see cref="Digillect.Mvvm.UI.ViewModelPage{TViewModel}"/> and descendants to provide data binding support.
 	/// </summary>
 	public class ViewModelPageDataContext : PageDataContext
 	{
+		/// <summary>
+		/// Factory delegate to create instances of this class through Autofac.
+		/// </summary>
+		/// <param name="page">The page.</param>
+		/// <param name="viewModel">The view model.</param>
+		/// <returns>Instance of context.</returns>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible" )]
 		public new delegate ViewModelPageDataContext Factory( Page page, ViewModel viewModel );
-		private readonly ViewModel viewModel;
+		private readonly ViewModel _viewModel;
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -19,8 +26,9 @@ namespace Digillect.Mvvm.UI
 		public ViewModelPageDataContext( Page page, ViewModel viewModel )
 			: base( page )
 		{
-			this.viewModel = viewModel;
+			_viewModel = viewModel;
 		}
+
 		#endregion
 
 		#region Public Properties
@@ -29,7 +37,7 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		public ViewModel ViewModel
 		{
-			get { return this.viewModel; }
+			get { return _viewModel; }
 		}
 		#endregion
 	}

@@ -1,28 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Globalization;
 
 using Digillect.Mvvm.UI;
+using System.Diagnostics.Contracts;
+using Autofac;
 
 namespace Digillect.Mvvm.Services
 {
-	public class NavigationService : INavigationService
+	internal sealed class NavigationService : INavigationService, IStartable
 	{
 		private readonly Dictionary<string, string> _views = new Dictionary<string, string>( StringComparer.InvariantCultureIgnoreCase );
 		private readonly INavigationServiceContext _navigationServiceContext;
 
+		#region Constructors/Disposer
 		public NavigationService( INavigationServiceContext navigationServiceContext )
 		{
 			_navigationServiceContext = navigationServiceContext;
+		}
+		#endregion
 
-			Assembly assemblyToScan = _navigationServiceContext.GetMainAssemblyContainingViews();
-			string rootNamespace = _navigationServiceContext.GetRootNamespace();
+		#region Start
+		public void Start()
+		{
+			var assemblyToScan = _navigationServiceContext.GetMainAssemblyContainingViews();
+			var rootNamespace = _navigationServiceContext.GetRootNamespace();
 
 			foreach( Type type in assemblyToScan.GetTypes().Where( t => !t.IsAbstract && t.GetCustomAttributes( typeof( ViewAttribute ), false ).Count() > 0 ) )
 			{
-				string typeName = type.FullName.StartsWith( rootNamespace ) ? type.FullName.Substring( rootNamespace.Length + 1 ) : type.FullName;
+				var typeName = type.FullName.StartsWith( rootNamespace ) ? type.FullName.Substring( rootNamespace.Length + 1 ) : type.FullName;
 				var viewAttribute = type.GetCustomAttributes( typeof( ViewAttribute ), false ).Cast<ViewAttribute>().FirstOrDefault();
 				var viewName = viewAttribute.Name ?? type.Name;
 
@@ -36,24 +43,35 @@ namespace Digillect.Mvvm.Services
 				}
 			}
 		}
+		#endregion
 
-		public void Navigate( string viewName, Parameters parameters = null )
+		#region Navigate
+		public void Navigate( string viewName )
+		{
+			Contract.Ensures( viewName != null );
+
+			Navigate( viewName, null );
+		}
+
+		public void Navigate( string viewName, Parameters parameters )
 		{
 			if( viewName == null )
 			{
 				throw new ArgumentNullException( "viewName" );
 			}
 
-			string path = null;
+			Contract.EndContractBlock();
+
+			var path = (string) null;
 
 			if( !_views.TryGetValue( viewName, out path ) )
 			{
-				throw new ArgumentException( "View with name '" + viewName + "' is not registered.", "viewName" );
+				throw new ArgumentException( String.Format( "View with name '{0}' is not registered.", viewName ), "viewName" );
 			}
 
 			try
 			{
-				Uri uri = new Uri( string.Format( "/{0}{1}", path, parameters != null ? "?" + string.Join( "&", parameters.Select( p => p.Key + "=" + EncodeValue( p.Value ) ) ) : "" ), UriKind.Relative );
+				var uri = new Uri( string.Format( "/{0}{1}", path, parameters != null ? "?" + string.Join( "&", parameters.Select( p => p.Key + "=" + EncodeValue( p.Value ) ) ) : string.Empty ), UriKind.Relative );
 
 				_navigationServiceContext.Navigate( uri );
 			}
@@ -61,9 +79,11 @@ namespace Digillect.Mvvm.Services
 			{
 			}
 		}
+		#endregion
 
+		#region Encode/Decode values
 		public const string DateTimeFormatString = "yyyy-MM-ddThh:mm:sszzz";
-		
+
 		public static string EncodeValue( object value )
 		{
 			if( value == null )
@@ -71,27 +91,29 @@ namespace Digillect.Mvvm.Services
 				return null;
 			}
 
-			Type valueType = value.GetType();
+			var valueType = value.GetType();
 			string formattedValue = null;
 
 			if( valueType == typeof( DateTime ) )
 			{
-				DateTime dtValue = (DateTime) value;
+				var dtValue = (DateTime) value;
 
 				formattedValue = dtValue.ToString( DateTimeFormatString, CultureInfo.InvariantCulture );
 			}
-			else if( valueType == typeof( DateTimeOffset ) )
-			{
-				DateTimeOffset dtValue = (DateTimeOffset) value;
-
-				formattedValue = dtValue.ToString( DateTimeFormatString, CultureInfo.InvariantCulture );
-			}
-
 			else
 			{
-				formattedValue = (string) Convert.ChangeType( value, typeof( string ), CultureInfo.InvariantCulture );
-			}
+				if( valueType == typeof( DateTimeOffset ) )
+				{
+					var dtValue = (DateTimeOffset) value;
 
+					formattedValue = dtValue.ToString( DateTimeFormatString, CultureInfo.InvariantCulture );
+				}
+
+				else
+				{
+					formattedValue = (string) Convert.ChangeType( value, typeof( string ), CultureInfo.InvariantCulture );
+				}
+			}
 			return Uri.EscapeDataString( formattedValue );
 		}
 
@@ -113,13 +135,16 @@ namespace Digillect.Mvvm.Services
 				{
 					return DateTime.ParseExact( stringValue, DateTimeFormatString, CultureInfo.InvariantCulture );
 				}
-				else if( targetType == typeof( DateTimeOffset ) )
-				{
-					return DateTimeOffset.ParseExact( stringValue, DateTimeFormatString, CultureInfo.InvariantCulture );
-				}
 				else
 				{
-					return Convert.ChangeType( stringValue, targetType, CultureInfo.InvariantCulture );
+					if( targetType == typeof( DateTimeOffset ) )
+					{
+						return DateTimeOffset.ParseExact( stringValue, DateTimeFormatString, CultureInfo.InvariantCulture );
+					}
+					else
+					{
+						return Convert.ChangeType( stringValue, targetType, CultureInfo.InvariantCulture );
+					}
 				}
 			}
 			catch( Exception )
@@ -127,5 +152,6 @@ namespace Digillect.Mvvm.Services
 				return null;
 			}
 		}
+		#endregion
 	}
 }

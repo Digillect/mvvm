@@ -28,6 +28,7 @@ namespace Digillect.Mvvm.UI
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PhoneApplication"/> class.
 		/// </summary>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors" )]
 		public PhoneApplication()
 		{
 			InitializeIoC();
@@ -98,6 +99,10 @@ namespace Digillect.Mvvm.UI
 			this.Scope = builder.Build();
 		}
 
+		/// <summary>
+		/// Called to register services in IoC container.
+		/// </summary>
+		/// <param name="builder">The builder.</param>
 		protected virtual void RegisterServices( ContainerBuilder builder )
 		{
 			builder.RegisterModule<WindowsPhoneModule>();

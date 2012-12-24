@@ -18,12 +18,15 @@ namespace Digillect.Mvvm
 		where TId : IComparable<TId>, IEquatable<TId>
 		where TEntity : class, IXIdentified<TId>
 	{
-		public const string EntityPart = "Entity";
+		private const string EntityPart = "Entity";
 
 		private TEntity _entity;
 
 		#region Constructors/Disposer
-		public EntityViewModel()
+		/// <summary>
+		/// Initializes a new instance of the <see cref="EntityViewModel{TId,TEntity}" /> class.
+		/// </summary>
+		protected EntityViewModel()
 		{
 			RegisterPart( EntityPart, (session, part) => LoadEntity( (EntitySession<TId>) session ), (session, part) => ShouldLoadEntity( (EntitySession<TId>) session ) );
 		}
@@ -52,6 +55,7 @@ namespace Digillect.Mvvm
 		/// </summary>
 		/// <param name="id">Entity identifier.</param>
 		/// <returns><see cref="System.Threading.Tasks.Task{T}"/> that can be awaited and will return <see cref="Digillect.Mvvm.Session"/>.</returns>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
 		public Task<Session> Load( TId id )
 		{
 			var session = new EntitySession<TId>( id );
@@ -64,6 +68,7 @@ namespace Digillect.Mvvm
 		/// </summary>
 		/// <param name="id">Entity identifier.</param>
 		/// <returns><see cref="System.Threading.Tasks.Task{T}"/> that can be awaited.</returns>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
 		public Task<Session> LoadEntity( TId id )
 		{
 			var session = new EntitySession<TId>( id, EntityPart );
@@ -77,8 +82,21 @@ namespace Digillect.Mvvm
 		/// <param name="session">The session.</param>
 		/// <returns><see cref="System.Threading.Tasks.Task"/> that can be awaited.</returns>
 		protected abstract Task LoadEntity( EntitySession<TId> session );
+		/// <summary>
+		/// Determines if entity part should participate in session.
+		/// </summary>
+		/// <param name="session">The session.</param>
+		/// <returns><c>true</c> if loader should be executed, otherwise <c>false</c>.</returns>
+		/// <exception cref="System.ArgumentNullException">If <paramref name="session"/> is null.</exception>
 		protected virtual bool ShouldLoadEntity( EntitySession<TId> session )
 		{
+			if( session == null )
+			{
+				throw new ArgumentNullException( "session" );
+			}
+
+			Contract.EndContractBlock();
+
 			return _entity == null || !object.Equals( ((EntitySession<TId>) session).Id, _entity.Id );
 		}
 		#endregion

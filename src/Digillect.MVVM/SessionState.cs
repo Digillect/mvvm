@@ -6,6 +6,7 @@ namespace Digillect.Mvvm
 	/// <summary>
 	/// Indicates session state.
 	/// </summary>
+	[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Naming", "CA1724:TypeNamesShouldNotMatchNamespaces" )]
 	public enum SessionState
 	{
 		/// <summary>
