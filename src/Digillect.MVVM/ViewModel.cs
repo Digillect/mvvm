@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Digillect.Mvvm.Services;
@@ -16,6 +14,7 @@ namespace Digillect.Mvvm
 	public class ViewModel : ObservableObject
 	{
 		private readonly Dictionary<string, PartInfo> _parts = new Dictionary<string, PartInfo>();
+		private readonly List<Session> _sessions = new List<Session>();
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -64,7 +63,9 @@ namespace Digillect.Mvvm
 		protected void RaiseSessionStarted( SessionEventArgs e )
 		{
 			if( SessionStarted != null )
+			{
 				SessionStarted( this, e );
+			}
 		}
 
 		/// <summary>
@@ -74,7 +75,9 @@ namespace Digillect.Mvvm
 		protected void RaiseSessionComplete( SessionEventArgs e )
 		{
 			if( SessionComplete != null )
+			{
 				SessionComplete( this, e );
+			}
 		}
 
 		/// <summary>
@@ -84,13 +87,14 @@ namespace Digillect.Mvvm
 		protected void RaiseSessionAborted( SessionAbortedEventArgs e )
 		{
 			if( SessionAborted != null )
+			{
 				SessionAborted( this, e );
+			}
 		}
+
 		#endregion
 
 		#region Loading/Sessions
-		private readonly List<Session> sessions = new List<Session>();
-
 		/// <summary>
 		/// Loads the specified session.
 		/// </summary>
@@ -100,38 +104,42 @@ namespace Digillect.Mvvm
 		public async Task<Session> Load( Session session )
 		{
 			if( session == null )
+			{
 				throw new ArgumentNullException( "session" );
+			}
 
 			if( !ShouldLoadSession( session ) )
 			{
 				session.State = SessionState.Complete;
-				
+
 				return session;
 			}
 
-			lock( this.sessions )
+			lock( _sessions )
 			{
 				if( session.Exclusive )
 				{
-					if( this.sessions.Count > 0 )
+					if( _sessions.Count > 0 )
 					{
-						foreach( var existingSession in this.sessions )
+						foreach( var existingSession in _sessions )
+						{
 							existingSession.Cancel();
+						}
 
-						this.sessions.Clear();
+						_sessions.Clear();
 					}
 				}
 
-				this.sessions.Add( session );
+				_sessions.Add( session );
 			}
 
 			RaiseSessionStarted( new SessionEventArgs( session ) );
 
 			if( session.IsCancellationRequested )
 			{
-				lock( this.sessions )
+				lock( _sessions )
 				{
-					this.sessions.Remove( session );
+					_sessions.Remove( session );
 				}
 
 				return session;
@@ -140,7 +148,9 @@ namespace Digillect.Mvvm
 			session.State = SessionState.Active;
 
 			if( DataExchangeService != null )
+			{
 				DataExchangeService.BeginDataExchange();
+			}
 
 			try
 			{
@@ -148,13 +158,15 @@ namespace Digillect.Mvvm
 			}
 			catch( Exception ex )
 			{
-				lock( this.sessions )
+				lock( _sessions )
 				{
-					this.sessions.Remove( session );
+					_sessions.Remove( session );
 				}
 
 				if( DataExchangeService != null )
+				{
 					DataExchangeService.EndDataExchange();
+				}
 
 				var canceled = ex is OperationCanceledException;
 				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
@@ -174,15 +186,17 @@ namespace Digillect.Mvvm
 
 			if( session.Tasks.Count == 0 )
 			{
-				lock( this.sessions )
+				lock( _sessions )
 				{
-					this.sessions.Remove( session );
+					_sessions.Remove( session );
 				}
 
 				session.State = SessionState.Complete;
 
 				if( DataExchangeService != null )
+				{
 					DataExchangeService.EndDataExchange();
+				}
 
 				RaiseSessionComplete( new SessionEventArgs( session ) );
 
@@ -201,22 +215,21 @@ namespace Digillect.Mvvm
 
 				RaiseSessionComplete( new SessionEventArgs( session ) );
 			}
-			catch( OperationCanceledException )
+			catch( Exception ex )
 			{
-				var eventArgs = new SessionAbortedEventArgs( session, null );
+				var canceled = ex is OperationCanceledException;
+				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
 
-				RaiseSessionAborted( eventArgs );
-			}
-			catch( AggregateException aex )
-			{
-				bool canceled = aex.InnerExceptions.OfType<OperationCanceledException>().Any();
-				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : aex );
+				if( ex is AggregateException )
+				{
+					canceled = ((AggregateException) ex).InnerExceptions.OfType<OperationCanceledException>().Any();
+				}
 
 				RaiseSessionAborted( eventArgs );
 
 				if( !canceled && !eventArgs.Handled )
 				{
-					if( ViewModelExceptionHandlingService == null || !ViewModelExceptionHandlingService.HandleException( this, session, aex ) )
+					if( ViewModelExceptionHandlingService == null || !ViewModelExceptionHandlingService.HandleException( this, session, ex ) )
 					{
 						throw;
 					}
@@ -224,13 +237,15 @@ namespace Digillect.Mvvm
 			}
 			finally
 			{
-				lock( this.sessions )
+				lock( _sessions )
 				{
-					this.sessions.Remove( session );
+					_sessions.Remove( session );
 				}
 
 				if( DataExchangeService != null )
+				{
 					DataExchangeService.EndDataExchange();
+				}
 			}
 
 			return session;
@@ -244,7 +259,7 @@ namespace Digillect.Mvvm
 		/// <returns><c>true</c> if view model should proceed with loading session; otherwise, <c>false</c>.</returns>
 		protected virtual bool ShouldLoadSession( Session session )
 		{
-			bool result = false;
+			var result = false;
 
 			foreach( var pair in _parts )
 			{
@@ -286,6 +301,7 @@ namespace Digillect.Mvvm
 				}
 			}
 		}
+
 		#endregion
 
 		#region Parts
@@ -307,7 +323,9 @@ namespace Digillect.Mvvm
 				throw new ArgumentNullException( "loader" );
 			}
 
-			_parts[part] = new PartInfo() { Loader = loader, Checker = checker, Default = @default };
+			_parts[part] = new PartInfo() { Loader = loader,
+					Checker = checker,
+					Default = @default };
 		}
 
 		private class PartInfo

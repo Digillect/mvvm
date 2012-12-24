@@ -23,11 +23,24 @@
 		</ProjectReference>
 		<ProjectReference Include="src\Digillect.Mvvm.WindowsPhone\Digillect.Mvvm.WindowsPhone (wp71).csproj"/>
 		<ProjectReference Include="src\Digillect.Mvvm.WindowsPhone\Digillect.Mvvm.WindowsPhone (wp80).csproj"/>
+		<ProjectReference Include="src\Digillect.Mvvm.Tests\Digillect.Mvvm.Tests.csproj"/>
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackagingProjectReference Include="src\DCL.Mvvm\DCL.Mvvm.nuproj"/>
 	</ItemGroup>
+
+	<PropertyGroup>
+		<MSpecCommand>$(MSBuildProjectDirectory)\packages\Machine.Specifications.0.5.11-beta2\tools\mspec-clr4.exe --xml .\report.xml</MSpecCommand>
+	</PropertyGroup>
+
+	<Target Name="Test">
+		<Exec Command="$(MSpecCommand) Digillect.Mvvm.Tests.dll" ContinueOnError="true" WorkingDirectory="target\$(Configuration)\Digillect.Mvvm.Tests"/>
+		<XslTransformation
+			XmlInputPaths="target\$(Configuration)\Digillect.Mvvm.Tests\report.xml"
+			XslInputPath="tools\testing\mspec2junit.xslt"
+			OutputPaths="target\$(Configuration)\Digillect.Mvvm.Tests\junit-report.xml"/>
+	</Target>
 
 	<Target Name="UpdateAssemblyVersion" Condition="'$(BuildNumber)' != ''">
 		<FileUpdate Files="src\AssemblySharedInfo.cs" Regex='BuildNumber = "\d+"' ReplacementText='BuildNumber = "$(BuildNumber)"'/>

@@ -2,4 +2,7 @@
 /target/
 /[Tt]est[Rr]esults/
 
-*.suo*.vsdoc
+*.suo
+*.vsdoc
+*.user
+*.DotSettings

@@ -123,7 +123,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Digillect">
-      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-00022\lib\wp8\Digillect.dll</HintPath>
+      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-00027\lib\wp8\Digillect.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm.WindowsPhone
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm (wp80)", "src\Digillect.MVVM\Digillect.Mvvm (wp80).csproj", "{095A8CC7-1C33-4F4C-B26B-23E252A56423}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm.Tests", "src\Digillect.Mvvm.Tests\Digillect.Mvvm.Tests.csproj", "{B6F0AD24-B021-4C62-9660-F797DB64F32A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{095A8CC7-1C33-4F4C-B26B-23E252A56423}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{095A8CC7-1C33-4F4C-B26B-23E252A56423}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{095A8CC7-1C33-4F4C-B26B-23E252A56423}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6F0AD24-B021-4C62-9660-F797DB64F32A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6F0AD24-B021-4C62-9660-F797DB64F32A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6F0AD24-B021-4C62-9660-F797DB64F32A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6F0AD24-B021-4C62-9660-F797DB64F32A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
