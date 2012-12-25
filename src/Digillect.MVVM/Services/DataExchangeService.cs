@@ -2,21 +2,35 @@
 
 namespace Digillect.Mvvm.Services
 {
-	[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses" )]
-	internal sealed class DataExchangeService : IDataExchangeService
+	/// <summary>
+	/// Windows 8 implementation of <see cref="IDataExchangeService"/>
+	/// </summary>
+	public sealed class DataExchangeService : IDataExchangeService
 	{
 		private readonly static object syncRoot = new object();
 
+		/// <summary>
+		/// Occurs when data exchange started.
+		/// </summary>
 		public event EventHandler DataExchangeStarted;
+		/// <summary>
+		/// Occurs when data exchange complete.
+		/// </summary>
 		public event EventHandler DataExchangeComplete;
 
 		private int _dataExchangeCount = 0;
 
+		/// <summary>
+		/// Gets the number of active data exchange operations.
+		/// </summary>
 		public int DataExchangeCount
 		{
 			get { return _dataExchangeCount; }
 		}
 
+		/// <summary>
+		/// Informs that another data exchange operation has begun.
+		/// </summary>
 		public void BeginDataExchange()
 		{
 			lock( syncRoot )
@@ -35,6 +49,9 @@ namespace Digillect.Mvvm.Services
 			}
 		}
 
+		/// <summary>
+		/// Informs that one of the data exchange operations has ended.
+		/// </summary>
 		public void EndDataExchange()
 		{
 			if( _dataExchangeCount > 0 )

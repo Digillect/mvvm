@@ -9,12 +9,19 @@ using Autofac;
 
 namespace Digillect.Mvvm.Services
 {
-	internal sealed class NavigationService : INavigationService, IStartable
+	/// <summary>
+	/// Windows phone implementation of <see cref="Digillect.Mvvm.Services.INavigationService"/>
+	/// </summary>
+	public sealed class NavigationService : INavigationService, IStartable
 	{
 		private readonly Dictionary<string, string> _views = new Dictionary<string, string>( StringComparer.InvariantCultureIgnoreCase );
 		private readonly INavigationServiceContext _navigationServiceContext;
 
 		#region Constructors/Disposer
+		/// <summary>
+		/// Initializes a new instance of the <see cref="NavigationService" /> class.
+		/// </summary>
+		/// <param name="navigationServiceContext">The navigation service context.</param>
 		public NavigationService( INavigationServiceContext navigationServiceContext )
 		{
 			_navigationServiceContext = navigationServiceContext;
@@ -22,6 +29,9 @@ namespace Digillect.Mvvm.Services
 		#endregion
 
 		#region Start
+		/// <summary>
+		/// Perform once-off startup processing.
+		/// </summary>
 		public void Start()
 		{
 			var assemblyToScan = _navigationServiceContext.GetMainAssemblyContainingViews();
@@ -46,6 +56,10 @@ namespace Digillect.Mvvm.Services
 		#endregion
 
 		#region Navigate
+		/// <summary>
+		/// Navigates to the specified view.
+		/// </summary>
+		/// <param name="viewName">Name of the view.</param>
 		public void Navigate( string viewName )
 		{
 			Contract.Ensures( viewName != null );
@@ -53,6 +67,13 @@ namespace Digillect.Mvvm.Services
 			Navigate( viewName, null );
 		}
 
+		/// <summary>
+		/// Navigates to the specified view with parameters.
+		/// </summary>
+		/// <param name="viewName">Name of the view.</param>
+		/// <param name="parameters">The parameters.</param>
+		/// <exception cref="System.ArgumentNullException">viewName</exception>
+		/// <exception cref="System.ArgumentException">viewName</exception>
 		public void Navigate( string viewName, Parameters parameters )
 		{
 			if( viewName == null )
@@ -82,8 +103,13 @@ namespace Digillect.Mvvm.Services
 		#endregion
 
 		#region Encode/Decode values
-		public const string DateTimeFormatString = "yyyy-MM-ddThh:mm:sszzz";
+		private const string DateTimeFormatString = "yyyy-MM-ddThh:mm:sszzz";
 
+		/// <summary>
+		/// Encodes the value to string representation.
+		/// </summary>
+		/// <param name="value">The value.</param>
+		/// <returns>Encoded value.</returns>
 		public static string EncodeValue( object value )
 		{
 			if( value == null )
@@ -117,6 +143,12 @@ namespace Digillect.Mvvm.Services
 			return Uri.EscapeDataString( formattedValue );
 		}
 
+		/// <summary>
+		/// Decodes the value.
+		/// </summary>
+		/// <param name="stringValue">String representation of the value.</param>
+		/// <param name="targetType">Target value type.</param>
+		/// <returns>Decoded value.</returns>
 		public static object DecodeValue( string stringValue, Type targetType )
 		{
 			if( stringValue == null )
