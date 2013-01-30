@@ -1,10 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm (net45)", "src\Digillect.Mvvm\Digillect.Mvvm (net45).csproj", "{87238C3D-EF26-4DF2-BB3E-51DF75A07DC1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm (win8)", "src\Digillect.Mvvm\Digillect.Mvvm (win8).csproj", "{A3037917-1B3D-4D99-A820-8D8C6121D8D1}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm.Windows8", "src\Digillect.Mvvm.Windows8\Digillect.Mvvm.Windows8.csproj", "{344778D6-EEB9-4302-ADDD-2027E4FFCDCE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm (wp71)", "src\Digillect.MVVM\Digillect.Mvvm (wp71).csproj", "{5B1A2D09-CDC4-4210-A0D1-6C5DC9A2DF7B}"
@@ -13,9 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm.WindowsPhone
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm.WindowsPhone (wp80)", "src\Digillect.Mvvm.WindowsPhone\Digillect.Mvvm.WindowsPhone (wp80).csproj", "{E35B5519-9B0F-4920-ADB3-48DD5F04EA40}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm (wp80)", "src\Digillect.MVVM\Digillect.Mvvm (wp80).csproj", "{095A8CC7-1C33-4F4C-B26B-23E252A56423}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm.Tests", "src\Digillect.Mvvm.Tests\Digillect.Mvvm.Tests.csproj", "{B6F0AD24-B021-4C62-9660-F797DB64F32A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digillect.Mvvm", "src\Digillect.Mvvm\Digillect.Mvvm.csproj", "{F85B96FF-33FE-40C7-9BD2-BD38A33460F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,18 +20,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{87238C3D-EF26-4DF2-BB3E-51DF75A07DC1}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
-		{87238C3D-EF26-4DF2-BB3E-51DF75A07DC1}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
-		{87238C3D-EF26-4DF2-BB3E-51DF75A07DC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{87238C3D-EF26-4DF2-BB3E-51DF75A07DC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{87238C3D-EF26-4DF2-BB3E-51DF75A07DC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{87238C3D-EF26-4DF2-BB3E-51DF75A07DC1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A3037917-1B3D-4D99-A820-8D8C6121D8D1}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
-		{A3037917-1B3D-4D99-A820-8D8C6121D8D1}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
-		{A3037917-1B3D-4D99-A820-8D8C6121D8D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A3037917-1B3D-4D99-A820-8D8C6121D8D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A3037917-1B3D-4D99-A820-8D8C6121D8D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A3037917-1B3D-4D99-A820-8D8C6121D8D1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{344778D6-EEB9-4302-ADDD-2027E4FFCDCE}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
 		{344778D6-EEB9-4302-ADDD-2027E4FFCDCE}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
 		{344778D6-EEB9-4302-ADDD-2027E4FFCDCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -60,18 +44,18 @@ Global
 		{E35B5519-9B0F-4920-ADB3-48DD5F04EA40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E35B5519-9B0F-4920-ADB3-48DD5F04EA40}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E35B5519-9B0F-4920-ADB3-48DD5F04EA40}.Release|Any CPU.Build.0 = Release|Any CPU
-		{095A8CC7-1C33-4F4C-B26B-23E252A56423}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
-		{095A8CC7-1C33-4F4C-B26B-23E252A56423}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
-		{095A8CC7-1C33-4F4C-B26B-23E252A56423}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{095A8CC7-1C33-4F4C-B26B-23E252A56423}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{095A8CC7-1C33-4F4C-B26B-23E252A56423}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{095A8CC7-1C33-4F4C-B26B-23E252A56423}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B6F0AD24-B021-4C62-9660-F797DB64F32A}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
 		{B6F0AD24-B021-4C62-9660-F797DB64F32A}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
 		{B6F0AD24-B021-4C62-9660-F797DB64F32A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B6F0AD24-B021-4C62-9660-F797DB64F32A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6F0AD24-B021-4C62-9660-F797DB64F32A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6F0AD24-B021-4C62-9660-F797DB64F32A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F85B96FF-33FE-40C7-9BD2-BD38A33460F8}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
+		{F85B96FF-33FE-40C7-9BD2-BD38A33460F8}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
+		{F85B96FF-33FE-40C7-9BD2-BD38A33460F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F85B96FF-33FE-40C7-9BD2-BD38A33460F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F85B96FF-33FE-40C7-9BD2-BD38A33460F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F85B96FF-33FE-40C7-9BD2-BD38A33460F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -13,6 +13,7 @@ namespace Digillect.Mvvm.UI
 		/// <param name="page">The page.</param>
 		/// <param name="viewModel">The view model.</param>
 		/// <returns>Instance of context.</returns>
+		[CLSCompliant( false )]
 		public new delegate ViewModelPageDataContext Factory( PhoneApplicationPage page, ViewModel viewModel );
 
 		#region Constructors/Disposer
@@ -21,6 +22,7 @@ namespace Digillect.Mvvm.UI
 		/// </summary>
 		/// <param name="page">The page used in this context.</param>
 		/// <param name="viewModel">The view model used in this context.</param>
+		[CLSCompliant( false )]
 		public ViewModelPageDataContext( PhoneApplicationPage page, ViewModel viewModel )
 			: base( page )
 		{
@@ -37,6 +39,7 @@ namespace Digillect.Mvvm.UI
 		/// <summary>
 		/// Gets the view model.
 		/// </summary>
+		[CLSCompliant( false )]
 		public ViewModel ViewModel { get; private set; }
 		#endregion
 	}

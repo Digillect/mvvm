@@ -9,6 +9,7 @@ namespace Digillect.Mvvm.Services
 	/// <summary>
 	/// Autofac module that registers default and system services.
 	/// </summary>
+	[CLSCompliant( false )]
 	public class MvvmModule : Module
 	{
 		/// <summary>

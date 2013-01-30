@@ -74,6 +74,7 @@ namespace Digillect.Mvvm.Services
 		/// <param name="parameters">The parameters.</param>
 		/// <exception cref="System.ArgumentNullException">viewName</exception>
 		/// <exception cref="System.ArgumentException">viewName</exception>
+		[CLSCompliant( false )]
 		public void Navigate( string viewName, Parameters parameters )
 		{
 			if( viewName == null )

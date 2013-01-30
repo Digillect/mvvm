@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\target\Debug\Digillect.Mvvm.Tests\</OutputPath>
+    <OutputPath>..\..\target\Debug\tests\Digillect.Mvvm.Tests\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -24,7 +24,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\target\Release\Digillect.Mvvm.Tests\</OutputPath>
+    <OutputPath>..\..\target\Release\tests\Digillect.Mvvm.Tests\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -39,8 +39,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Digillect">
-      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-00027\lib\net45\Digillect.dll</HintPath>
+    <Reference Include="Digillect.ObjectModel">
+      <HintPath>..\..\packages\Digillect.ObjectModel.4.0.0-dev-00002\lib\portable-net45+wp8+win8\Digillect.ObjectModel.dll</HintPath>
     </Reference>
     <Reference Include="Machine.Specifications">
       <HintPath>..\..\packages\Machine.Specifications.0.5.11-beta2\lib\net40\Machine.Specifications.dll</HintPath>
@@ -66,13 +66,13 @@
     <Compile Include="ViewModelErrorHandlingTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Digillect.Mvvm\Digillect.Mvvm %28net45%29.csproj">
-      <Project>{87238c3d-ef26-4df2-bb3e-51df75a07dc1}</Project>
-      <Name>Digillect.Mvvm %28net45%29</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Digillect.Mvvm\Digillect.Mvvm.csproj">
+      <Project>{f85b96ff-33fe-40c7-9bd2-bd38a33460f8}</Project>
+      <Name>Digillect.Mvvm</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

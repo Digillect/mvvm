@@ -27,13 +27,13 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\target\Debug\wp71\</OutputPath>
+    <OutputPath>..\..\target\Debug\bin\wp71\</OutputPath>
     <DefineConstants>TRACE;DEBUG;NET40;SILVERLIGHT;WINDOWS_PHONE;WINDOWS_PHONE_71</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\..\target\Debug\wp71\Digillect.Mvvm.xml</DocumentationFile>
+    <DocumentationFile>..\..\target\Debug\bin\wp71\Digillect.Mvvm.xml</DocumentationFile>
     <NoWarn>1591,1607</NoWarn>
     <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
     <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
@@ -72,13 +72,13 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\target\Release\wp71\</OutputPath>
+    <OutputPath>..\..\target\Release\bin\wp71\</OutputPath>
     <DefineConstants>TRACE;NET40;SILVERLIGHT;WINDOWS_PHONE;WINDOWS_PHONE_71</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\..\target\Release\wp71\Digillect.Mvvm.xml</DocumentationFile>
+    <DocumentationFile>..\..\target\Release\bin\wp71\Digillect.Mvvm.xml</DocumentationFile>
     <NoWarn>1591,1607</NoWarn>
     <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
     <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
@@ -118,7 +118,6 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>obj\wp71\CodeAnalysis\</OutputPath>
     <DefineConstants>TRACE;DEBUG;NET40;SILVERLIGHT;WINDOWS_PHONE;WINDOWS_PHONE_71</DefineConstants>
-    <DocumentationFile>..\..\target\Debug\wp71\Digillect.Mvvm.xml</DocumentationFile>
     <NoWarn>1591,1607</NoWarn>
     <NoStdLib>true</NoStdLib>
     <DebugType>full</DebugType>
@@ -164,9 +163,8 @@
       <HintPath>..\..\packages\Autofac.2.6.3.862\lib\SL4-WindowsPhone71\Autofac.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Digillect">
-      <HintPath>..\..\packages\DCL.Core.4.0.0-dev-00027\lib\wp71\Digillect.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Digillect.ObjectModel">
+      <HintPath>..\..\packages\Digillect.ObjectModel.4.0.0-dev-00002\lib\wp71\Digillect.ObjectModel.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Contracts">
       <HintPath>C:\Program Files (x86)\Microsoft\Contracts\PublicAssemblies\Silverlight3\Microsoft.Contracts.dll</HintPath>
@@ -244,4 +242,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <PropertyGroup>
+    <CompileDependsOn>$(CompileDependsOn);CheckForCodeContracts</CompileDependsOn>
+  </PropertyGroup>
+  <Target Name="CheckForCodeContracts" Condition=" '$(CodeContractsImported)' != 'true' ">
+    <Error Text="Project requires Code Contracts http://msdn.microsoft.com/en-us/devlabs/dd491992.aspx" />
+  </Target>
 </Project>

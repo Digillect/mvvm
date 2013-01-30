@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Digillect.Mvvm.Services;
 
 namespace Digillect.Mvvm
@@ -318,27 +319,27 @@ namespace Digillect.Mvvm
 
 		#region Parts
 		/// <summary>
-        /// Registers handler of multipart loader.
-        /// </summary>
-        /// <param name="part">Part identifier.</param>
-        /// <param name="loader">Function to load specified part.</param>
-        protected void RegisterPart( string part, Func<Session, string, Task> loader )
-        {
-        	RegisterPart( part, loader, null, true );
-        }
+		/// Registers handler of multipart loader.
+		/// </summary>
+		/// <param name="part">Part identifier.</param>
+		/// <param name="loader">Function to load specified part.</param>
+		protected void RegisterPart( string part, Func<Session, string, Task> loader )
+		{
+			RegisterPart( part, loader, null, true );
+		}
 
-        /// <summary>
-        /// Registers handler of multipart loader.
-        /// </summary>
-        /// <param name="part">Part identifier.</param>
-        /// <param name="loader">Function to load specified part.</param>
-        /// <param name="checker">Function to check if the specified part should be loaded.</param>
-        protected void RegisterPart( string part, Func<Session, string, Task> loader, Func<Session, string, bool> checker )
-        {
-        	RegisterPart( part, loader, checker, true );
-        }
+		/// <summary>
+		/// Registers handler of multipart loader.
+		/// </summary>
+		/// <param name="part">Part identifier.</param>
+		/// <param name="loader">Function to load specified part.</param>
+		/// <param name="checker">Function to check if the specified part should be loaded.</param>
+		protected void RegisterPart( string part, Func<Session, string, Task> loader, Func<Session, string, bool> checker )
+		{
+			RegisterPart( part, loader, checker, true );
+		}
 
-        /// <summary>
+		/// <summary>
 		/// Registers handler of multipart loader.
 		/// </summary>
 		/// <param name="part">Part identifier.</param>

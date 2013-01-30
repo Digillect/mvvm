@@ -55,6 +55,7 @@ namespace Digillect.Mvvm.UI
 		/// <value>
 		/// The parameters.
 		/// </value>
+		[CLSCompliant( false )]
 		public Parameters Parameters
 		{
 			get { return _parameters; }

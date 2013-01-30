@@ -125,6 +125,7 @@ namespace Digillect.Mvvm
 		/// <summary>
 		/// Gets the <see cref="System.Threading.CancellationToken"/> to be used in asynchronous operations.
 		/// </summary>
+		[CLSCompliant( false )]
 		public CancellationToken Token
 		{
 			get { return _tokenSource.Token; }
