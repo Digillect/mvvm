@@ -21,5 +21,8 @@
 				<dependency id="Autofac" version="2.6.3.862"/>
 			</group>
 		</dependencies>
+		<references>
+			<reference file="Digillect.Mvvm.dll"/>
+		</references>
 	</metadata>
 </package>
