@@ -7,7 +7,7 @@
 		<authors>Gregory Nickonov</authors>
 		<owners>Gregory Nickonov</owners>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>Digillect Common Libraries: Model-View-ViewModel</description>
+		<description>Digillect Model-View-ViewModel framework.</description>
 		<releaseNotes>Initial release.</releaseNotes>
 		<copyright>Copyright © 2011-2013 Actis Systems. All rights reserved.</copyright>
 		<tags>digillect mvvm</tags>
@@ -19,14 +19,6 @@
 			<group targetFramework="wp71">
 				<dependency id="Digillect.ObjectModel" version="4.0.0-dev-00002"/>
 				<dependency id="Autofac" version="2.6.3.862"/>
-			</group>
-			<group targetFramework="wp80">
-				<dependency id="Digillect.ObjectModel" version="4.0.0-dev-00002"/>
-				<dependency id="Autofac" version="3.0.0"/>
-			</group>
-			<group targetFramework="windows8">
-				<dependency id="Digillect.ObjectModel" version="4.0.0-dev-00002"/>
-				<dependency id="Autofac" version="3.0.0"/>
 			</group>
 		</dependencies>
 	</metadata>

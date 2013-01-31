@@ -11,10 +11,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<LibWin8 Include="$(BuildPath)\win8\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)"/>
 		<LibWP71 Include="$(BuildPath)\wp71\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)"/>
-		<LibWP80 Include="$(BuildPath)\wp80\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)"/>
-		<LibPortable Include="$(BuildPath)\net45+wp8+win8\**\Digillect.Mvvm.*" Exclude="$(BuildPath)\net45+wp8+win8\*.xml.old">
+		<LibPortable Include="$(BuildPath)\net45+wp8+win8\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)">
 			<Profile>net45+wp8+win8</Profile>
 		</LibPortable>
 	</ItemGroup>

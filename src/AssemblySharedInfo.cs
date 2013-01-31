@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("Retail")]
 #endif
 [assembly: AssemblyCompany( "Actis Systems" )]
-[assembly: AssemblyProduct("Digillect� Common Libraries")]
+[assembly: AssemblyProduct("Digillect� Model-View-ViewModel framework.")]
 [assembly: AssemblyCopyright("� 2011-2012 Actis Systems. All rights reserved.")]
 [assembly: AssemblyTrademark("Digillect is a registered trademark of Actis Systems.")]
 
