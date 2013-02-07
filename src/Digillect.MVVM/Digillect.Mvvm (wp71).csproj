@@ -202,6 +202,8 @@
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
     <Compile Include="IRelayCommand.cs" />
+    <Compile Include="NavigationCommand.cs" />
+    <Compile Include="NavigationCommand`1.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="RelayCommand`1.cs" />
     <Compile Include="RelayCommand.cs" />
@@ -226,7 +228,9 @@
     <Compile Include="ViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="..\CustomDictionary.xml">

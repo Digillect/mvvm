@@ -152,6 +152,8 @@
     <Compile Include="EntitySession.cs" />
     <Compile Include="EntityViewModel.cs" />
     <Compile Include="IRelayCommand.cs" />
+    <Compile Include="NavigationCommand.cs" />
+    <Compile Include="NavigationCommand`1.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RelayCommand.cs" />
