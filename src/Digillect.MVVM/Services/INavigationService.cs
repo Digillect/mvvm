@@ -20,5 +20,14 @@ namespace Digillect.Mvvm.Services
 		/// <param name="viewName">Name of the view.</param>
 		/// <param name="parameters">The parameters.</param>
 		void Navigate( string viewName, Parameters parameters );
+		/// <summary>
+		/// Navigated to the previous view, if any.
+		/// </summary>
+		void GoBack();
+		/// <summary>
+		/// Navigates back until encounters view named <param name="viewName"/>.
+		/// </summary>
+		/// <param name="viewName">Name of the view.</param>
+		void GoBack( string viewName );
 	}
 }
