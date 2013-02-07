@@ -25,7 +25,7 @@ namespace Digillect.Mvvm.Services
 		/// </summary>
 		void GoBack();
 		/// <summary>
-		/// Navigates back until encounters view named <param name="viewName"/>.
+		/// Navigates back until encounters view named <paramref name="viewName"/>.
 		/// </summary>
 		/// <param name="viewName">Name of the view.</param>
 		void GoBack( string viewName );

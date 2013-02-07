@@ -8,7 +8,7 @@ namespace Digillect.Mvvm
 	/// Delegate-based implementation of <see cref="System.Windows.Input.ICommand"/>.
 	/// </summary>
 	/// <typeparam name="T">Type of the parameter used by execute and canExecute delegates.</typeparam>
-	public class RelayCommand<T> : ICommand
+	public class RelayCommand<T> : IRelayCommand
 	{
 		private readonly Action<T> _execute;
 		private readonly Func<T, bool> _canExecute;
@@ -71,7 +71,7 @@ namespace Digillect.Mvvm
 		/// </returns>
 		public bool CanExecute( object parameter )
 		{
-			return _canExecute == null ? true : _canExecute( (T) parameter );
+			return _canExecute == null || _canExecute( (T) parameter );
 		}
 
 		/// <summary>

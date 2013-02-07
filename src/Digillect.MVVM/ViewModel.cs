@@ -10,57 +10,95 @@ using Digillect.Mvvm.Services;
 namespace Digillect.Mvvm
 {
 	/// <summary>
-	/// Base ViewModel that can be used to build Model-View-ViewModel architecture. All application ViewModels must be descendant of this class.
+	///     Base ViewModel that can be used to build Model-View-ViewModel architecture. All application ViewModels must be descendant of this class.
 	/// </summary>
-	public class ViewModel : ObservableObject
+	public class ViewModel : ObservableObject, IDisposable
 	{
 		private readonly Dictionary<string, PartInfo> _parts = new Dictionary<string, PartInfo>();
 		private readonly List<Session> _sessions = new List<Session>();
+		private bool _preserveSessions = false;
 
 		#region Constructors/Disposer
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ViewModel"/> class.
+		///     Initializes a new instance of the <see cref="ViewModel" /> class.
 		/// </summary>
 		protected ViewModel()
 		{
+		}
+
+		/// <summary>
+		/// Finalizes an instance of the <see cref="ViewModel" /> class.
+		/// </summary>
+		~ViewModel()
+		{
+			Dispose( false );
+		}
+
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
+		public void Dispose()
+		{
+			Dispose( true );
+			GC.SuppressFinalize( this );
+		}
+
+		/// <summary>
+		/// Releases unmanaged and - optionally - managed resources.
+		/// </summary>
+		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+		protected virtual void Dispose( bool disposing )
+		{
+			if( disposing )
+			{
+				if( !_preserveSessions )
+				{
+					CancelActiveSessions();
+				}
+			}
 		}
 		#endregion
 
 		#region Public Properties
 		/// <summary>
-		/// Gets or sets the data exchange service.
+		///     Gets or sets the data exchange service.
 		/// </summary>
 		/// <value>
-		/// The service used to indicate that data exchange is in the progress.
+		///     The service used to indicate that data exchange is in the progress.
 		/// </value>
 		public IDataExchangeService DataExchangeService { get; set; }
+
 		/// <summary>
-		/// Gets or sets view model exception handling service.
+		///     Gets or sets view model exception handling service.
 		/// </summary>
 		/// <value>
-		/// The service used to report any exceptions occured while view model loads a session.
+		///     The service used to report any exceptions occured while view model loads a session.
 		/// </value>
 		public IViewModelExceptionHandlingService ViewModelExceptionHandlingService { get; set; }
 		#endregion
 
 		#region Data-Exchange notifications
 		/// <summary>
-		/// Occurs when <see cref="Digillect.Mvvm.Session"/> load is started.
+		///     Occurs when <see cref="Digillect.Mvvm.Session" /> load is started.
 		/// </summary>
 		public event EventHandler<SessionEventArgs> SessionStarted;
+
 		/// <summary>
-		/// Occurs when <see cref="Digillect.Mvvm.Session"/> load is successfully completed.
+		///     Occurs when <see cref="Digillect.Mvvm.Session" /> load is successfully completed.
 		/// </summary>
 		public event EventHandler<SessionEventArgs> SessionComplete;
+
 		/// <summary>
-		/// Occurs when <see cref="Digillect.Mvvm.Session"/> load was aborted due to unhandled error.
+		///     Occurs when <see cref="Digillect.Mvvm.Session" /> load was aborted due to unhandled error.
 		/// </summary>
 		public event EventHandler<SessionAbortedEventArgs> SessionAborted;
 
 		/// <summary>
-		/// Raises the session started event.
+		///     Raises the session started event.
 		/// </summary>
-		/// <param name="e">The <see cref="Digillect.Mvvm.SessionEventArgs"/> instance containing the event data.</param>
+		/// <param name="e">
+		///     The <see cref="Digillect.Mvvm.SessionEventArgs" /> instance containing the event data.
+		/// </param>
 		protected virtual void OnSessionStarted( SessionEventArgs e )
 		{
 			if( SessionStarted != null )
@@ -70,9 +108,11 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Raises the session complete event.
+		///     Raises the session complete event.
 		/// </summary>
-		/// <param name="e">The <see cref="Digillect.Mvvm.SessionEventArgs"/> instance containing the event data.</param>
+		/// <param name="e">
+		///     The <see cref="Digillect.Mvvm.SessionEventArgs" /> instance containing the event data.
+		/// </param>
 		protected virtual void OnSessionComplete( SessionEventArgs e )
 		{
 			if( SessionComplete != null )
@@ -82,9 +122,11 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Raises the session aborted event.
+		///     Raises the session aborted event.
 		/// </summary>
-		/// <param name="e">The <see cref="Digillect.Mvvm.SessionAbortedEventArgs"/> instance containing the event data.</param>
+		/// <param name="e">
+		///     The <see cref="Digillect.Mvvm.SessionAbortedEventArgs" /> instance containing the event data.
+		/// </param>
 		protected virtual void OnSessionAborted( SessionAbortedEventArgs e )
 		{
 			if( SessionAborted != null )
@@ -96,10 +138,12 @@ namespace Digillect.Mvvm
 
 		#region Loading/Sessions
 		/// <summary>
-		/// Loads the specified session.
+		///     Loads the specified session.
 		/// </summary>
 		/// <param name="session">The session.</param>
-		/// <returns><see cref="System.Threading.Tasks.Task{T}"/> that can be awaited.</returns>
+		/// <returns>
+		///     <see cref="System.Threading.Tasks.Task{T}" /> that can be awaited.
+		/// </returns>
 		[EditorBrowsable( EditorBrowsableState.Never )]
 		public async Task<Session> Load( Session session )
 		{
@@ -251,19 +295,46 @@ namespace Digillect.Mvvm
 			return session;
 		}
 
+		private void CancelActiveSessions()
+		{
+			List<Session> sessions;
+
+			lock( _sessions )
+			{
+				sessions = new List<Session>( _sessions );
+			}
+
+			foreach( var session in sessions )
+			{
+				session.Cancel();
+			}
+		}
+
 		/// <summary>
-		/// When overriden checks that the specified session should be loaded or ignored. Default behavior is
-		/// to load any session.
+		/// Preserves the sessions from being canceled upon disposal.
+		/// </summary>
+		/// <param name="preserve">if set to <c>true</c> then sessions will not be cancelled when <see cref="Dispose"/> method will be called.</param>
+		[EditorBrowsable( EditorBrowsableState.Never )]
+		protected void PreserveSessions( bool preserve )
+		{
+			_preserveSessions = preserve;
+		}
+
+		/// <summary>
+		///     When overriden checks that the specified session should be loaded or ignored. Default behavior is
+		///     to load any session.
 		/// </summary>
 		/// <param name="session">The session to check.</param>
-		/// <returns><c>true</c> if view model should proceed with loading session; otherwise, <c>false</c>.</returns>
+		/// <returns>
+		///     <c>true</c> if view model should proceed with loading session; otherwise, <c>false</c>.
+		/// </returns>
 		protected virtual bool ShouldLoadSession( Session session )
 		{
 			if( session == null )
 			{
 				throw new ArgumentNullException( "session" );
 			}
-			
+
 			Contract.EndContractBlock();
 
 			var result = false;
@@ -292,7 +363,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Override this method to perform actual session loading.
+		///     Override this method to perform actual session loading.
 		/// </summary>
 		/// <param name="session">The session.</param>
 		protected virtual void LoadSession( Session session )
@@ -301,7 +372,7 @@ namespace Digillect.Mvvm
 			{
 				throw new ArgumentNullException( "session" );
 			}
-			
+
 			Contract.EndContractBlock();
 
 			foreach( var pair in _parts )
@@ -319,7 +390,7 @@ namespace Digillect.Mvvm
 
 		#region Parts
 		/// <summary>
-		/// Registers handler of multipart loader.
+		///     Registers handler of multipart loader.
 		/// </summary>
 		/// <param name="part">Part identifier.</param>
 		/// <param name="loader">Function to load specified part.</param>
@@ -329,7 +400,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Registers handler of multipart loader.
+		///     Registers handler of multipart loader.
 		/// </summary>
 		/// <param name="part">Part identifier.</param>
 		/// <param name="loader">Function to load specified part.</param>
@@ -340,12 +411,14 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Registers handler of multipart loader.
+		///     Registers handler of multipart loader.
 		/// </summary>
 		/// <param name="part">Part identifier.</param>
 		/// <param name="loader">Function to load specified part.</param>
 		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <param name="default"><c>true</c> if this part loads when no parts specified for the session.</param>
+		/// <param name="default">
+		///     <c>true</c> if this part loads when no parts specified for the session.
+		/// </param>
 		protected void RegisterPart( string part, Func<Session, string, Task> loader, Func<Session, string, bool> checker, bool @default )
 		{
 			if( part == null )
@@ -358,7 +431,7 @@ namespace Digillect.Mvvm
 				throw new ArgumentNullException( "loader" );
 			}
 
-			_parts[part] = new PartInfo()
+			_parts[part] = new PartInfo
 			{
 				Loader = loader,
 				Checker = checker,

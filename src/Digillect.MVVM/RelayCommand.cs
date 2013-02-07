@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
-using System.Windows.Input;
 
 namespace Digillect.Mvvm
 {
 	/// <summary>
 	/// Delegate-based implementation of <see cref="System.Windows.Input.ICommand"/>.
 	/// </summary>
-	public class RelayCommand : ICommand
+	public class RelayCommand : IRelayCommand
 	{
 		private readonly Action _execute;
 		private readonly Func<bool> _canExecute;
@@ -70,7 +69,7 @@ namespace Digillect.Mvvm
 		/// </returns>
 		public bool CanExecute( object parameter )
 		{
-			return _canExecute == null ? true : _canExecute();
+			return _canExecute == null || _canExecute();
 		}
 
 		/// <summary>
