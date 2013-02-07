@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Windows.Input;
 
 using Digillect.Mvvm.Services;
 
 namespace Digillect.Mvvm
 {
 	/// <summary>
-	/// Command that performs navigation to the specified view.
+	///     Command that performs navigation to the specified view.
 	/// </summary>
-	public class NavigationCommand<T> : ICommand
+	public class NavigationCommand<T> : IRelayCommand
 	{
 		private readonly INavigationService _navigationService;
 		private readonly string _view;
@@ -18,7 +18,7 @@ namespace Digillect.Mvvm
 
 		#region Constructors/Disposer
 		/// <summary>
-		/// Initializes a new instance of the <see cref="NavigationCommand" /> class.
+		///     Initializes a new instance of the <see cref="NavigationCommand" /> class.
 		/// </summary>
 		/// <param name="navigationService">Instance of navigation service to be used to perform navigation.</param>
 		/// <param name="view">Target view.</param>
@@ -28,7 +28,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="NavigationCommand" /> class.
+		///     Initializes a new instance of the <see cref="NavigationCommand" /> class.
 		/// </summary>
 		/// <param name="navigationService">Instance of navigation service to be used to perform navigation.</param>
 		/// <param name="view">Target view.</param>
@@ -39,7 +39,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="NavigationCommand" /> class.
+		///     Initializes a new instance of the <see cref="NavigationCommand" /> class.
 		/// </summary>
 		/// <param name="navigationService">Instance of navigation service to be used to perform navigation.</param>
 		/// <param name="view">Target view.</param>
@@ -50,7 +50,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="NavigationCommand" /> class.
+		///     Initializes a new instance of the <see cref="NavigationCommand" /> class.
 		/// </summary>
 		/// <param name="navigationService">Instance of navigation service to be used to perform navigation.</param>
 		/// <param name="view">Target view.</param>
@@ -62,7 +62,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="NavigationCommand" /> class.
+		///     Initializes a new instance of the <see cref="NavigationCommand" /> class.
 		/// </summary>
 		/// <param name="navigationService">Instance of navigation service to be used to perform navigation.</param>
 		/// <param name="view">Target view.</param>
@@ -73,7 +73,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="NavigationCommand" /> class.
+		///     Initializes a new instance of the <see cref="NavigationCommand" /> class.
 		/// </summary>
 		/// <param name="navigationService">Instance of navigation service to be used to perform navigation.</param>
 		/// <param name="view">Target view.</param>
@@ -101,14 +101,14 @@ namespace Digillect.Mvvm
 		#endregion
 
 		/// <summary>
-		/// Occurs when changes occur that affect whether or not the command should execute.
+		///     Occurs when changes occur that affect whether or not the command should execute.
 		/// </summary>
 		public event EventHandler CanExecuteChanged;
 
 		/// <summary>
-		/// Raises event that indicates that <see cref="CanExecute"/> return value has been changed.
+		///     Raises event that indicates that <see cref="CanExecute" /> return value has been changed.
 		/// </summary>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA1030:UseEventsWhereAppropriate" )]
+		[SuppressMessage( "Microsoft.Design", "CA1030:UseEventsWhereAppropriate" )]
 		public void RaiseCanExecuteChanged()
 		{
 			var handler = CanExecuteChanged;
@@ -120,11 +120,11 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Defines the method that determines whether the command can execute in its current state.
+		///     Defines the method that determines whether the command can execute in its current state.
 		/// </summary>
 		/// <param name="parameter">Data used by the command. Always ignored in this implementation.</param>
 		/// <returns>
-		/// true if this command can be executed; otherwise, false.
+		///     true if this command can be executed; otherwise, false.
 		/// </returns>
 		public bool CanExecute( object parameter )
 		{
@@ -132,7 +132,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Defines the method to be called when the command is invoked.
+		///     Defines the method to be called when the command is invoked.
 		/// </summary>
 		/// <param name="parameter">Data used by the command. Always ignored in this implementation.</param>
 		public void Execute( object parameter )

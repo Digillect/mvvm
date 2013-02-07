@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
-using System.Windows.Input;
 
 using Digillect.Mvvm.Services;
 
@@ -9,7 +8,7 @@ namespace Digillect.Mvvm
 	/// <summary>
 	/// Command that performs navigation to the specified view.
 	/// </summary>
-	public class NavigationCommand : ICommand
+	public class NavigationCommand : IRelayCommand
 	{
 		private readonly INavigationService _navigationService;
 		private readonly string _view;
