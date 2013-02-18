@@ -150,7 +150,9 @@
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
     <Compile Include="EntitySession.cs" />
-    <Compile Include="EntityViewModel.cs" />
+    <Compile Include="EntitySession`1.cs" />
+    <Compile Include="EntityViewModel`1.cs" />
+    <Compile Include="EntityViewModel`2.cs" />
     <Compile Include="IRelayCommand.cs" />
     <Compile Include="NavigationCommand.cs" />
     <Compile Include="NavigationCommand`1.cs" />
@@ -184,7 +186,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Digillect.ObjectModel">
-      <HintPath>..\..\packages\Digillect.ObjectModel.4.0.0-dev-00002\lib\portable-net45+wp8+win8\Digillect.ObjectModel.dll</HintPath>
+      <HintPath>..\..\packages\Digillect.ObjectModel.4.0.0-dev-00004\lib\portable-net45+wp8+win8\Digillect.ObjectModel.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Threading.Tasks">
       <HintPath>..\..\packages\Microsoft.Bcl.Async.1.0.14-rc\lib\portable-net45+win8+wp8\Microsoft.Threading.Tasks.dll</HintPath>

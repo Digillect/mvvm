@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.Contracts;
 
 namespace Digillect.Mvvm
@@ -6,30 +6,31 @@ namespace Digillect.Mvvm
 	/// <summary>
 	/// Represents session to be used to load entity into <see cref="Digillect.Mvvm.EntityViewModel{TId,TEntity}"/>.
 	/// </summary>
-	public class EntitySession : Session
+	/// <typeparam name="TId">Type of entity's identifier.</typeparam>
+	public class EntitySession<TId> : Session
 	{
-		private XKey _key;
+		private readonly TId _id;
 
 		#region Constructors/Disposer
 		/// <summary>
-		/// Initializes a new instance of the <see cref="EntitySession"/> class.
+		/// Initializes a new instance of the <see cref="EntitySession&lt;TId&gt;"/> class.
 		/// </summary>
-		/// <param name="key">Entity key.</param>
-		public EntitySession( XKey key )
+		/// <param name="id">Entity identifier.</param>
+		public EntitySession( TId id )
 		{
-			_key = key;
+			_id = id;
 			Exclusive = true;
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="EntitySession"/> class.
+		/// Initializes a new instance of the <see cref="EntitySession&lt;TId&gt;"/> class.
 		/// </summary>
-		/// <param name="key">Entity key.</param>
+		/// <param name="id">Entity identifier.</param>
 		/// <param name="parts">Specifies what part(s) of multipart entity to load.</param>
-		public EntitySession( XKey key, params string[] parts )
+		public EntitySession( TId id, params string[] parts )
 			: base( parts )
 		{
-			_key = key;
+			_id = id;
 			Exclusive = parts == null;
 		}
 		#endregion
@@ -38,9 +39,9 @@ namespace Digillect.Mvvm
 		/// <summary>
 		/// Gets entity identifier.
 		/// </summary>
-		public XKey Key
+		public TId Id
 		{
-			get { return _key; }
+			get { return _id; }
 		}
 		#endregion
 
@@ -51,7 +52,7 @@ namespace Digillect.Mvvm
 		/// <param name="name">Parameter name.</param>
 		/// <param name="value">Parameter value.</param>
 		/// <returns>Current session.</returns>
-		public new EntitySession AddParameter( string name, object value )
+		public new EntitySession<TId> AddParameter( string name, object value )
 		{
 			Parameters.Add( name, value );
 

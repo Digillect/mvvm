@@ -164,7 +164,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Digillect.ObjectModel">
-      <HintPath>..\..\packages\Digillect.ObjectModel.4.0.0-dev-00002\lib\wp71\Digillect.ObjectModel.dll</HintPath>
+      <HintPath>..\..\packages\Digillect.ObjectModel.4.0.0-dev-00004\lib\wp71\Digillect.ObjectModel.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Contracts">
       <HintPath>C:\Program Files (x86)\Microsoft\Contracts\PublicAssemblies\Silverlight3\Microsoft.Contracts.dll</HintPath>
@@ -201,6 +201,9 @@
     <Compile Include="..\AssemblySharedInfo.cs">
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
+    <Compile Include="EntitySession`1.cs" />
+    <Compile Include="EntityViewModel`1.cs" />
+    <Compile Include="EntityViewModel`2.cs" />
     <Compile Include="IRelayCommand.cs" />
     <Compile Include="NavigationCommand.cs" />
     <Compile Include="NavigationCommand`1.cs" />
@@ -209,7 +212,6 @@
     <Compile Include="RelayCommand.cs" />
     <Compile Include="Services\DataExchangeService.cs" />
     <Compile Include="EntitySession.cs" />
-    <Compile Include="EntityViewModel.cs" />
     <Compile Include="Services\DefaultViewModelExceptionHandlingService.cs" />
     <Compile Include="Services\IDataExchangeService.cs" />
     <Compile Include="Services\IExceptionHandlingService.cs" />
