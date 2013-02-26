@@ -10,7 +10,7 @@ namespace Digillect.Mvvm.Services
 	/// Autofac module that registers default and system services.
 	/// </summary>
 	[CLSCompliant( false )]
-	public class MvvmModule : Module
+	public class MvvmModule : Autofac.Module
 	{
 		/// <summary>
 		/// Override to add registrations to the container.

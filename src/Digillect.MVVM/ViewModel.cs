@@ -16,7 +16,7 @@ namespace Digillect.Mvvm
 	{
 		private readonly Dictionary<string, PartInfo> _parts = new Dictionary<string, PartInfo>();
 		private readonly List<Session> _sessions = new List<Session>();
-		private bool _preserveSessions = false;
+		private bool _preserveSessions;
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -140,23 +140,29 @@ namespace Digillect.Mvvm
 		/// <summary>
 		///     Loads the specified session.
 		/// </summary>
-		/// <param name="session">The session.</param>
+		/// <param name="session">The session to load.</param>
 		/// <returns>
-		///     <see cref="System.Threading.Tasks.Task{T}" /> that can be awaited.
+		///     <see cref="System.Threading.Tasks.Task" /> that can be awaited.
 		/// </returns>
-		[EditorBrowsable( EditorBrowsableState.Never )]
-		public async Task<Session> Load( Session session )
+		/// <exception cref="ArgumentNullException">If <paramref name="session"/> is null.</exception>
+		/// <exception cref="ArgumentException">If <paramref name="session"/> has been already loaded or canceled.</exception>
+		public async Task Load( Session session )
 		{
 			if( session == null )
 			{
 				throw new ArgumentNullException( "session" );
 			}
 
+			if( session.State != SessionState.Created )
+			{
+				throw new ArgumentException( "Invalid session state.", "session" );
+			}
+
 			if( !ShouldLoadSession( session ) )
 			{
 				session.State = SessionState.Complete;
 
-				return session;
+				return;
 			}
 
 			lock( _sessions )
@@ -186,7 +192,7 @@ namespace Digillect.Mvvm
 					_sessions.Remove( session );
 				}
 
-				return session;
+				return;
 			}
 
 			session.State = SessionState.Active;
@@ -225,7 +231,7 @@ namespace Digillect.Mvvm
 					}
 				}
 
-				return session;
+				return;
 			}
 
 			if( session.Tasks.Count == 0 )
@@ -244,7 +250,7 @@ namespace Digillect.Mvvm
 
 				OnSessionComplete( new SessionEventArgs( session ) );
 
-				return session;
+				return;
 			}
 
 			try
@@ -263,10 +269,11 @@ namespace Digillect.Mvvm
 			{
 				var canceled = ex is OperationCanceledException;
 				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
-
-				if( ex is AggregateException )
+				var aggregateException = ex as AggregateException;
+				
+				if( aggregateException != null )
 				{
-					canceled = ((AggregateException) ex).InnerExceptions.OfType<OperationCanceledException>().Any();
+					canceled = aggregateException.InnerExceptions.OfType<OperationCanceledException>().Any();
 				}
 
 				OnSessionAborted( eventArgs );
@@ -291,8 +298,6 @@ namespace Digillect.Mvvm
 					DataExchangeService.EndDataExchange();
 				}
 			}
-
-			return session;
 		}
 
 		private void CancelActiveSessions()
@@ -301,6 +306,11 @@ namespace Digillect.Mvvm
 
 			lock( _sessions )
 			{
+				if( _sessions.Count == 0 )
+				{
+					return;
+				}
+
 				sessions = new List<Session>( _sessions );
 			}
 
@@ -313,7 +323,7 @@ namespace Digillect.Mvvm
 		/// <summary>
 		/// Preserves the sessions from being canceled upon disposal.
 		/// </summary>
-		/// <param name="preserve">if set to <c>true</c> then sessions will not be cancelled when <see cref="Dispose"/> method will be called.</param>
+		/// <param name="preserve">if set to <c>true</c> then sessions will not be cancelled when <see cref="Dispose()"/> method will be called.</param>
 		[EditorBrowsable( EditorBrowsableState.Never )]
 		protected void PreserveSessions( bool preserve )
 		{
@@ -328,6 +338,7 @@ namespace Digillect.Mvvm
 		/// <returns>
 		///     <c>true</c> if view model should proceed with loading session; otherwise, <c>false</c>.
 		/// </returns>
+		/// <exception cref="ArgumentNullException">If <paramref name="session"/> is null.</exception>
 		protected virtual bool ShouldLoadSession( Session session )
 		{
 			if( session == null )
@@ -366,6 +377,7 @@ namespace Digillect.Mvvm
 		///     Override this method to perform actual session loading.
 		/// </summary>
 		/// <param name="session">The session.</param>
+		/// <exception cref="ArgumentNullException">If <paramref name="session"/> is null.</exception>
 		protected virtual void LoadSession( Session session )
 		{
 			if( session == null )
@@ -419,6 +431,7 @@ namespace Digillect.Mvvm
 		/// <param name="default">
 		///     <c>true</c> if this part loads when no parts specified for the session.
 		/// </param>
+		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
 		protected void RegisterPart( string part, Func<Session, string, Task> loader, Func<Session, string, bool> checker, bool @default )
 		{
 			if( part == null )

@@ -48,33 +48,22 @@ namespace Digillect.Mvvm
 		///     Loads the entity with specified id and all other parts that can be needed by ViewModel logic.
 		/// </summary>
 		/// <param name="id">Entity identifier.</param>
-		/// <returns>
-		///     <see cref="System.Threading.Tasks.Task{T}" /> that can be awaited and will return
-		///     <see
-		///         cref="Digillect.Mvvm.Session" />
-		///     .
-		/// </returns>
+		/// <returns>Session that can be used as a parameter for <see cref="Digillect.Mvvm.ViewModel.Load"/> call.</returns>
 		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
-		public Task<Session> Load( TId id )
+		public Session Load( TId id )
 		{
-			var session = new EntitySession<TId>( id );
-
-			return Load( session );
+			return new EntitySession<TId>( id );
 		}
 
 		/// <summary>
 		///     Loads the entity alone.
 		/// </summary>
 		/// <param name="id">Entity identifier.</param>
-		/// <returns>
-		///     <see cref="System.Threading.Tasks.Task{T}" /> that can be awaited.
-		/// </returns>
+		/// <returns>Session that can be used as a parameter for <see cref="Digillect.Mvvm.ViewModel.Load"/> call.</returns>
 		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
-		public Task<Session> LoadEntity( TId id )
+		public Session LoadEntity( TId id )
 		{
-			var session = new EntitySession<TId>( id, EntityPart );
-
-			return Load( session );
+			return new EntitySession<TId>( id, EntityPart );
 		}
 		#endregion
 

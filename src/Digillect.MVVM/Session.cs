@@ -136,8 +136,17 @@ namespace Digillect.Mvvm
 		/// </summary>
 		public void Cancel()
 		{
-			_tokenSource.Cancel();
-			State = SessionState.Canceled;
+			if( State == SessionState.Active || State == SessionState.Created )
+			{
+				var oldState = State;
+
+				State = SessionState.Canceled;
+
+				if( oldState == SessionState.Active )
+				{
+					_tokenSource.Cancel();
+				}
+			}
 		}
 		#endregion
 		#region Parameters

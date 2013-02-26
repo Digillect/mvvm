@@ -8,7 +8,7 @@ namespace Digillect.Mvvm
 	public interface IRelayCommand : ICommand
 	{
 		/// <summary>
-		///     Raises event that indicates that <see cref="System.Windows.Input.CanExecute" /> return value has been changed.
+		///     Raises event that indicates that <see cref="System.Windows.Input.ICommand.CanExecute" /> return value has been changed.
 		/// </summary>
 		void RaiseCanExecuteChanged();
 	}

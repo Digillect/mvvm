@@ -122,12 +122,12 @@ namespace Digillect.Mvvm.Tests
 			RegisterPart( "main", ( session, part ) => LoadMainPart( session ) );
 		}
 
-		public Task<Session> LoadAndThrowSync()
+		public Task LoadAndThrowSync()
 		{
 			return Load( new Session().AddParameter( "ThrowSync", true ) );
 		}
 
-		public Task<Session> LoadAndThrowAsync()
+		public Task LoadAndThrowAsync()
 		{
 			return Load( new Session().AddParameter( "ThrowAsync", true ) );
 		}

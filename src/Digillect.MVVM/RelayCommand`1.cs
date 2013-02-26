@@ -21,6 +21,7 @@ namespace Digillect.Mvvm
 		public RelayCommand( Action<T> execute )
 			: this( execute, null )
 		{
+			Contract.Requires( execute != null );
 		}
 
 		/// <summary>
@@ -28,6 +29,7 @@ namespace Digillect.Mvvm
 		/// </summary>
 		/// <param name="execute">Action that will be used for command execution.</param>
 		/// <param name="canExecute">Function that indicates whether command can be executed or not.</param>
+		/// <exception cref="ArgumentNullException">If <paramref name="execute"/> is <c>null</c>.</exception>
 		public RelayCommand( Action<T> execute, Func<T, bool> canExecute )
 		{
 			if( execute == null )

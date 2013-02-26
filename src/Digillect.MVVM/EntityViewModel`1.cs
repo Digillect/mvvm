@@ -45,33 +45,22 @@ namespace Digillect.Mvvm
 		///     Loads the entity with specified id and all other parts that can be needed by ViewModel logic.
 		/// </summary>
 		/// <param name="key">Entity key.</param>
-		/// <returns>
-		///     <see cref="System.Threading.Tasks.Task{T}" /> that can be awaited and will return
-		///     <see
-		///         cref="Digillect.Mvvm.Session" />
-		///     .
-		/// </returns>
+		/// <returns>Session that can be used as a parameter for <see cref="Digillect.Mvvm.ViewModel.Load"/> call.</returns>
 		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
-		public Task<Session> Load( XKey key )
+		public Session Load( XKey key )
 		{
-			var session = new EntitySession( key );
-
-			return Load( session );
+			return new EntitySession( key );
 		}
 
 		/// <summary>
 		///     Loads the entity alone.
 		/// </summary>
 		/// <param name="key">Entity key.</param>
-		/// <returns>
-		///     <see cref="System.Threading.Tasks.Task{T}" /> that can be awaited.
-		/// </returns>
+		/// <returns>Session that can be used as a parameter for <see cref="Digillect.Mvvm.ViewModel.Load"/> call.</returns>
 		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
-		public Task<Session> LoadEntity( XKey key )
+		public Session LoadEntity( XKey key )
 		{
-			var session = new EntitySession( key, EntityPart );
-
-			return Load( session );
+			return new EntitySession( key, EntityPart );
 		}
 		#endregion
 
