@@ -42,23 +42,23 @@ namespace Digillect.Mvvm
 
 		#region Loaders
 		/// <summary>
-		///     Loads the entity with specified id and all other parts that can be needed by ViewModel logic.
+		///     Creates the session that loads everything.
 		/// </summary>
 		/// <param name="key">Entity key.</param>
-		/// <returns>Session that can be used as a parameter for <see cref="Digillect.Mvvm.ViewModel.Load"/> call.</returns>
+		/// <returns>Session that (usually) loads everything, including entity using specified <paramref name="key"/>.</returns>
 		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
-		public Session Load( XKey key )
+		public EntitySession CreateSession( XKey key )
 		{
 			return new EntitySession( key );
 		}
 
 		/// <summary>
-		///     Loads the entity alone.
+		///     Creates the session that loads only the entity.
 		/// </summary>
 		/// <param name="key">Entity key.</param>
-		/// <returns>Session that can be used as a parameter for <see cref="Digillect.Mvvm.ViewModel.Load"/> call.</returns>
+		/// <returns>Session that loads entity using specified <paramref name="key"/>.</returns>
 		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
-		public Session LoadEntity( XKey key )
+		public EntitySession CreateEntitySession( XKey key )
 		{
 			return new EntitySession( key, EntityPart );
 		}

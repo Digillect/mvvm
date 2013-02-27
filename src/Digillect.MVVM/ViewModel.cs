@@ -138,15 +138,24 @@ namespace Digillect.Mvvm
 
 		#region Loading/Sessions
 		/// <summary>
+		/// Creates the session.
+		/// </summary>
+		/// <returns>Session that (usually) loads everything.</returns>
+		public virtual Session CreateSession()
+		{
+			return new Session();
+		}
+
+		/// <summary>
 		///     Loads the specified session.
 		/// </summary>
 		/// <param name="session">The session to load.</param>
 		/// <returns>
-		///     <see cref="System.Threading.Tasks.Task" /> that can be awaited.
+		///     <see cref="System.Threading.Tasks.Task{T}" /> that can be awaited.
 		/// </returns>
 		/// <exception cref="ArgumentNullException">If <paramref name="session"/> is null.</exception>
 		/// <exception cref="ArgumentException">If <paramref name="session"/> has been already loaded or canceled.</exception>
-		public async Task Load( Session session )
+		public async Task<Session> Load( Session session )
 		{
 			if( session == null )
 			{
@@ -162,7 +171,7 @@ namespace Digillect.Mvvm
 			{
 				session.State = SessionState.Complete;
 
-				return;
+				return session;
 			}
 
 			lock( _sessions )
@@ -192,7 +201,7 @@ namespace Digillect.Mvvm
 					_sessions.Remove( session );
 				}
 
-				return;
+				return session;
 			}
 
 			session.State = SessionState.Active;
@@ -231,7 +240,7 @@ namespace Digillect.Mvvm
 					}
 				}
 
-				return;
+				return session;
 			}
 
 			if( session.Tasks.Count == 0 )
@@ -250,7 +259,7 @@ namespace Digillect.Mvvm
 
 				OnSessionComplete( new SessionEventArgs( session ) );
 
-				return;
+				return session;
 			}
 
 			try
@@ -298,6 +307,8 @@ namespace Digillect.Mvvm
 					DataExchangeService.EndDataExchange();
 				}
 			}
+
+			return session;
 		}
 
 		private void CancelActiveSessions()
