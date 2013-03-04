@@ -14,7 +14,19 @@
 		<dependencies>
 			<group targetFramework="portable-net45+wp8+win8">
 				<dependency id="Digillect.ObjectModel" version="4.0.0-dev-00004"/>
-				<dependency id="Autofac" version="3.0.0"/>
+				<dependency id="Autofac" version="3.0.1"/>
+			</group>
+			<group targetFramework="net45">
+				<dependency id="Digillect.ObjectModel" version="4.0.0-dev-00004"/>
+				<dependency id="Autofac" version="3.0.1"/>
+			</group>
+			<group targetFramework="wp8">
+				<dependency id="Digillect.ObjectModel" version="4.0.0-dev-00004"/>
+				<dependency id="Autofac" version="3.0.1"/>
+			</group>
+			<group targetFramework="win8">
+				<dependency id="Digillect.ObjectModel" version="4.0.0-dev-00004"/>
+				<dependency id="Autofac" version="3.0.1"/>
 			</group>
 			<group targetFramework="wp71">
 				<dependency id="Digillect.ObjectModel" version="4.0.0-dev-00004"/>
