@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Digillect.Mvvm
@@ -12,33 +13,27 @@ namespace Digillect.Mvvm
 	{
 		private readonly Dictionary<string, object> _values = new Dictionary<string,object>( StringComparer.OrdinalIgnoreCase );
 
-		#region From<T>
 		/// <summary>
-		/// Creates instance from the specified name.
+		/// Creates instance from the specified name/value pair.
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="name">The name.</param>
-		/// <param name="value">The value.</param>
+		/// <param name="name">Parameter name.</param>
+		/// <param name="value">Parameter value.</param>
 		/// <returns>Constructed instance with added name/value pair.</returns>
-		public static Parameters From<T>( string name, T value )
+		public static Parameters Create( string name, object value )
 		{
-			Parameters parameters = new Parameters();
-
-			parameters.Add( name, value );
+			var parameters = new Parameters { { name, value } };
 
 			return parameters;
 		}
-		#endregion
-		#region Add<T>
+
 		/// <summary>
 		/// Adds the value with the specified name to current parameters.
 		/// </summary>
-		/// <typeparam name="T">Value type.</typeparam>
-		/// <param name="name">The name.</param>
-		/// <param name="value">The value.</param>
+		/// <param name="name">Parameter name.</param>
+		/// <param name="value">Parameter value.</param>
 		/// <returns>Current instance</returns>
-		/// <exception cref="System.ArgumentNullException">name</exception>
-		public Parameters Add<T>( string name, T value )
+		/// <exception cref="System.ArgumentNullException">If <paramref name="name"/> or <paramref name="value"/> is <c>null</c>.</exception>
+		public Parameters Add( string name, object value )
 		{
 			if( name == null )
 			{
@@ -50,20 +45,29 @@ namespace Digillect.Mvvm
 				throw new ArgumentNullException( "value" );
 			}
 
+			Contract.EndContractBlock();
+
 			_values.Add( name, value );
 
 			return this;
 		}
-		#endregion
-		#region Get/Get<T>
+
 		/// <summary>
 		/// Gets the value for the specified name.
 		/// </summary>
 		/// <typeparam name="T">Value type.</typeparam>
-		/// <param name="name">The name.</param>
-		/// <returns>Value or default value for the <typeparamref name="T"/> if specified name does not exists.</returns>
+		/// <param name="name">Parameter name.</param>
+		/// <returns>Value or default value for the <typeparamref name="T"/> if the specified name does not exists.</returns>
+		/// <exception cref="System.ArgumentNullException">If <paramref name="name"/> is <c>null</c>.</exception>
 		public T Get<T>( string name )
 		{
+			if( name == null )
+			{
+				throw new ArgumentNullException( "name" );
+			}
+
+			Contract.EndContractBlock();
+
 			if( !_values.ContainsKey( name ) )
 			{
 				return default( T );
@@ -76,11 +80,17 @@ namespace Digillect.Mvvm
 		/// Gets the value for the specified name.
 		/// </summary>
 		/// <typeparam name="T">Value type</typeparam>
-		/// <param name="name">The name.</param>
-		/// <param name="defaultValue">The default value.</param>
-		/// <returns>Value or <paramref name="defaultValue"/> if the specified name does not exists.</returns>
+		/// <param name="name">Parameter name.</param>
+		/// <param name="defaultValue">Value to use as a default.</param>
+		/// <returns>Parameter value or <paramref name="defaultValue"/> if specifiedn <paramref name="name"/> is not found.</returns>
+		/// <exception cref="System.ArgumentNullException">If <paramref name="name"/> is <c>null</c>.</exception>
 		public T Get<T>( string name, T defaultValue )
 		{
+			if( name == null )
+			{
+				throw new ArgumentNullException( "name" );
+			}
+
 			if( !_values.ContainsKey( name ) )
 			{
 				return defaultValue;
@@ -88,7 +98,26 @@ namespace Digillect.Mvvm
 
 			return (T) _values[name];
 		}
-		#endregion
+
+		/// <summary>
+		/// Determines whether parameters contains the specified name.
+		/// </summary>
+		/// <param name="name">Name to check.</param>
+		/// <returns>
+		///   <c>true</c> if parameters contains the specified name; otherwise, <c>false</c>.
+		/// </returns>
+		/// <exception cref="System.ArgumentNullException">If <paramref name="name"/> is <c>null</c>.</exception>
+		public bool Contains( string name )
+		{
+			if( name == null )
+			{
+				throw new ArgumentNullException( "name" );
+			}
+
+			Contract.EndContractBlock();
+
+			return _values.ContainsKey( name );
+		}
 
 		#region IEnumerable implementation
 		/// <summary>

@@ -15,7 +15,7 @@ namespace Digillect.Mvvm.Tests
 	{
 		static Parameters parameters;
 
-		Because of = () => parameters = Parameters.From( "hello", "world" );
+		Because of = () => parameters = Parameters.Create( "hello", "world" );
 
 		It should_return_valid_object = () => parameters.ShouldNotBeNull();
 		It should_have_only_one_parameter = () => parameters.Count().ShouldEqual( 1 );
@@ -42,7 +42,7 @@ namespace Digillect.Mvvm.Tests
 	{
 		static Parameters parameters;
 
-		Because of = () => parameters = Parameters.From( "hello", "world" ).Add( "year", 2012 );
+		Because of = () => parameters = Parameters.Create( "hello", "world" ).Add( "year", 2012 );
 
 		It should_return_valid_object = () => parameters.ShouldNotBeNull();
 		It should_have_two_parameters = () => parameters.Count().ShouldEqual( 2 );
@@ -53,7 +53,7 @@ namespace Digillect.Mvvm.Tests
 		static Parameters parameters;
 		static Exception exception;
 
-		Because of = () => exception = Catch.Exception( () => parameters = Parameters.From( null, "world" ) );
+		Because of = () => exception = Catch.Exception( () => parameters = Parameters.Create( null, "world" ) );
 
 		It should_throw_ArgumentNullException = () => exception.ShouldBeOfType<ArgumentNullException>();
 		It should_not_return_valid_object = () => parameters.ShouldBeNull();
@@ -64,7 +64,7 @@ namespace Digillect.Mvvm.Tests
 		static Parameters parameters;
 		static Exception exception;
 
-		Because of = () => exception = Catch.Exception( () => parameters = Parameters.From( "hello", (string) null ) );
+		Because of = () => exception = Catch.Exception( () => parameters = Parameters.Create( "hello", (string) null ) );
 
 		It should_throw_ArgumentNullException = () => exception.ShouldBeOfType<ArgumentNullException>();
 		It should_not_return_valid_object = () => parameters.ShouldBeNull();
@@ -111,7 +111,7 @@ namespace Digillect.Mvvm.Tests
 
 		Establish context = () =>
 		{
-			parameters = Parameters.From( "hello", "world" );
+			parameters = Parameters.Create( "hello", "world" );
 		};
 
 		Because of = () => result = parameters.Get<string>( "hello" );
@@ -156,7 +156,7 @@ namespace Digillect.Mvvm.Tests
 
 		Establish context = () =>
 		{
-			parameters = Parameters.From( "hello", "world" ).Add( "year", 2012 );
+			parameters = Parameters.Create( "hello", "world" ).Add( "year", 2012 );
 		};
 
 		Because of = () => enumerator = parameters.GetEnumerator();

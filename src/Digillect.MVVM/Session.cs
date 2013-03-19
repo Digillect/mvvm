@@ -32,7 +32,10 @@ namespace Digillect.Mvvm
 		/// <param name="parts">Parts to load.</param>
 		public Session( params string[] parts )
 		{
-			_parts = parts;
+			if( parts != null && parts.Length > 0 )
+			{
+				_parts = parts;
+			}
 		}
 
 		/// <summary>
@@ -82,6 +85,7 @@ namespace Digillect.Mvvm
 		{
 			get { return _tasks; }
 		}
+
 		/// <summary>
 		/// Gets logical part for multipart requests.
 		/// </summary>
@@ -89,6 +93,7 @@ namespace Digillect.Mvvm
 		{
 			get { return _parts; }
 		}
+
 		/// <summary>
 		/// Gets a value indicating whether this instance is partial.
 		/// </summary>
@@ -105,6 +110,7 @@ namespace Digillect.Mvvm
 		/// begins to load.
 		/// </summary>
 		public bool Exclusive { get; set; }
+
 		/// <summary>
 		/// Gets session state
 		/// </summary>
@@ -150,31 +156,6 @@ namespace Digillect.Mvvm
 		}
 		#endregion
 		#region Parameters
-		/// <summary>
-		/// Gets the parameter.
-		/// </summary>
-		/// <typeparam name="T">Parameter type.</typeparam>
-		/// <param name="name">Parameter name</param>
-		/// <returns>Parameter value, casted to <typeparamref name="T"/>.</returns>
-		[Obsolete( "Use Parameters.Get<T>() instead." )]
-		public T GetParameter<T>( string name )
-		{
-			return _parameters.Get<T>( name );
-		}
-
-		/// <summary>
-		/// Gets the parameter.
-		/// </summary>
-		/// <typeparam name="T">Parameter type.</typeparam>
-		/// <param name="name">Parameter name.</param>
-		/// <param name="defaultValue">Default value.</param>
-		/// <returns>Parameter value or <paramref name="defaultValue"/> if parameter with corresponding <paramref name="name"/> is not found, casted to <typeparamref name="T"/>.</returns>
-		[Obsolete( "Use Parameters.GetParameter<T>() instead." )]
-		public T GetParameter<T>( string name, T defaultValue )
-		{
-			return _parameters.Get<T>( name, defaultValue );
-		}
-
 		/// <summary>
 		/// Adds the parameter value to the current session.
 		/// </summary>

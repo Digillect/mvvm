@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Digillect.Mvvm.UI
 {
 	/// <summary>
 	/// Declares view parameter's name and type.
 	/// </summary>
-	[AttributeUsage( AttributeTargets.Class, Inherited = false, AllowMultiple = true )]
+	[AttributeUsage( AttributeTargets.Class, Inherited = true, AllowMultiple = true )]
 	public sealed class ViewParameterAttribute : Attribute
 	{
 		private readonly string _parameterName;
@@ -22,6 +20,8 @@ namespace Digillect.Mvvm.UI
 		{
 			_parameterName = parameterName;
 			_parameterType = typeof( string );
+
+			Required = true;
 		}
 
 		/// <summary>
@@ -33,6 +33,8 @@ namespace Digillect.Mvvm.UI
 		{
 			_parameterName = parameterName;
 			_parameterType = parameterType;
+
+			Required = true;
 		}
 		#endregion
 
@@ -59,7 +61,7 @@ namespace Digillect.Mvvm.UI
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this parameterName is required.
+		/// Gets or sets a value indicating whether this parameter is required.
 		/// </summary>
 		/// <value>
 		///   <c>true</c> if required; otherwise, <c>false</c>.

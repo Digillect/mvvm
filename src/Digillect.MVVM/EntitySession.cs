@@ -1,14 +1,11 @@
-﻿using System;
-using System.Diagnostics.Contracts;
-
-namespace Digillect.Mvvm
+﻿namespace Digillect.Mvvm
 {
 	/// <summary>
-	/// Represents session to be used to load entity into <see cref="Digillect.Mvvm.EntityViewModel{TId,TEntity}"/>.
+	/// Represents session to be used to load entity into <see cref="Digillect.Mvvm.EntityViewModel{TEntity}"/>.
 	/// </summary>
 	public class EntitySession : Session
 	{
-		private XKey _key;
+		private readonly XKey _key;
 
 		#region Constructors/Disposer
 		/// <summary>

@@ -138,12 +138,13 @@ namespace Digillect.Mvvm
 
 		#region Loading/Sessions
 		/// <summary>
-		/// Creates the session.
+		/// Creates the session with the list of parts to be processed.
 		/// </summary>
-		/// <returns>Session that (usually) loads everything.</returns>
-		public virtual Session CreateSession()
+		/// <param name="parts">Parts to load.</param>
+		/// <returns>Session that loads specified parts.</returns>
+		public virtual Session CreateSession( params string[] parts )
 		{
-			return new Session();
+			return new Session( parts );
 		}
 
 		/// <summary>
@@ -363,16 +364,9 @@ namespace Digillect.Mvvm
 
 			foreach( var pair in _parts )
 			{
-				if( (session.Parts == null && pair.Value.Default) || session.Includes( pair.Key ) )
+				if( (session.Parts == null && pair.Value.LoadIfNoPartsSpecified) || session.Includes( pair.Key ) )
 				{
-					if( pair.Value.Checker != null )
-					{
-						result |= pair.Value.Checker( session, pair.Key );
-					}
-					else
-					{
-						result = true;
-					}
+					result |= pair.Value.Check( session, pair.Key );
 				}
 
 				if( result )
@@ -400,11 +394,11 @@ namespace Digillect.Mvvm
 
 			foreach( var pair in _parts )
 			{
-				if( (session.Parts == null && pair.Value.Default) || session.Includes( pair.Key ) )
+				if( (session.Parts == null && pair.Value.LoadIfNoPartsSpecified) || session.Includes( pair.Key ) )
 				{
-					if( pair.Value.Checker == null || pair.Value.Checker( session, pair.Key ) )
+					if( pair.Value.Check( session, pair.Key ) )
 					{
-						session.Tasks.Add( pair.Value.Loader( session, pair.Key ) );
+						session.Tasks.Add( pair.Value.Process( session, pair.Key ) );
 					}
 				}
 			}
@@ -413,61 +407,257 @@ namespace Digillect.Mvvm
 
 		#region Parts
 		/// <summary>
-		///     Registers handler of multipart loader.
+		///     Registers handler of multipart processor.
 		/// </summary>
 		/// <param name="part">Part identifier.</param>
-		/// <param name="loader">Function to load specified part.</param>
-		protected void RegisterPart( string part, Func<Session, string, Task> loader )
+		/// <param name="processor">Function to load specified part.</param>
+		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		protected void RegisterPart( string part, Func<Session, string, Task> processor )
 		{
-			RegisterPart( part, loader, null, true );
+			RegisterPart( part, processor, (Func<Session, string, bool>) null, true );
 		}
 
 		/// <summary>
-		///     Registers handler of multipart loader.
+		///     Registers handler of multipart processor.
 		/// </summary>
 		/// <param name="part">Part identifier.</param>
-		/// <param name="loader">Function to load specified part.</param>
-		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		protected void RegisterPart( string part, Func<Session, string, Task> loader, Func<Session, string, bool> checker )
+		/// <param name="processor">Function to load specified part.</param>
+		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		protected void RegisterPart( string part, Func<Session, Task> processor )
 		{
-			RegisterPart( part, loader, checker, true );
+			RegisterPart( part, processor, (Func<Session, bool>) null, true );
 		}
 
 		/// <summary>
-		///     Registers handler of multipart loader.
+		///     Registers handler of multipart processor.
 		/// </summary>
 		/// <param name="part">Part identifier.</param>
-		/// <param name="loader">Function to load specified part.</param>
-		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <param name="default">
+		/// <param name="processor">Function to load specified part.</param>
+		/// <param name="loadIfNoPartsSpecified">
 		///     <c>true</c> if this part loads when no parts specified for the session.
 		/// </param>
 		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
-		protected void RegisterPart( string part, Func<Session, string, Task> loader, Func<Session, string, bool> checker, bool @default )
+		protected void RegisterPart( string part, Func<Session, string, Task> processor, bool loadIfNoPartsSpecified )
+		{
+			RegisterPart( part, processor, (Func<Session, string, bool>) null, loadIfNoPartsSpecified );
+		}
+
+		/// <summary>
+		///     Registers handler of multipart processor.
+		/// </summary>
+		/// <param name="part">Part identifier.</param>
+		/// <param name="processor">Function to load specified part.</param>
+		/// <param name="loadIfNoPartsSpecified">
+		///     <c>true</c> if this part loads when no parts specified for the session.
+		/// </param>
+		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		protected void RegisterPart( string part, Func<Session, Task> processor, bool loadIfNoPartsSpecified )
+		{
+			RegisterPart( part, processor, (Func<Session, bool>) null, loadIfNoPartsSpecified );
+		}
+
+		/// <summary>
+		///     Registers handler of multipart processor.
+		/// </summary>
+		/// <param name="part">Part identifier.</param>
+		/// <param name="processor">Function to load specified part.</param>
+		/// <param name="checker">Function to check if the specified part should be loaded.</param>
+		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, string, bool> checker )
+		{
+			RegisterPart( part, processor, checker, true );
+		}
+
+		/// <summary>
+		///     Registers handler of multipart processor.
+		/// </summary>
+		/// <param name="part">Part identifier.</param>
+		/// <param name="processor">Function to load specified part.</param>
+		/// <param name="checker">Function to check if the specified part should be loaded.</param>
+		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, string, bool> checker )
+		{
+			RegisterPart( part, processor, checker, true );
+		}
+
+		/// <summary>
+		///     Registers handler of multipart processor.
+		/// </summary>
+		/// <param name="part">Part identifier.</param>
+		/// <param name="processor">Function to load specified part.</param>
+		/// <param name="checker">Function to check if the specified part should be loaded.</param>
+		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, bool> checker )
+		{
+			RegisterPart( part, processor, checker, true );
+		}
+
+		/// <summary>
+		///     Registers handler of multipart processor.
+		/// </summary>
+		/// <param name="part">Part identifier.</param>
+		/// <param name="processor">Function to load specified part.</param>
+		/// <param name="checker">Function to check if the specified part should be loaded.</param>
+		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, bool> checker )
+		{
+			RegisterPart( part, processor, checker, true );
+		}
+
+		/// <summary>
+		///     Registers handler of multipart processor.
+		/// </summary>
+		/// <param name="part">Part identifier.</param>
+		/// <param name="processor">Function to load specified part.</param>
+		/// <param name="checker">Function to check if the specified part should be loaded.</param>
+		/// <param name="loadIfNoPartsSpecified">
+		///     <c>true</c> if this part loads when no parts specified for the session.
+		/// </param>
+		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, string, bool> checker, bool loadIfNoPartsSpecified )
 		{
 			if( part == null )
 			{
 				throw new ArgumentNullException( "part" );
 			}
 
-			if( loader == null )
+			if( processor == null )
 			{
-				throw new ArgumentNullException( "loader" );
+				throw new ArgumentNullException( "processor" );
 			}
 
 			_parts[part] = new PartInfo
 			{
-				Loader = loader,
+				ProcessorWithPart = processor,
+				CheckerWithPart = checker,
+				LoadIfNoPartsSpecified = loadIfNoPartsSpecified
+			};
+		}
+
+		/// <summary>
+		///     Registers handler of multipart processor.
+		/// </summary>
+		/// <param name="part">Part identifier.</param>
+		/// <param name="processor">Function to load specified part.</param>
+		/// <param name="checker">Function to check if the specified part should be loaded.</param>
+		/// <param name="loadIfNoPartsSpecified">
+		///     <c>true</c> if this part loads when no parts specified for the session.
+		/// </param>
+		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, string, bool> checker, bool loadIfNoPartsSpecified )
+		{
+			if( part == null )
+			{
+				throw new ArgumentNullException( "part" );
+			}
+
+			if( processor == null )
+			{
+				throw new ArgumentNullException( "processor" );
+			}
+
+			_parts[part] = new PartInfo
+			{
+				Processor = processor,
+				CheckerWithPart = checker,
+				LoadIfNoPartsSpecified = loadIfNoPartsSpecified
+			};
+		}
+
+		/// <summary>
+		///     Registers handler of multipart processor.
+		/// </summary>
+		/// <param name="part">Part identifier.</param>
+		/// <param name="processor">Function to load specified part.</param>
+		/// <param name="checker">Function to check if the specified part should be loaded.</param>
+		/// <param name="loadIfNoPartsSpecified">
+		///     <c>true</c> if this part loads when no parts specified for the session.
+		/// </param>
+		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, bool> checker, bool loadIfNoPartsSpecified )
+		{
+			if( part == null )
+			{
+				throw new ArgumentNullException( "part" );
+			}
+
+			if( processor == null )
+			{
+				throw new ArgumentNullException( "processor" );
+			}
+
+			_parts[part] = new PartInfo
+			{
+				ProcessorWithPart = processor,
 				Checker = checker,
-				Default = @default
+				LoadIfNoPartsSpecified = loadIfNoPartsSpecified
+			};
+		}
+
+		/// <summary>
+		///     Registers handler of multipart processor.
+		/// </summary>
+		/// <param name="part">Part identifier.</param>
+		/// <param name="processor">Function to load specified part.</param>
+		/// <param name="checker">Function to check if the specified part should be loaded.</param>
+		/// <param name="loadIfNoPartsSpecified">
+		///     <c>true</c> if this part loads when no parts specified for the session.
+		/// </param>
+		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, bool> checker, bool loadIfNoPartsSpecified )
+		{
+			if( part == null )
+			{
+				throw new ArgumentNullException( "part" );
+			}
+
+			if( processor == null )
+			{
+				throw new ArgumentNullException( "processor" );
+			}
+
+			_parts[part] = new PartInfo
+			{
+				Processor = processor,
+				Checker = checker,
+				LoadIfNoPartsSpecified = loadIfNoPartsSpecified
 			};
 		}
 
 		private class PartInfo
 		{
-			public Func<Session, string, Task> Loader { get; set; }
-			public Func<Session, string, bool> Checker { get; set; }
-			public bool Default { get; set; }
+			public Func<Session, string, Task> ProcessorWithPart { get; set; }
+			public Func<Session, string, bool> CheckerWithPart { get; set; }
+			public Func<Session, Task> Processor { get; set; }
+			public Func<Session, bool> Checker { get; set; }
+			public bool LoadIfNoPartsSpecified { get; set; }
+
+			public bool Check( Session session, string part )
+			{
+				if( Checker != null )
+				{
+					return Checker( session );
+				}
+
+				if( CheckerWithPart != null )
+				{
+					return CheckerWithPart( session, part );
+				}
+
+				return true;
+			}
+
+			public Task Process( Session session, string part )
+			{
+				if( Processor != null )
+				{
+					return Processor( session );
+				}
+				else
+				{
+					return ProcessorWithPart( session, part );
+				}
+			}
 		}
 		#endregion
 	}

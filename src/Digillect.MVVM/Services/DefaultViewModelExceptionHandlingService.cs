@@ -1,38 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Digillect.Mvvm.Services
 {
 	/// <summary>
-	/// Default implementation of <see cref="IViewModelExceptionHandlingService"/>.
+	///     Default implementation of <see cref="IViewModelExceptionHandlingService" />.
 	/// </summary>
 	public class DefaultViewModelExceptionHandlingService : IViewModelExceptionHandlingService
 	{
-		/// <summary>
-		/// Gets or sets the exception handling service.
-		/// </summary>
-		/// <value>
-		/// The exception handling service.
-		/// </value>
-		public IExceptionHandlingService ExceptionHandlingService { get; set; }
+		readonly IExceptionHandlingService _exceptionHandlingService;
 
+		#region Constructors/Disposer
+		public DefaultViewModelExceptionHandlingService( IExceptionHandlingService exceptionHandlingService = null )
+		{
+			_exceptionHandlingService = exceptionHandlingService;
+		}
+		#endregion
+
+		#region IViewModelExceptionHandlingService Members
 		/// <summary>
-		/// Handle exception the right way.
+		///     Handle exception the right way.
 		/// </summary>
-		/// <param name="viewModel">ViewModel that loads session.</param>
-		/// <param name="session">Session that is loading.</param>
+		/// <param name="viewModel">View model that processed session.</param>
+		/// <param name="session">Session that caused an exception.</param>
 		/// <param name="ex">Exception to handle.</param>
-		/// <returns><c>true</c> if exception was handled, otherwise <c>false</c>.</returns>
+		/// <returns>
+		///     <c>true</c> if exception was handled, otherwise <c>false</c>.
+		/// </returns>
 		public bool HandleException( ViewModel viewModel, Session session, Exception ex )
 		{
-			if( ExceptionHandlingService != null )
+			if( _exceptionHandlingService != null )
 			{
-				ExceptionHandlingService.HandleException( ex );
+				_exceptionHandlingService.HandleException( ex );
+
 				return true;
 			}
 
 			return false;
 		}
+		#endregion
 	}
 }

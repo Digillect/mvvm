@@ -18,11 +18,11 @@ namespace Digillect.Mvvm
 
 		#region Constructors/Disposer
 		/// <summary>
-		///     Initializes a new instance of the <see cref="EntityViewModel{TId,TEntity}" /> class.
+		///     Initializes a new instance of the <see cref="EntityViewModel{TEntity}" /> class.
 		/// </summary>
 		protected EntityViewModel()
 		{
-			RegisterPart( EntityPart, ( session, part ) => LoadEntity( (EntitySession) session ), ( session, part ) => ShouldLoadEntity( (EntitySession) session ) );
+			RegisterPart( EntityPart, session => LoadEntity( (EntitySession) session ), session => ShouldLoadEntity( (EntitySession) session ) );
 		}
 		#endregion
 
@@ -45,11 +45,12 @@ namespace Digillect.Mvvm
 		///     Creates the session that loads everything.
 		/// </summary>
 		/// <param name="key">Entity key.</param>
+		/// <param name="parts">Parts to load.</param>
 		/// <returns>Session that (usually) loads everything, including entity using specified <paramref name="key"/>.</returns>
 		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
-		public EntitySession CreateSession( XKey key )
+		public EntitySession CreateSession( XKey key, params string[] parts )
 		{
-			return new EntitySession( key );
+			return new EntitySession( key, parts );
 		}
 
 		/// <summary>

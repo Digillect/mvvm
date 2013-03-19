@@ -7,7 +7,7 @@ namespace Digillect.Mvvm.Services
 	/// </summary>
 	public sealed class DataExchangeService : IDataExchangeService
 	{
-		private readonly static object syncRoot = new object();
+		private readonly static object SyncRoot = new object();
 
 		/// <summary>
 		/// Occurs when data exchange started.
@@ -33,7 +33,7 @@ namespace Digillect.Mvvm.Services
 		/// </summary>
 		public void BeginDataExchange()
 		{
-			lock( syncRoot )
+			lock( SyncRoot )
 			{
 				_dataExchangeCount++;
 			}
@@ -58,7 +58,7 @@ namespace Digillect.Mvvm.Services
 			{
 				var fire = false;
 
-				lock( syncRoot )
+				lock( SyncRoot )
 				{
 					if( _dataExchangeCount > 0 )
 					{

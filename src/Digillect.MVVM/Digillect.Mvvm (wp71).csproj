@@ -205,9 +205,7 @@
     <Compile Include="..\AssemblySharedInfo.cs">
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
-    <Compile Include="EntitySession`1.cs" />
     <Compile Include="EntityViewModel`1.cs" />
-    <Compile Include="EntityViewModel`2.cs" />
     <Compile Include="IRelayCommand.cs" />
     <Compile Include="NavigationCommand.cs" />
     <Compile Include="NavigationCommand`1.cs" />
@@ -232,6 +230,7 @@
     <Compile Include="UI\ViewAttribute.cs" />
     <Compile Include="UI\ViewParameterAttribute.cs" />
     <Compile Include="ViewModel.cs" />
+    <Compile Include="XObjectExtentions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
