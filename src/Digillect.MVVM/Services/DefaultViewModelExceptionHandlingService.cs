@@ -10,7 +10,18 @@ namespace Digillect.Mvvm.Services
 		readonly IExceptionHandlingService _exceptionHandlingService;
 
 		#region Constructors/Disposer
-		public DefaultViewModelExceptionHandlingService( IExceptionHandlingService exceptionHandlingService = null )
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DefaultViewModelExceptionHandlingService"/> class.
+		/// </summary>
+		public DefaultViewModelExceptionHandlingService()
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DefaultViewModelExceptionHandlingService"/> class.
+		/// </summary>
+		/// <param name="exceptionHandlingService">The exception handling service.</param>
+		public DefaultViewModelExceptionHandlingService( IExceptionHandlingService exceptionHandlingService )
 		{
 			_exceptionHandlingService = exceptionHandlingService;
 		}

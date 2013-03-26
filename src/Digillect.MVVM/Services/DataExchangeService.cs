@@ -3,25 +3,26 @@
 namespace Digillect.Mvvm.Services
 {
 	/// <summary>
-	/// Windows 8 implementation of <see cref="IDataExchangeService"/>
+	///     Windows 8 implementation of <see cref="IDataExchangeService" />
 	/// </summary>
 	public sealed class DataExchangeService : IDataExchangeService
 	{
-		private readonly static object SyncRoot = new object();
+		private static readonly object SyncRoot = new object();
+		private int _dataExchangeCount;
 
+		#region IDataExchangeService Members
 		/// <summary>
-		/// Occurs when data exchange started.
+		///     Occurs when data exchange started.
 		/// </summary>
 		public event EventHandler DataExchangeStarted;
+
 		/// <summary>
-		/// Occurs when data exchange complete.
+		///     Occurs when data exchange complete.
 		/// </summary>
 		public event EventHandler DataExchangeComplete;
 
-		private int _dataExchangeCount = 0;
-
 		/// <summary>
-		/// Gets the number of active data exchange operations.
+		///     Gets the number of active data exchange operations.
 		/// </summary>
 		public int DataExchangeCount
 		{
@@ -29,7 +30,7 @@ namespace Digillect.Mvvm.Services
 		}
 
 		/// <summary>
-		/// Informs that another data exchange operation has begun.
+		///     Informs that another data exchange operation has begun.
 		/// </summary>
 		public void BeginDataExchange()
 		{
@@ -40,7 +41,7 @@ namespace Digillect.Mvvm.Services
 
 			if( _dataExchangeCount == 1 )
 			{
-				var handler = DataExchangeStarted;
+				EventHandler handler = DataExchangeStarted;
 
 				if( handler != null )
 				{
@@ -50,13 +51,13 @@ namespace Digillect.Mvvm.Services
 		}
 
 		/// <summary>
-		/// Informs that one of the data exchange operations has ended.
+		///     Informs that one of the data exchange operations has ended.
 		/// </summary>
 		public void EndDataExchange()
 		{
 			if( _dataExchangeCount > 0 )
 			{
-				var fire = false;
+				bool fire = false;
 
 				lock( SyncRoot )
 				{
@@ -71,7 +72,7 @@ namespace Digillect.Mvvm.Services
 
 				if( fire )
 				{
-					var handler = DataExchangeComplete;
+					EventHandler handler = DataExchangeComplete;
 
 					if( handler != null )
 					{
@@ -80,5 +81,6 @@ namespace Digillect.Mvvm.Services
 				}
 			}
 		}
+		#endregion
 	}
 }
