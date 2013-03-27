@@ -174,8 +174,10 @@
     <Compile Include="Services\IDataExchangeService.cs" />
     <Compile Include="Services\IExceptionHandlingService.cs" />
     <Compile Include="Services\INavigationService.cs" />
+    <Compile Include="Services\INavigationServiceContract.cs" />
     <Compile Include="Services\INetworkAvailabilityService.cs" />
     <Compile Include="Services\IViewModelExceptionHandlingService.cs" />
+    <Compile Include="Services\IViewModelExceptionHandlingServiceContract.cs" />
     <Compile Include="Services\MvvmModule.cs" />
     <Compile Include="Session.cs" />
     <Compile Include="SessionAbortedEventArgs.cs" />

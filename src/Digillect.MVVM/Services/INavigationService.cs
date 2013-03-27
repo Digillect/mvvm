@@ -1,8 +1,11 @@
-﻿namespace Digillect.Mvvm.Services
+﻿using System.Diagnostics.Contracts;
+
+namespace Digillect.Mvvm.Services
 {
 	/// <summary>
 	///     Service that handles the navigation between views.
 	/// </summary>
+	[ContractClass( typeof( INavigationServiceContract ) )]
 	public interface INavigationService
 	{
 		/// <summary>
@@ -22,11 +25,5 @@
 		///     Navigated to the previous view, if any.
 		/// </summary>
 		void GoBack();
-
-		/// <summary>
-		///     Navigates back until encounters view named <paramref name="viewName" />.
-		/// </summary>
-		/// <param name="viewName">Name of the view.</param>
-		void GoBack( string viewName );
 	}
 }

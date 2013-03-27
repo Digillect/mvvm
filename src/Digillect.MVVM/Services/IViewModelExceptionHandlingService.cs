@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace Digillect.Mvvm.Services
 {
 	/// <summary>
-	/// Service interface to handle exceptions that may occure while ViewModel loads the session.
+	/// Service interface to handle exceptions that may occur while ViewModel loads the session.
 	/// </summary>
+	[ContractClass( typeof( IViewModelExceptionHandlingServiceContract ) )]
 	public interface IViewModelExceptionHandlingService
 	{
 		/// <summary>
