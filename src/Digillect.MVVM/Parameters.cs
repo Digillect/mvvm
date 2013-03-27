@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 
 namespace Digillect.Mvvm
 {
@@ -21,6 +20,10 @@ namespace Digillect.Mvvm
 		/// <returns>Constructed instance with added name/value pair.</returns>
 		public static Parameters Create( string name, object value )
 		{
+			Contract.Requires<ArgumentNullException>( name != null );
+			Contract.Requires<ArgumentNullException>( value != null );
+			Contract.Ensures( Contract.Result<Parameters>() != null );
+
 			var parameters = new Parameters { { name, value } };
 
 			return parameters;
@@ -35,17 +38,9 @@ namespace Digillect.Mvvm
 		/// <exception cref="System.ArgumentNullException">If <paramref name="name"/> or <paramref name="value"/> is <c>null</c>.</exception>
 		public Parameters Add( string name, object value )
 		{
-			if( name == null )
-			{
-				throw new ArgumentNullException( "name" );
-			}
-
-			if( value == null )
-			{
-				throw new ArgumentNullException( "value" );
-			}
-
-			Contract.EndContractBlock();
+			Contract.Requires<ArgumentNullException>( name != null );
+			Contract.Requires<ArgumentNullException>( value != null );
+			Contract.Ensures( Contract.Result<Parameters>() != null );
 
 			_values.Add( name, value );
 
@@ -61,12 +56,7 @@ namespace Digillect.Mvvm
 		/// <exception cref="System.ArgumentNullException">If <paramref name="name"/> is <c>null</c>.</exception>
 		public T Get<T>( string name )
 		{
-			if( name == null )
-			{
-				throw new ArgumentNullException( "name" );
-			}
-
-			Contract.EndContractBlock();
+			Contract.Requires<ArgumentNullException>( name != null );
 
 			if( !_values.ContainsKey( name ) )
 			{
@@ -82,15 +72,12 @@ namespace Digillect.Mvvm
 		/// <typeparam name="T">Value type</typeparam>
 		/// <param name="name">Parameter name.</param>
 		/// <param name="defaultValue">Value to use as a default.</param>
-		/// <returns>Parameter value or <paramref name="defaultValue"/> if specifiedn <paramref name="name"/> is not found.</returns>
+		/// <returns>Parameter value or <paramref name="defaultValue"/> if specified <paramref name="name"/> is not found.</returns>
 		/// <exception cref="System.ArgumentNullException">If <paramref name="name"/> is <c>null</c>.</exception>
 		public T Get<T>( string name, T defaultValue )
 		{
-			if( name == null )
-			{
-				throw new ArgumentNullException( "name" );
-			}
-
+			Contract.Requires<ArgumentNullException>( name != null );
+			
 			if( !_values.ContainsKey( name ) )
 			{
 				return defaultValue;
@@ -109,12 +96,7 @@ namespace Digillect.Mvvm
 		/// <exception cref="System.ArgumentNullException">If <paramref name="name"/> is <c>null</c>.</exception>
 		public bool Contains( string name )
 		{
-			if( name == null )
-			{
-				throw new ArgumentNullException( "name" );
-			}
-
-			Contract.EndContractBlock();
+			Contract.Requires<ArgumentNullException>( name != null );
 
 			return _values.ContainsKey( name );
 		}

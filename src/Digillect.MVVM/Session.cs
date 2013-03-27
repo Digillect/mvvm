@@ -131,7 +131,6 @@ namespace Digillect.Mvvm
 		/// <summary>
 		/// Gets the <see cref="System.Threading.CancellationToken"/> to be used in asynchronous operations.
 		/// </summary>
-		[CLSCompliant( false )]
 		public CancellationToken Token
 		{
 			get { return _tokenSource.Token; }
@@ -164,6 +163,10 @@ namespace Digillect.Mvvm
 		/// <returns>Current session.</returns>
 		public Session AddParameter( string name, object value )
 		{
+			Contract.Requires<ArgumentNullException>( name != null );
+			Contract.Requires<ArgumentNullException>( value != null );
+			Contract.Ensures( Contract.Result<Session>() != null );
+
 			_parameters.Add( name, value );
 
 			return this;
@@ -178,10 +181,7 @@ namespace Digillect.Mvvm
 		/// <exception cref="System.ArgumentNullException">if part is <c>null</c>.</exception>
 		public bool Includes( string part )
 		{
-			if( part == null )
-			{
-				throw new ArgumentNullException( "part" );
-			}
+			Contract.Requires<ArgumentNullException>( part != null );
 
 			if( _parts == null )
 			{

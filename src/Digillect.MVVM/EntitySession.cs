@@ -1,4 +1,7 @@
-﻿namespace Digillect.Mvvm
+﻿using System;
+using System.Diagnostics.Contracts;
+
+namespace Digillect.Mvvm
 {
 	/// <summary>
 	/// Represents session to be used to load entity into <see cref="Digillect.Mvvm.EntityViewModel{TEntity}"/>.
@@ -14,6 +17,8 @@
 		/// <param name="key">Entity key.</param>
 		public EntitySession( XKey key )
 		{
+			Contract.Requires<ArgumentNullException>( key != null );
+
 			_key = key;
 			Exclusive = true;
 		}
@@ -26,6 +31,8 @@
 		public EntitySession( XKey key, params string[] parts )
 			: base( parts )
 		{
+			Contract.Requires<ArgumentNullException>( key != null );
+
 			_key = key;
 			Exclusive = parts == null;
 		}
@@ -50,9 +57,22 @@
 		/// <returns>Current session.</returns>
 		public new EntitySession AddParameter( string name, object value )
 		{
+			Contract.Requires<ArgumentNullException>( name != null );
+			Contract.Requires<ArgumentNullException>( value != null );
+			Contract.Ensures( Contract.Result<EntitySession>() != null );
+
 			Parameters.Add( name, value );
 
 			return this;
+		}
+		#endregion
+
+		#region ObjectInvariant
+		[ContractInvariantMethod]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts." )]
+		private void ObjectInvariant()
+		{
+			Contract.Invariant( Key != null );
 		}
 		#endregion
 	}

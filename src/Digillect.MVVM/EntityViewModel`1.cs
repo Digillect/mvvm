@@ -50,6 +50,9 @@ namespace Digillect.Mvvm
 		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
 		public EntitySession CreateSession( XKey key, params string[] parts )
 		{
+			Contract.Requires<ArgumentNullException>( key != null );
+			Contract.Ensures( Contract.Result<EntitySession>() != null );
+
 			return new EntitySession( key, parts );
 		}
 
@@ -61,6 +64,9 @@ namespace Digillect.Mvvm
 		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
 		public EntitySession CreateEntitySession( XKey key )
 		{
+			Contract.Requires<ArgumentNullException>( key != null );
+			Contract.Ensures( Contract.Result<EntitySession>() != null );
+
 			return new EntitySession( key, EntityPart );
 		}
 		#endregion
@@ -87,12 +93,7 @@ namespace Digillect.Mvvm
 		/// </exception>
 		protected virtual bool ShouldLoadEntity( EntitySession session )
 		{
-			if( session == null )
-			{
-				throw new ArgumentNullException( "session" );
-			}
-
-			Contract.EndContractBlock();
+			Contract.Requires<ArgumentNullException>( session != null );
 
 			return _entity == null || !_entity.GetKey().Equals( session.Key );
 		}

@@ -1,18 +1,18 @@
 ﻿namespace Digillect.Mvvm
 {
 	/// <summary>
-	/// Contains the extentions to simplify creation of navigation commands.
+	/// Contains the extensions to simplify creation of navigation commands.
 	/// </summary>
-	public static class XObjectExtentions
+	public static class XObjectExtensions
 	{
 		/// <summary>
 		/// Create navigation parameters that contains object key.
 		/// </summary>
-		/// <param name="obj">The object to get key from.</param>
+		/// <param name="source">The object to get key from.</param>
 		/// <returns><see cref="Digillect.XKey"/> that contains entry named <c>key</c> with the value of object's key.</returns>
-		public static Parameters KeyParameter( this XObject obj )
+		public static Parameters KeyParameter( this XObject source )
 		{
-			return Parameters.Create( "key", obj.GetKey() );
+			return Parameters.Create( "key", source.GetKey() );
 		}
 	}
 }

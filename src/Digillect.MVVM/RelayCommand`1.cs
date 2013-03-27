@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
-using System.Windows.Input;
 
 namespace Digillect.Mvvm
 {
@@ -21,7 +20,7 @@ namespace Digillect.Mvvm
 		public RelayCommand( Action<T> execute )
 			: this( execute, null )
 		{
-			Contract.Requires( execute != null );
+			Contract.Requires<ArgumentNullException>( execute != null );
 		}
 
 		/// <summary>
@@ -32,12 +31,7 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="execute"/> is <c>null</c>.</exception>
 		public RelayCommand( Action<T> execute, Func<T, bool> canExecute )
 		{
-			if( execute == null )
-			{
-				throw new ArgumentNullException( "execute" );
-			}
-
-			Contract.EndContractBlock();
+			Contract.Requires<ArgumentNullException>( execute != null );
 
 			_execute = execute;
 			_canExecute = canExecute;

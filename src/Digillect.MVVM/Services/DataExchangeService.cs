@@ -3,9 +3,10 @@
 namespace Digillect.Mvvm.Services
 {
 	/// <summary>
-	///     Windows 8 implementation of <see cref="IDataExchangeService" />
+	///     Default implementation of <see cref="IDataExchangeService" />
 	/// </summary>
-	public sealed class DataExchangeService : IDataExchangeService
+	[System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Instance of this class will be created through IoC container.")]
+	internal sealed class DataExchangeService : IDataExchangeService
 	{
 		private static readonly object SyncRoot = new object();
 		private int _dataExchangeCount;
@@ -58,7 +59,7 @@ namespace Digillect.Mvvm.Services
 			if( _dataExchangeCount > 0 )
 			{
 				bool fire = false;
-
+				
 				lock( SyncRoot )
 				{
 					if( _dataExchangeCount > 0 )

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.Contracts;
 
 namespace Digillect.Mvvm
 {
@@ -7,7 +8,7 @@ namespace Digillect.Mvvm
 	/// </summary>
 	public class SessionEventArgs : EventArgs
 	{
-		readonly Session _session;
+		private readonly Session _session;
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -16,10 +17,7 @@ namespace Digillect.Mvvm
 		/// <param name="session">The session.</param>
 		public SessionEventArgs( Session session )
 		{
-			if( session == null )
-			{
-				throw new ArgumentNullException( "session" );
-			}
+			Contract.Requires<ArgumentNullException>( session != null );
 
 			_session = session;
 		}

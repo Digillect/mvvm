@@ -19,7 +19,7 @@ namespace Digillect.Mvvm
 		public RelayCommand( Action execute )
 			: this( execute, null )
 		{
-			Contract.Requires( execute != null );
+			Contract.Requires<ArgumentNullException>( execute != null );
 		}
 
 		/// <summary>
@@ -30,12 +30,7 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="execute"/> is <c>null</c>.</exception>
 		public RelayCommand( Action execute, Func<bool> canExecute )
 		{
-			if( execute == null )
-			{
-				throw new ArgumentNullException( "execute" );
-			}
-
-			Contract.EndContractBlock();
+			Contract.Requires<ArgumentNullException>( execute != null );
 
 			_execute = execute;
 			_canExecute = canExecute;

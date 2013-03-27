@@ -72,7 +72,7 @@ namespace Digillect.Mvvm
 		///     Gets or sets view model exception handling service.
 		/// </summary>
 		/// <value>
-		///     The service used to report any exceptions occured while view model loads a session.
+		///     The service used to report any exceptions occurred while view model loads a session.
 		/// </value>
 		public IViewModelExceptionHandlingService ViewModelExceptionHandlingService { get; set; }
 		#endregion
@@ -144,6 +144,8 @@ namespace Digillect.Mvvm
 		/// <returns>Session that loads specified parts.</returns>
 		public virtual Session CreateSession( params string[] parts )
 		{
+			Contract.Ensures( Contract.Result<Session>() != null );
+
 			return new Session( parts );
 		}
 
@@ -158,10 +160,7 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentException">If <paramref name="session"/> has been already loaded or canceled.</exception>
 		public async Task<Session> Load( Session session )
 		{
-			if( session == null )
-			{
-				throw new ArgumentNullException( "session" );
-			}
+			Contract.Requires<ArgumentNullException>( session != null );
 
 			if( session.State != SessionState.Created )
 			{
@@ -343,7 +342,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		///     When overriden checks that the specified session should be loaded or ignored. Default behavior is
+		///     When overridden checks that the specified session should be loaded or ignored. Default behavior is
 		///     to load any session.
 		/// </summary>
 		/// <param name="session">The session to check.</param>
@@ -353,12 +352,7 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="session"/> is null.</exception>
 		protected virtual bool ShouldLoadSession( Session session )
 		{
-			if( session == null )
-			{
-				throw new ArgumentNullException( "session" );
-			}
-
-			Contract.EndContractBlock();
+			Contract.Requires<ArgumentNullException>( session != null );
 
 			var result = false;
 
@@ -385,12 +379,7 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="session"/> is null.</exception>
 		protected virtual void LoadSession( Session session )
 		{
-			if( session == null )
-			{
-				throw new ArgumentNullException( "session" );
-			}
-
-			Contract.EndContractBlock();
+			Contract.Requires<ArgumentNullException>( session != null );
 
 			foreach( var pair in _parts )
 			{
@@ -414,6 +403,9 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
 		protected void RegisterPart( string part, Func<Session, string, Task> processor )
 		{
+			Contract.Requires<ArgumentNullException>( part != null );
+			Contract.Requires<ArgumentNullException>( processor != null );
+
 			RegisterPart( part, processor, (Func<Session, string, bool>) null, true );
 		}
 
@@ -425,6 +417,9 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
 		protected void RegisterPart( string part, Func<Session, Task> processor )
 		{
+			Contract.Requires<ArgumentNullException>( part != null );
+			Contract.Requires<ArgumentNullException>( processor != null );
+
 			RegisterPart( part, processor, (Func<Session, bool>) null, true );
 		}
 
@@ -439,6 +434,9 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
 		protected void RegisterPart( string part, Func<Session, string, Task> processor, bool loadIfNoPartsSpecified )
 		{
+			Contract.Requires<ArgumentNullException>( part != null );
+			Contract.Requires<ArgumentNullException>( processor != null );
+
 			RegisterPart( part, processor, (Func<Session, string, bool>) null, loadIfNoPartsSpecified );
 		}
 
@@ -453,6 +451,9 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
 		protected void RegisterPart( string part, Func<Session, Task> processor, bool loadIfNoPartsSpecified )
 		{
+			Contract.Requires<ArgumentNullException>( part != null );
+			Contract.Requires<ArgumentNullException>( processor != null );
+
 			RegisterPart( part, processor, (Func<Session, bool>) null, loadIfNoPartsSpecified );
 		}
 
@@ -465,6 +466,9 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
 		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, string, bool> checker )
 		{
+			Contract.Requires<ArgumentNullException>( part != null );
+			Contract.Requires<ArgumentNullException>( processor != null );
+
 			RegisterPart( part, processor, checker, true );
 		}
 
@@ -477,6 +481,9 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
 		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, string, bool> checker )
 		{
+			Contract.Requires<ArgumentNullException>( part != null );
+			Contract.Requires<ArgumentNullException>( processor != null );
+
 			RegisterPart( part, processor, checker, true );
 		}
 
@@ -489,6 +496,9 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
 		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, bool> checker )
 		{
+			Contract.Requires<ArgumentNullException>( part != null );
+			Contract.Requires<ArgumentNullException>( processor != null );
+
 			RegisterPart( part, processor, checker, true );
 		}
 
@@ -501,6 +511,9 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
 		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, bool> checker )
 		{
+			Contract.Requires<ArgumentNullException>( part != null );
+			Contract.Requires<ArgumentNullException>( processor != null );
+
 			RegisterPart( part, processor, checker, true );
 		}
 
@@ -516,15 +529,8 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
 		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, string, bool> checker, bool loadIfNoPartsSpecified )
 		{
-			if( part == null )
-			{
-				throw new ArgumentNullException( "part" );
-			}
-
-			if( processor == null )
-			{
-				throw new ArgumentNullException( "processor" );
-			}
+			Contract.Requires<ArgumentNullException>( part != null );
+			Contract.Requires<ArgumentNullException>( processor != null );
 
 			_parts[part] = new PartInfo
 			{
@@ -546,15 +552,8 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
 		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, string, bool> checker, bool loadIfNoPartsSpecified )
 		{
-			if( part == null )
-			{
-				throw new ArgumentNullException( "part" );
-			}
-
-			if( processor == null )
-			{
-				throw new ArgumentNullException( "processor" );
-			}
+			Contract.Requires<ArgumentNullException>( part != null );
+			Contract.Requires<ArgumentNullException>( processor != null );
 
 			_parts[part] = new PartInfo
 			{
@@ -576,15 +575,8 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
 		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, bool> checker, bool loadIfNoPartsSpecified )
 		{
-			if( part == null )
-			{
-				throw new ArgumentNullException( "part" );
-			}
-
-			if( processor == null )
-			{
-				throw new ArgumentNullException( "processor" );
-			}
+			Contract.Requires<ArgumentNullException>( part != null );
+			Contract.Requires<ArgumentNullException>( processor != null );
 
 			_parts[part] = new PartInfo
 			{
@@ -606,15 +598,8 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
 		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, bool> checker, bool loadIfNoPartsSpecified )
 		{
-			if( part == null )
-			{
-				throw new ArgumentNullException( "part" );
-			}
-
-			if( processor == null )
-			{
-				throw new ArgumentNullException( "processor" );
-			}
+			Contract.Requires<ArgumentNullException>( part != null );
+			Contract.Requires<ArgumentNullException>( processor != null );
 
 			_parts[part] = new PartInfo
 			{
