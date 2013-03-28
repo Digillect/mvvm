@@ -1,3 +1,24 @@
+#region Copyright (c) 2011-2013 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman)
+// Copyright (c) 2011-2013 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman).
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this
+// software and associated documentation files (the "Software"), to deal in the Software
+// without restriction, including without limitation the rights to use, copy, modify, merge,
+// publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+// to whom the Software is furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all copies or
+// substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -8,18 +29,18 @@ using System.Threading.Tasks;
 namespace Digillect.Mvvm
 {
 	/// <summary>
-	/// Holds information about <see cref="Digillect.Mvvm.ViewModel"/>'s loading session.
+	///     Holds information about <see cref="Digillect.Mvvm.ViewModel" />'s loading session.
 	/// </summary>
 	public class Session : IDisposable
 	{
 		private readonly Parameters _parameters = new Parameters();
+		private readonly string[] _parts;
 		private readonly List<Task> _tasks = new List<Task>();
 		private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
-		private readonly string[] _parts;
 
 		#region Constructors/Disposer
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Session"/> class.
+		///     Initializes a new instance of the <see cref="Session" /> class.
 		/// </summary>
 		public Session()
 		{
@@ -27,7 +48,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Session" /> class.
+		///     Initializes a new instance of the <see cref="Session" /> class.
 		/// </summary>
 		/// <param name="parts">Parts to load.</param>
 		public Session( params string[] parts )
@@ -39,8 +60,8 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Releases unmanaged resources and performs other cleanup operations before the
-		/// <see cref="Session"/> is reclaimed by garbage collection.
+		///     Releases unmanaged resources and performs other cleanup operations before the
+		///     <see cref="Session" /> is reclaimed by garbage collection.
 		/// </summary>
 		~Session()
 		{
@@ -48,7 +69,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose()
 		{
@@ -57,9 +78,11 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Releases unmanaged and - optionally - managed resources
+		///     Releases unmanaged and - optionally - managed resources
 		/// </summary>
-		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+		/// <param name="disposing">
+		///     <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.
+		/// </param>
 		protected virtual void Dispose( bool disposing )
 		{
 			if( disposing )
@@ -71,7 +94,7 @@ namespace Digillect.Mvvm
 
 		#region Public Properties
 		/// <summary>
-		/// Gets the parameters.
+		///     Gets the parameters.
 		/// </summary>
 		public Parameters Parameters
 		{
@@ -79,7 +102,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Gets the collection of tasks, associated with this session.
+		///     Gets the collection of tasks, associated with this session.
 		/// </summary>
 		public IList<Task> Tasks
 		{
@@ -87,7 +110,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Gets logical part for multipart requests.
+		///     Gets logical part for multipart requests.
 		/// </summary>
 		public IEnumerable<string> Parts
 		{
@@ -95,10 +118,10 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Gets a value indicating whether this instance is partial.
+		///     Gets a value indicating whether this instance is partial.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is partial; otherwise, <c>false</c>.
+		///     <c>true</c> if this instance is partial; otherwise, <c>false</c>.
 		/// </value>
 		public bool IsPartial
 		{
@@ -106,22 +129,23 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Gets or sets flag indicating that all other sessions should be terminated when this one
-		/// begins to load.
+		///     Gets or sets flag indicating that all other sessions should be terminated when this one
+		///     begins to load.
 		/// </summary>
 		public bool Exclusive { get; set; }
 
 		/// <summary>
-		/// Gets session state
+		///     Gets session state
 		/// </summary>
 		public SessionState State { get; internal set; }
 		#endregion
+
 		#region Cancellation Support
 		/// <summary>
-		/// Gets a value indicating whether cancellation of this session is requested.
+		///     Gets a value indicating whether cancellation of this session is requested.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if cancellation is requested for this session; otherwise, <c>false</c>.
+		///     <c>true</c> if cancellation is requested for this session; otherwise, <c>false</c>.
 		/// </value>
 		public bool IsCancellationRequested
 		{
@@ -129,7 +153,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Gets the <see cref="System.Threading.CancellationToken"/> to be used in asynchronous operations.
+		///     Gets the <see cref="System.Threading.CancellationToken" /> to be used in asynchronous operations.
 		/// </summary>
 		public CancellationToken Token
 		{
@@ -137,13 +161,13 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Cancels this session.
+		///     Cancels this session.
 		/// </summary>
 		public void Cancel()
 		{
 			if( State == SessionState.Active || State == SessionState.Created )
 			{
-				var oldState = State;
+				SessionState oldState = State;
 
 				State = SessionState.Canceled;
 
@@ -154,9 +178,10 @@ namespace Digillect.Mvvm
 			}
 		}
 		#endregion
+
 		#region Parameters
 		/// <summary>
-		/// Adds the parameter value to the current session.
+		///     Adds the parameter value to the current session.
 		/// </summary>
 		/// <param name="name">Parameter name.</param>
 		/// <param name="value">Parameter value.</param>
@@ -172,13 +197,20 @@ namespace Digillect.Mvvm
 			return this;
 		}
 		#endregion
+
 		#region Parts
 		/// <summary>
-		/// Checks that session is used to load specified logical part.
+		///     Checks that session is used to load specified logical part.
 		/// </summary>
-		/// <param name="part">Part to check, can't be <c>null</c>.</param>
-		/// <returns><c>true</c> if specified part is loading; otherwise, <c>false</c>.</returns>
-		/// <exception cref="System.ArgumentNullException">if part is <c>null</c>.</exception>
+		/// <param name="part">
+		///     Part to check, can't be <c>null</c>.
+		/// </param>
+		/// <returns>
+		///     <c>true</c> if specified part is loading; otherwise, <c>false</c>.
+		/// </returns>
+		/// <exception cref="System.ArgumentNullException">
+		///     if part is <c>null</c>.
+		/// </exception>
 		public bool Includes( string part )
 		{
 			Contract.Requires<ArgumentNullException>( part != null, "part" );

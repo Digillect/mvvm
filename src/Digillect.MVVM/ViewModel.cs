@@ -1,4 +1,25 @@
-﻿using System;
+﻿#region Copyright (c) 2011-2013 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman)
+// Copyright (c) 2011-2013 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman).
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this
+// software and associated documentation files (the "Software"), to deal in the Software
+// without restriction, including without limitation the rights to use, copy, modify, merge,
+// publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+// to whom the Software is furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all copies or
+// substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
@@ -27,7 +48,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Finalizes an instance of the <see cref="ViewModel" /> class.
+		///     Finalizes an instance of the <see cref="ViewModel" /> class.
 		/// </summary>
 		~ViewModel()
 		{
@@ -35,7 +56,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose()
 		{
@@ -44,9 +65,11 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Releases unmanaged and - optionally - managed resources.
+		///     Releases unmanaged and - optionally - managed resources.
 		/// </summary>
-		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+		/// <param name="disposing">
+		///     <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.
+		/// </param>
 		protected virtual void Dispose( bool disposing )
 		{
 			if( disposing )
@@ -138,7 +161,7 @@ namespace Digillect.Mvvm
 
 		#region Loading/Sessions
 		/// <summary>
-		/// Creates the session with the list of parts to be processed.
+		///     Creates the session with the list of parts to be processed.
 		/// </summary>
 		/// <param name="parts">Parts to load.</param>
 		/// <returns>Session that loads specified parts.</returns>
@@ -156,8 +179,12 @@ namespace Digillect.Mvvm
 		/// <returns>
 		///     <see cref="System.Threading.Tasks.Task{T}" /> that can be awaited.
 		/// </returns>
-		/// <exception cref="ArgumentNullException">If <paramref name="session"/> is null.</exception>
-		/// <exception cref="ArgumentException">If <paramref name="session"/> has been already loaded or canceled.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="session" /> is null.
+		/// </exception>
+		/// <exception cref="ArgumentException">
+		///     If <paramref name="session" /> has been already loaded or canceled.
+		/// </exception>
 		public async Task<Session> Load( Session session )
 		{
 #if NET45
@@ -237,8 +264,8 @@ namespace Digillect.Mvvm
 					DataExchangeService.EndDataExchange();
 				}
 
-				var canceled = ex is OperationCanceledException;
-				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
+				bool canceled = ex is OperationCanceledException;
+				SessionAbortedEventArgs eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
 
 				OnSessionAborted( eventArgs );
 
@@ -286,10 +313,10 @@ namespace Digillect.Mvvm
 			}
 			catch( Exception ex )
 			{
-				var canceled = ex is OperationCanceledException;
-				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
-				var aggregateException = ex as AggregateException;
-				
+				bool canceled = ex is OperationCanceledException;
+				SessionAbortedEventArgs eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
+				AggregateException aggregateException = ex as AggregateException;
+
 				if( aggregateException != null )
 				{
 					canceled = aggregateException.InnerExceptions.OfType<OperationCanceledException>().Any();
@@ -342,9 +369,11 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Preserves the sessions from being canceled upon disposal.
+		///     Preserves the sessions from being canceled upon disposal.
 		/// </summary>
-		/// <param name="preserve">if set to <c>true</c> then sessions will not be cancelled when <see cref="Dispose()"/> method will be called.</param>
+		/// <param name="preserve">
+		///     if set to <c>true</c> then sessions will not be cancelled when <see cref="Dispose()" /> method will be called.
+		/// </param>
 		[EditorBrowsable( EditorBrowsableState.Never )]
 		protected void PreserveSessions( bool preserve )
 		{
@@ -359,12 +388,14 @@ namespace Digillect.Mvvm
 		/// <returns>
 		///     <c>true</c> if view model should proceed with loading session; otherwise, <c>false</c>.
 		/// </returns>
-		/// <exception cref="ArgumentNullException">If <paramref name="session"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="session" /> is null.
+		/// </exception>
 		protected virtual bool ShouldLoadSession( Session session )
 		{
 			Contract.Requires<ArgumentNullException>( session != null, "session" );
 
-			var result = false;
+			bool result = false;
 
 			foreach( var pair in _parts )
 			{
@@ -386,7 +417,9 @@ namespace Digillect.Mvvm
 		///     Override this method to perform actual session loading.
 		/// </summary>
 		/// <param name="session">The session.</param>
-		/// <exception cref="ArgumentNullException">If <paramref name="session"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="session" /> is null.
+		/// </exception>
 		protected virtual void LoadSession( Session session )
 		{
 			Contract.Requires<ArgumentNullException>( session != null, "session" );
@@ -410,7 +443,9 @@ namespace Digillect.Mvvm
 		/// </summary>
 		/// <param name="part">Part identifier.</param>
 		/// <param name="processor">Function to load specified part.</param>
-		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="part" /> is null.
+		/// </exception>
 		protected void RegisterPart( string part, Func<Session, string, Task> processor )
 		{
 			Contract.Requires<ArgumentNullException>( part != null, "part" );
@@ -424,7 +459,9 @@ namespace Digillect.Mvvm
 		/// </summary>
 		/// <param name="part">Part identifier.</param>
 		/// <param name="processor">Function to load specified part.</param>
-		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="part" /> is null.
+		/// </exception>
 		protected void RegisterPart( string part, Func<Session, Task> processor )
 		{
 			Contract.Requires<ArgumentNullException>( part != null, "part" );
@@ -441,7 +478,9 @@ namespace Digillect.Mvvm
 		/// <param name="loadIfNoPartsSpecified">
 		///     <c>true</c> if this part loads when no parts specified for the session.
 		/// </param>
-		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="part" /> is null.
+		/// </exception>
 		protected void RegisterPart( string part, Func<Session, string, Task> processor, bool loadIfNoPartsSpecified )
 		{
 			Contract.Requires<ArgumentNullException>( part != null, "part" );
@@ -458,7 +497,9 @@ namespace Digillect.Mvvm
 		/// <param name="loadIfNoPartsSpecified">
 		///     <c>true</c> if this part loads when no parts specified for the session.
 		/// </param>
-		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="part" /> is null.
+		/// </exception>
 		protected void RegisterPart( string part, Func<Session, Task> processor, bool loadIfNoPartsSpecified )
 		{
 			Contract.Requires<ArgumentNullException>( part != null, "part" );
@@ -473,7 +514,9 @@ namespace Digillect.Mvvm
 		/// <param name="part">Part identifier.</param>
 		/// <param name="processor">Function to load specified part.</param>
 		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="part" /> is null.
+		/// </exception>
 		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, string, bool> checker )
 		{
 			Contract.Requires<ArgumentNullException>( part != null, "part" );
@@ -488,7 +531,9 @@ namespace Digillect.Mvvm
 		/// <param name="part">Part identifier.</param>
 		/// <param name="processor">Function to load specified part.</param>
 		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="part" /> is null.
+		/// </exception>
 		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, string, bool> checker )
 		{
 			Contract.Requires<ArgumentNullException>( part != null, "part" );
@@ -503,7 +548,9 @@ namespace Digillect.Mvvm
 		/// <param name="part">Part identifier.</param>
 		/// <param name="processor">Function to load specified part.</param>
 		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="part" /> is null.
+		/// </exception>
 		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, bool> checker )
 		{
 			Contract.Requires<ArgumentNullException>( part != null, "part" );
@@ -518,7 +565,9 @@ namespace Digillect.Mvvm
 		/// <param name="part">Part identifier.</param>
 		/// <param name="processor">Function to load specified part.</param>
 		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="part" /> is null.
+		/// </exception>
 		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, bool> checker )
 		{
 			Contract.Requires<ArgumentNullException>( part != null, "part" );
@@ -536,18 +585,20 @@ namespace Digillect.Mvvm
 		/// <param name="loadIfNoPartsSpecified">
 		///     <c>true</c> if this part loads when no parts specified for the session.
 		/// </param>
-		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="part" /> is null.
+		/// </exception>
 		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, string, bool> checker, bool loadIfNoPartsSpecified )
 		{
 			Contract.Requires<ArgumentNullException>( part != null, "part" );
 			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
 
 			_parts[part] = new PartInfo
-			{
-				ProcessorWithPart = processor,
-				CheckerWithPart = checker,
-				LoadIfNoPartsSpecified = loadIfNoPartsSpecified
-			};
+								{
+									ProcessorWithPart = processor,
+									CheckerWithPart = checker,
+									LoadIfNoPartsSpecified = loadIfNoPartsSpecified
+								};
 		}
 
 		/// <summary>
@@ -559,18 +610,20 @@ namespace Digillect.Mvvm
 		/// <param name="loadIfNoPartsSpecified">
 		///     <c>true</c> if this part loads when no parts specified for the session.
 		/// </param>
-		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="part" /> is null.
+		/// </exception>
 		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, string, bool> checker, bool loadIfNoPartsSpecified )
 		{
 			Contract.Requires<ArgumentNullException>( part != null, "part" );
 			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
 
 			_parts[part] = new PartInfo
-			{
-				Processor = processor,
-				CheckerWithPart = checker,
-				LoadIfNoPartsSpecified = loadIfNoPartsSpecified
-			};
+								{
+									Processor = processor,
+									CheckerWithPart = checker,
+									LoadIfNoPartsSpecified = loadIfNoPartsSpecified
+								};
 		}
 
 		/// <summary>
@@ -582,18 +635,20 @@ namespace Digillect.Mvvm
 		/// <param name="loadIfNoPartsSpecified">
 		///     <c>true</c> if this part loads when no parts specified for the session.
 		/// </param>
-		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="part" /> is null.
+		/// </exception>
 		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, bool> checker, bool loadIfNoPartsSpecified )
 		{
 			Contract.Requires<ArgumentNullException>( part != null, "part" );
 			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
 
 			_parts[part] = new PartInfo
-			{
-				ProcessorWithPart = processor,
-				Checker = checker,
-				LoadIfNoPartsSpecified = loadIfNoPartsSpecified
-			};
+								{
+									ProcessorWithPart = processor,
+									Checker = checker,
+									LoadIfNoPartsSpecified = loadIfNoPartsSpecified
+								};
 		}
 
 		/// <summary>
@@ -605,27 +660,31 @@ namespace Digillect.Mvvm
 		/// <param name="loadIfNoPartsSpecified">
 		///     <c>true</c> if this part loads when no parts specified for the session.
 		/// </param>
-		/// <exception cref="ArgumentNullException">If <paramref name="part"/> is null.</exception>
+		/// <exception cref="ArgumentNullException">
+		///     If <paramref name="part" /> is null.
+		/// </exception>
 		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, bool> checker, bool loadIfNoPartsSpecified )
 		{
 			Contract.Requires<ArgumentNullException>( part != null, "part" );
 			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
 
 			_parts[part] = new PartInfo
-			{
-				Processor = processor,
-				Checker = checker,
-				LoadIfNoPartsSpecified = loadIfNoPartsSpecified
-			};
+								{
+									Processor = processor,
+									Checker = checker,
+									LoadIfNoPartsSpecified = loadIfNoPartsSpecified
+								};
 		}
 
 		private class PartInfo
 		{
+			#region Public Properties
 			public Func<Session, string, Task> ProcessorWithPart { get; set; }
 			public Func<Session, string, bool> CheckerWithPart { get; set; }
 			public Func<Session, Task> Processor { get; set; }
 			public Func<Session, bool> Checker { get; set; }
 			public bool LoadIfNoPartsSpecified { get; set; }
+			#endregion
 
 			public bool Check( Session session, string part )
 			{
