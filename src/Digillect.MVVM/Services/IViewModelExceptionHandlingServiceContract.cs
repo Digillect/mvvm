@@ -9,9 +9,9 @@ namespace Digillect.Mvvm.Services
 		#region Implementation of IViewModelExceptionHandlingService
 		public bool HandleException( ViewModel viewModel, Session session, Exception ex )
 		{
-			Contract.Requires<ArgumentNullException>( viewModel != null );
-			Contract.Requires<ArgumentNullException>( session != null );
-			Contract.Requires<ArgumentNullException>( ex != null );
+			Contract.Requires<ArgumentNullException>( viewModel != null, "viewModel" );
+			Contract.Requires<ArgumentNullException>( session != null, "session" );
+			Contract.Requires<ArgumentNullException>( ex != null, "ex" );
 
 			return false;
 		}

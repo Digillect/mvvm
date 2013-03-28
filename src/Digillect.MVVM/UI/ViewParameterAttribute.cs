@@ -19,7 +19,7 @@ namespace Digillect.Mvvm.UI
 		/// <param name="parameterName">Name of the parameter.</param>
 		public ViewParameterAttribute( string parameterName )
 		{
-			Contract.Requires<ArgumentNullException>( !string.IsNullOrEmpty( parameterName ) );
+			Contract.Requires<ArgumentNullException>( !string.IsNullOrEmpty( parameterName ), "parameterName" );
 
 			_parameterName = parameterName;
 			_parameterType = typeof( string );
@@ -34,8 +34,8 @@ namespace Digillect.Mvvm.UI
 		/// <param name="parameterType">Type of the parameter.</param>
 		public ViewParameterAttribute( string parameterName, Type parameterType )
 		{
-			Contract.Requires<ArgumentNullException>( !string.IsNullOrEmpty( parameterName ) );
-			Contract.Requires<ArgumentNullException>( parameterType != null );
+			Contract.Requires<ArgumentNullException>( !string.IsNullOrEmpty( parameterName ), "parameterName" );
+			Contract.Requires<ArgumentNullException>( parameterType != null, "parameterType" );
 
 			_parameterName = parameterName;
 			_parameterType = parameterType;

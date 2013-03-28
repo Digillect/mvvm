@@ -20,8 +20,8 @@ namespace Digillect.Mvvm
 		/// <returns>Constructed instance with added name/value pair.</returns>
 		public static Parameters Create( string name, object value )
 		{
-			Contract.Requires<ArgumentNullException>( name != null );
-			Contract.Requires<ArgumentNullException>( value != null );
+			Contract.Requires<ArgumentNullException>( name != null, "name" );
+			Contract.Requires<ArgumentNullException>( value != null, "value" );
 			Contract.Ensures( Contract.Result<Parameters>() != null );
 
 			var parameters = new Parameters { { name, value } };
@@ -38,8 +38,8 @@ namespace Digillect.Mvvm
 		/// <exception cref="System.ArgumentNullException">If <paramref name="name"/> or <paramref name="value"/> is <c>null</c>.</exception>
 		public Parameters Add( string name, object value )
 		{
-			Contract.Requires<ArgumentNullException>( name != null );
-			Contract.Requires<ArgumentNullException>( value != null );
+			Contract.Requires<ArgumentNullException>( name != null, "name" );
+			Contract.Requires<ArgumentNullException>( value != null, "value" );
 			Contract.Ensures( Contract.Result<Parameters>() != null );
 
 			_values.Add( name, value );
@@ -56,7 +56,7 @@ namespace Digillect.Mvvm
 		/// <exception cref="System.ArgumentNullException">If <paramref name="name"/> is <c>null</c>.</exception>
 		public T Get<T>( string name )
 		{
-			Contract.Requires<ArgumentNullException>( name != null );
+			Contract.Requires<ArgumentNullException>( name != null, "name" );
 
 			if( !_values.ContainsKey( name ) )
 			{
@@ -76,7 +76,7 @@ namespace Digillect.Mvvm
 		/// <exception cref="System.ArgumentNullException">If <paramref name="name"/> is <c>null</c>.</exception>
 		public T Get<T>( string name, T defaultValue )
 		{
-			Contract.Requires<ArgumentNullException>( name != null );
+			Contract.Requires<ArgumentNullException>( name != null, "name" );
 			
 			if( !_values.ContainsKey( name ) )
 			{
@@ -96,7 +96,7 @@ namespace Digillect.Mvvm
 		/// <exception cref="System.ArgumentNullException">If <paramref name="name"/> is <c>null</c>.</exception>
 		public bool Contains( string name )
 		{
-			Contract.Requires<ArgumentNullException>( name != null );
+			Contract.Requires<ArgumentNullException>( name != null, "name" );
 
 			return _values.ContainsKey( name );
 		}

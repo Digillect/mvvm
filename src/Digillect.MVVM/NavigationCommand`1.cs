@@ -25,8 +25,8 @@ namespace Digillect.Mvvm
 		public NavigationCommand( INavigationService navigationService, string view )
 			: this( navigationService, view, null, (Func<T, Parameters>) null )
 		{
-			Contract.Requires<ArgumentNullException>( navigationService != null );
-			Contract.Requires<ArgumentNullException>( view != null );
+			Contract.Requires<ArgumentNullException>( navigationService != null, "navigationService" );
+			Contract.Requires<ArgumentNullException>( view != null, "view" );
 		}
 
 		/// <summary>
@@ -38,8 +38,8 @@ namespace Digillect.Mvvm
 		public NavigationCommand( INavigationService navigationService, string view, Func<T, bool> canNavigate )
 			: this( navigationService, view, canNavigate, (Func<T, Parameters>) null )
 		{
-			Contract.Requires<ArgumentNullException>( navigationService != null );
-			Contract.Requires<ArgumentNullException>( view != null );
+			Contract.Requires<ArgumentNullException>( navigationService != null, "navigationService" );
+			Contract.Requires<ArgumentNullException>( view != null, "view" );
 		}
 
 		/// <summary>
@@ -51,8 +51,8 @@ namespace Digillect.Mvvm
 		public NavigationCommand( INavigationService navigationService, string view, Parameters parameters )
 			: this( navigationService, view, null, item => parameters )
 		{
-			Contract.Requires<ArgumentNullException>( navigationService != null );
-			Contract.Requires<ArgumentNullException>( view != null );
+			Contract.Requires<ArgumentNullException>( navigationService != null, "navigationService" );
+			Contract.Requires<ArgumentNullException>( view != null, "view" );
 		}
 
 		/// <summary>
@@ -65,8 +65,8 @@ namespace Digillect.Mvvm
 		public NavigationCommand( INavigationService navigationService, string view, Func<T, bool> canNavigate, Parameters parameters )
 			: this( navigationService, view, canNavigate, item => parameters )
 		{
-			Contract.Requires<ArgumentNullException>( navigationService != null );
-			Contract.Requires<ArgumentNullException>( view != null );
+			Contract.Requires<ArgumentNullException>( navigationService != null, "navigationService" );
+			Contract.Requires<ArgumentNullException>( view != null, "view" );
 		}
 
 		/// <summary>
@@ -78,8 +78,8 @@ namespace Digillect.Mvvm
 		public NavigationCommand( INavigationService navigationService, string view, Func<T, Parameters> parametersProvider )
 			: this( navigationService, view, null, parametersProvider )
 		{
-			Contract.Requires<ArgumentNullException>( navigationService != null );
-			Contract.Requires<ArgumentNullException>( view != null );
+			Contract.Requires<ArgumentNullException>( navigationService != null, "navigationService" );
+			Contract.Requires<ArgumentNullException>( view != null, "view" );
 		}
 
 		/// <summary>
@@ -92,8 +92,8 @@ namespace Digillect.Mvvm
 		/// <exception cref="ArgumentNullException">If <paramref name="navigationService"/> or <paramref name="view"/> is <c>null</c>.</exception>
 		public NavigationCommand( INavigationService navigationService, string view, Func<T, bool> canNavigate, Func<T, Parameters> parametersProvider )
 		{
-			Contract.Requires<ArgumentNullException>( navigationService != null );
-			Contract.Requires<ArgumentNullException>( view != null );
+			Contract.Requires<ArgumentNullException>( navigationService != null, "navigationService" );
+			Contract.Requires<ArgumentNullException>( view != null, "view" );
 
 			_navigationService = navigationService;
 			_view = view;

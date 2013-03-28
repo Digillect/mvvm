@@ -17,7 +17,7 @@ namespace Digillect.Mvvm
 		/// <param name="key">Entity key.</param>
 		public EntitySession( XKey key )
 		{
-			Contract.Requires<ArgumentNullException>( key != null );
+			Contract.Requires<ArgumentNullException>( key != null, "key" );
 
 			_key = key;
 			Exclusive = true;
@@ -31,7 +31,7 @@ namespace Digillect.Mvvm
 		public EntitySession( XKey key, params string[] parts )
 			: base( parts )
 		{
-			Contract.Requires<ArgumentNullException>( key != null );
+			Contract.Requires<ArgumentNullException>( key != null, "key" );
 
 			_key = key;
 			Exclusive = parts == null;
@@ -57,8 +57,8 @@ namespace Digillect.Mvvm
 		/// <returns>Current session.</returns>
 		public new EntitySession AddParameter( string name, object value )
 		{
-			Contract.Requires<ArgumentNullException>( name != null );
-			Contract.Requires<ArgumentNullException>( value != null );
+			Contract.Requires<ArgumentNullException>( name != null, "name" );
+			Contract.Requires<ArgumentNullException>( value != null, "value" );
 			Contract.Ensures( Contract.Result<EntitySession>() != null );
 
 			Parameters.Add( name, value );

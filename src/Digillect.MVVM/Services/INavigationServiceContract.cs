@@ -9,12 +9,12 @@ namespace Digillect.Mvvm.Services
 		#region Implementation of INavigationService
 		public void Navigate( string viewName )
 		{
-			Contract.Requires<ArgumentNullException>( viewName != null );
+			Contract.Requires<ArgumentNullException>( viewName != null, "viewName" );
 		}
 
 		public void Navigate( string viewName, Parameters parameters )
 		{
-			Contract.Requires<ArgumentNullException>( viewName != null );
+			Contract.Requires<ArgumentNullException>( viewName != null, "viewName" );
 		}
 
 		public abstract void GoBack();

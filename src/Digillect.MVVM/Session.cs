@@ -163,8 +163,8 @@ namespace Digillect.Mvvm
 		/// <returns>Current session.</returns>
 		public Session AddParameter( string name, object value )
 		{
-			Contract.Requires<ArgumentNullException>( name != null );
-			Contract.Requires<ArgumentNullException>( value != null );
+			Contract.Requires<ArgumentNullException>( name != null, "name" );
+			Contract.Requires<ArgumentNullException>( value != null, "value" );
 			Contract.Ensures( Contract.Result<Session>() != null );
 
 			_parameters.Add( name, value );
@@ -181,7 +181,7 @@ namespace Digillect.Mvvm
 		/// <exception cref="System.ArgumentNullException">if part is <c>null</c>.</exception>
 		public bool Includes( string part )
 		{
-			Contract.Requires<ArgumentNullException>( part != null );
+			Contract.Requires<ArgumentNullException>( part != null, "part" );
 
 			if( _parts == null )
 			{

@@ -14,24 +14,24 @@ namespace Digillect.Mvvm
 
 		#region Constructors/Disposer
 		/// <summary>
-		/// Initializes a new instance of the <see cref="RelayCommand&lt;T&gt;"/> class.
+		/// Initializes a new instance of the <see cref="RelayCommand{T}"/> class.
 		/// </summary>
 		/// <param name="execute">Action that will be used for command execution.</param>
 		public RelayCommand( Action<T> execute )
 			: this( execute, null )
 		{
-			Contract.Requires<ArgumentNullException>( execute != null );
+			Contract.Requires<ArgumentNullException>( execute != null, "execute" );
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="RelayCommand&lt;T&gt;"/> class.
+		/// Initializes a new instance of the <see cref="RelayCommand{T}"/> class.
 		/// </summary>
 		/// <param name="execute">Action that will be used for command execution.</param>
 		/// <param name="canExecute">Function that indicates whether command can be executed or not.</param>
 		/// <exception cref="ArgumentNullException">If <paramref name="execute"/> is <c>null</c>.</exception>
 		public RelayCommand( Action<T> execute, Func<T, bool> canExecute )
 		{
-			Contract.Requires<ArgumentNullException>( execute != null );
+			Contract.Requires<ArgumentNullException>( execute != null, "execute" );
 
 			_execute = execute;
 			_canExecute = canExecute;

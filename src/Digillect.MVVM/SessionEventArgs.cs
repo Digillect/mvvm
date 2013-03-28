@@ -17,7 +17,7 @@ namespace Digillect.Mvvm
 		/// <param name="session">The session.</param>
 		public SessionEventArgs( Session session )
 		{
-			Contract.Requires<ArgumentNullException>( session != null );
+			Contract.Requires<ArgumentNullException>( session != null, "session" );
 
 			_session = session;
 		}
