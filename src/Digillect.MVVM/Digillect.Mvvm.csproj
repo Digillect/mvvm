@@ -198,7 +198,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Digillect.ObjectModel">
-      <HintPath>..\..\packages\Digillect.ObjectModel.4.0.0-dev-00006\lib\portable-net45+wp8+win8\Digillect.ObjectModel.dll</HintPath>
+      <HintPath>..\..\packages\Digillect.ObjectModel.4.0.0\lib\portable-net45+wp8+win8\Digillect.ObjectModel.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Threading.Tasks">
       <HintPath>..\..\packages\Microsoft.Bcl.Async.1.0.14-rc\lib\portable-net45+win8+wp8\Microsoft.Threading.Tasks.dll</HintPath>
