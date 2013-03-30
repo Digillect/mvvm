@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="BuildAndPackage" InitialTargets="CheckForBuildTools" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<BuildToolsVersion>1.2.0</BuildToolsVersion>
+		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	</PropertyGroup>
+
+	<Target Name="CheckForBuildTools" Condition="!Exists('packages\Digillect.Build.Tools.$(BuildToolsVersion)\tools\Build.targets')">
+		<Error Text="Project requires Digillect.Build.Tools package to run."/>
+	</Target>
+	
+	<Import Project="packages\Digillect.Build.Tools.$(BuildToolsVersion)\tools\Build.targets" Condition="Exists('packages\Digillect.Build.Tools.$(BuildToolsVersion)\tools\Build.targets')"/>
+
+	<ItemGroup>
+		<!--ProjectReference Include="src\Digillect.Mvvm\Digillect.Mvvm (net40).csproj"/-->
+		<ProjectReference Include="src\Digillect.Mvvm\Digillect.Mvvm.csproj">
+			<AdditionalProperties>VisualStudioVersion=11.0</AdditionalProperties>
+		</ProjectReference>
+		<ProjectReference Include="src\Digillect.Mvvm\Digillect.Mvvm (wp71).csproj"/>
+		<ProjectReference Include="src\Digillect.Mvvm.Tests\Digillect.Mvvm.Tests.csproj"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackagingProjectReference Include="Digillect.Mvvm.proj"/>
+	</ItemGroup>
+
+	<PropertyGroup>
+		<MSpecCommand>$(MSBuildProjectDirectory)\packages\Machine.Specifications.0.5.11\tools\mspec-clr4.exe --xml .\report.xml</MSpecCommand>
+	</PropertyGroup>
+
+	<Target Name="Test">
+		<Exec Command="$(MSpecCommand) Digillect.Mvvm.Tests.dll" ContinueOnError="true" WorkingDirectory="target\$(Configuration)\tests\Digillect.Mvvm.Tests"/>
+		<XslTransformation
+			XmlInputPaths="target\$(Configuration)\tests\Digillect.Mvvm.Tests\report.xml"
+			XslInputPath="tools\testing\mspec2junit.xslt"
+			OutputPaths="target\$(Configuration)\tests\Digillect.Mvvm.Tests\junit-report.xml"/>
+	</Target>
+
+	<Target Name="UpdateAssemblyVersion" Condition="'$(BuildNumber)' != ''">
+		<FileUpdate Files="src\AssemblySharedInfo.cs" Regex='BuildNumber = "\d+"' ReplacementText='BuildNumber = "$(BuildNumber)"'/>
+	</Target>
+
+	<Target Name="BeforeBuildOrRebuild" DependsOnTargets="UpdateAssemblyVersion"/>
+
+	<Target Name="BuildAndPackage" DependsOnTargets="Build;Package"/>
+</Project>

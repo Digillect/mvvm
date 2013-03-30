@@ -1,0 +1,9 @@
+obj/
+bin/
+/packages/
+/target/
+/[Tt]est[Rr]esults/
+
+*.suo
+*.vsdoc
+*.user
