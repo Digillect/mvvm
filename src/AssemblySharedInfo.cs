@@ -48,7 +48,7 @@ internal static class AssemblyInfo
 	public const string Minor = "0";
 	public const string Revision = "0";
 	public const string BuildNumber = "0";
-	public const string Suffix = "-rc";
+	public const string Suffix = "";
 
 	public const string Version = Major + "." + Minor + "." + Revision + ".0";
 	public const string FileVersion = Major + "." + Minor + "." + Revision + "." + BuildNumber + Suffix;

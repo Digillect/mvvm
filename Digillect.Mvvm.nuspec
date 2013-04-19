@@ -31,8 +31,8 @@
 			<group targetFramework="wp71">
 				<dependency id="Digillect.ObjectModel" version="4.0.0"/>
 				<dependency id="Autofac" version="2.6.3.862"/>
-				<dependency id="Microsoft.Bcl" version="1.0.16-rc"/>
-				<dependency id="Microsoft.Bcl.Async" version="1.0.14-rc"/>
+				<dependency id="Microsoft.Bcl" version="1.0.19"/>
+				<dependency id="Microsoft.Bcl.Async" version="1.0.16"/>
 			</group>
 		</dependencies>
 		<references>
