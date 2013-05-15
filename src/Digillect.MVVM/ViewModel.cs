@@ -161,15 +161,30 @@ namespace Digillect.Mvvm
 
 		#region Loading/Sessions
 		/// <summary>
-		///     Creates the session with the list of parts to be processed.
+		/// Creates the session with the list of parts to be processed.
 		/// </summary>
 		/// <param name="parts">Parts to load.</param>
-		/// <returns>Session that loads specified parts.</returns>
+		/// <returns>
+		/// Session that loads specified parts.
+		/// </returns>
 		public virtual Session CreateSession( params string[] parts )
+		{
+			return CreateSession( null, parts );
+		}
+
+		/// <summary>
+		/// Creates the session with the list of parts to be processed.
+		/// </summary>
+		/// <param name="parameters">Parameters of the session.</param>
+		/// <param name="parts">Parts to load.</param>
+		/// <returns>
+		/// Session with specified parameters that loads specified parts.
+		/// </returns>
+		public virtual Session CreateSession( XParameters parameters, params string[] parts )
 		{
 			Contract.Ensures( Contract.Result<Session>() != null );
 
-			return new Session( parts );
+			return new Session( parameters, parts );
 		}
 
 		/// <summary>
@@ -187,7 +202,7 @@ namespace Digillect.Mvvm
 		/// </exception>
 		public async Task<Session> Load( Session session )
 		{
-#if NET45
+#if true
 			Contract.Requires<ArgumentNullException>( session != null, "session" );
 #else
 			// Unfortunately there is a bug in code contracts rewriter targeting async methods on NET 4.0.

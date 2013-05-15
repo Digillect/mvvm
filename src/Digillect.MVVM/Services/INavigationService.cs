@@ -40,7 +40,7 @@ namespace Digillect.Mvvm.Services
 		/// </summary>
 		/// <param name="viewName">Name of the view.</param>
 		/// <param name="parameters">The parameters.</param>
-		void Navigate( string viewName, Parameters parameters );
+		void Navigate( string viewName, XParameters parameters );
 
 		/// <summary>
 		///     Navigated to the previous view, if any.

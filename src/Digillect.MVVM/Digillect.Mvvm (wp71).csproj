@@ -175,7 +175,7 @@
     </Reference>
     <Reference Include="Digillect.ObjectModel">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Digillect.ObjectModel.4.0.0\lib\wp71\Digillect.ObjectModel.dll</HintPath>
+      <HintPath>..\..\packages\Digillect.ObjectModel.4.1.0-dev-00006\lib\wp71\Digillect.ObjectModel.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=736440c9b414ea16, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Phone" />
@@ -213,11 +213,9 @@
     <Compile Include="IRelayCommand.cs" />
     <Compile Include="NavigationCommand.cs" />
     <Compile Include="NavigationCommand`1.cs" />
-    <Compile Include="Parameters.cs" />
     <Compile Include="RelayCommand`1.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="Services\DataExchangeService.cs" />
-    <Compile Include="EntitySession.cs" />
     <Compile Include="Services\DefaultViewModelExceptionHandlingService.cs" />
     <Compile Include="Services\IDataExchangeService.cs" />
     <Compile Include="Services\IExceptionHandlingService.cs" />

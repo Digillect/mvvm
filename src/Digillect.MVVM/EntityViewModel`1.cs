@@ -33,6 +33,7 @@ namespace Digillect.Mvvm
 	public abstract class EntityViewModel<TEntity> : ViewModel
 		where TEntity : XObject
 	{
+		private const string KeyParameter = "Key";
 		private const string EntityPart = "Entity";
 
 		private TEntity _entity;
@@ -43,7 +44,7 @@ namespace Digillect.Mvvm
 		/// </summary>
 		protected EntityViewModel()
 		{
-			RegisterPart( EntityPart, session => LoadEntity( (EntitySession) session ), session => ShouldLoadEntity( (EntitySession) session ) );
+			RegisterPart( EntityPart, LoadEntity, ShouldLoadEntity );
 		}
 		#endregion
 
@@ -70,12 +71,12 @@ namespace Digillect.Mvvm
 		///     Session that loads entity using specified <paramref name="key" />.
 		/// </returns>
 		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
-		public EntitySession CreateEntitySession( XKey key )
+		public Session CreateEntitySession( XKey key )
 		{
 			Contract.Requires<ArgumentNullException>( key != null, "key" );
-			Contract.Ensures( Contract.Result<EntitySession>() != null );
+			Contract.Ensures( Contract.Result<Session>() != null );
 
-			return new EntitySession( key, EntityPart );
+			return new Session( XParameters.Create( KeyParameter, key ), EntityPart );
 		}
 
 		/// <summary>
@@ -87,12 +88,12 @@ namespace Digillect.Mvvm
 		///     Session that (usually) loads everything, including entity using specified <paramref name="key" />.
 		/// </returns>
 		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
-		public EntitySession CreateSession( XKey key, params string[] parts )
+		public Session CreateSession( XKey key, params string[] parts )
 		{
 			Contract.Requires<ArgumentNullException>( key != null, "key" );
-			Contract.Ensures( Contract.Result<EntitySession>() != null );
+			Contract.Ensures( Contract.Result<Session>() != null );
 
-			return new EntitySession( key, parts );
+			return new Session( XParameters.Create( KeyParameter, key ), parts );
 		}
 		#endregion
 
@@ -104,7 +105,7 @@ namespace Digillect.Mvvm
 		/// <returns>
 		///     <see cref="System.Threading.Tasks.Task" /> that can be awaited.
 		/// </returns>
-		protected abstract Task LoadEntity( EntitySession session );
+		protected abstract Task LoadEntity( Session session );
 
 		/// <summary>
 		///     Determines if entity part should participate in session.
@@ -116,11 +117,11 @@ namespace Digillect.Mvvm
 		/// <exception cref="System.ArgumentNullException">
 		///     If <paramref name="session" /> is null.
 		/// </exception>
-		protected virtual bool ShouldLoadEntity( EntitySession session )
+		protected virtual bool ShouldLoadEntity( Session session )
 		{
 			Contract.Requires<ArgumentNullException>( session != null, "session" );
 
-			return _entity == null || !_entity.GetKey().Equals( session.Key );
+			return _entity == null || !_entity.GetKey().Equals( session.Parameters.GetValue<XKey>( KeyParameter ) );
 		}
 		#endregion
 	}

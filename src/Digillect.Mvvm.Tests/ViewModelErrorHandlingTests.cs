@@ -140,7 +140,7 @@ namespace Digillect.Mvvm.Tests
 	{
 		public ErrorRaisingViewModel()
 		{
-			RegisterPart( "main", ( session, part ) => LoadMainPart( session ) );
+			RegisterPart( "main", LoadMainPart );
 		}
 
 		public Task LoadAndThrowSync()
@@ -157,7 +157,7 @@ namespace Digillect.Mvvm.Tests
 		{
 			base.LoadSession( session );
 
-			if( session.Parameters.Get<bool>( "ThrowSync" ) )
+			if( session.Parameters.GetValue<bool>( "ThrowSync" ) )
 			{
 				throw new NotImplementedException();
 			}
@@ -167,7 +167,7 @@ namespace Digillect.Mvvm.Tests
 		{
 			await Task.Delay( 1000 );
 
-			if( session.Parameters.Get<bool>( "ThrowAsync" ) )
+			if( session.Parameters.GetValue<bool>( "ThrowAsync" ) )
 			{
 				throw new NotImplementedException();
 			}

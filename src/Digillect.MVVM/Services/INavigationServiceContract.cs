@@ -33,7 +33,7 @@ namespace Digillect.Mvvm.Services
 			Contract.Requires<ArgumentNullException>( viewName != null, "viewName" );
 		}
 
-		public void Navigate( string viewName, Parameters parameters )
+		public void Navigate( string viewName, XParameters parameters )
 		{
 			Contract.Requires<ArgumentNullException>( viewName != null, "viewName" );
 		}

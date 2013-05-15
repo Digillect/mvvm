@@ -33,30 +33,54 @@ namespace Digillect.Mvvm
 	/// </summary>
 	public class Session : IDisposable
 	{
-		private readonly Parameters _parameters = new Parameters();
 		private readonly string[] _parts;
+		private readonly Dictionary<string, object> _values = new Dictionary<string, object>();
 		private readonly List<Task> _tasks = new List<Task>();
 		private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
+		private XParameters _parameters = XParameters.Empty;
 
 		#region Constructors/Disposer
 		/// <summary>
 		///     Initializes a new instance of the <see cref="Session" /> class.
 		/// </summary>
 		public Session()
+			: this( XParameters.Empty, null )
 		{
-			State = SessionState.Created;
 		}
 
 		/// <summary>
-		///     Initializes a new instance of the <see cref="Session" /> class.
+		/// Initializes a new instance of the <see cref="Session"/> class.
+		/// </summary>
+		/// <param name="parameters">Parameters of the session.</param>
+		public Session( XParameters parameters )
+			: this( parameters, null )
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Session"/> class.
 		/// </summary>
 		/// <param name="parts">Parts to load.</param>
 		public Session( params string[] parts )
+			: this( XParameters.Empty, parts )
 		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Session" /> class.
+		/// </summary>
+		/// <param name="parameters">Parameters of the session.</param>
+		/// <param name="parts">Parts to load.</param>
+		public Session( XParameters parameters, params string[] parts )
+		{
+			_parameters = parameters ?? XParameters.Empty;
+
 			if( parts != null && parts.Length > 0 )
 			{
 				_parts = parts;
 			}
+
+			State = SessionState.Created;
 		}
 
 		/// <summary>
@@ -96,7 +120,7 @@ namespace Digillect.Mvvm
 		/// <summary>
 		///     Gets the parameters.
 		/// </summary>
-		public Parameters Parameters
+		public XParameters Parameters
 		{
 			get { return _parameters; }
 		}
@@ -115,6 +139,17 @@ namespace Digillect.Mvvm
 		public IEnumerable<string> Parts
 		{
 			get { return _parts; }
+		}
+
+		/// <summary>
+		/// Gets the dictionary used as name-value storage.
+		/// </summary>
+		/// <value>
+		/// The values.
+		/// </value>
+		public IDictionary<string, object> Values
+		{
+			get { return _values; }
 		}
 
 		/// <summary>
@@ -192,7 +227,7 @@ namespace Digillect.Mvvm
 			Contract.Requires<ArgumentNullException>( value != null, "value" );
 			Contract.Ensures( Contract.Result<Session>() != null );
 
-			_parameters.Add( name, value );
+			_parameters = _parameters.WithValue( name, value );
 
 			return this;
 		}
