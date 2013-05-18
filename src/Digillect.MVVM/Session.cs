@@ -33,10 +33,9 @@ namespace Digillect.Mvvm
 	/// </summary>
 	public class Session : IDisposable
 	{
-		private readonly string[] _parts;
-		private readonly Dictionary<string, object> _values = new Dictionary<string, object>();
-		private readonly List<Task> _tasks = new List<Task>();
+		private readonly string _action;
 		private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
+		private readonly Dictionary<string, object> _values = new Dictionary<string, object>();
 		private XParameters _parameters = XParameters.Empty;
 
 		#region Constructors/Disposer
@@ -60,9 +59,9 @@ namespace Digillect.Mvvm
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Session"/> class.
 		/// </summary>
-		/// <param name="parts">Parts to load.</param>
-		public Session( params string[] parts )
-			: this( XParameters.Empty, parts )
+		/// <param name="action">Action to process.</param>
+		public Session( string action )
+			: this( XParameters.Empty, action )
 		{
 		}
 
@@ -70,15 +69,11 @@ namespace Digillect.Mvvm
 		/// Initializes a new instance of the <see cref="Session" /> class.
 		/// </summary>
 		/// <param name="parameters">Parameters of the session.</param>
-		/// <param name="parts">Parts to load.</param>
-		public Session( XParameters parameters, params string[] parts )
+		/// <param name="action">Action to process.</param>
+		public Session( XParameters parameters, string action )
 		{
 			_parameters = parameters ?? XParameters.Empty;
-
-			if( parts != null && parts.Length > 0 )
-			{
-				_parts = parts;
-			}
+			_action = action ?? ViewModel.DefaultAction;
 
 			State = SessionState.Created;
 		}
@@ -126,19 +121,14 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		///     Gets the collection of tasks, associated with this session.
+		/// Gets the action associated with this session.
 		/// </summary>
-		public IList<Task> Tasks
+		/// <value>
+		/// The action.
+		/// </value>
+		public string Action
 		{
-			get { return _tasks; }
-		}
-
-		/// <summary>
-		///     Gets logical part for multipart requests.
-		/// </summary>
-		public IEnumerable<string> Parts
-		{
-			get { return _parts; }
+			get { return _action; }
 		}
 
 		/// <summary>
@@ -150,17 +140,6 @@ namespace Digillect.Mvvm
 		public IDictionary<string, object> Values
 		{
 			get { return _values; }
-		}
-
-		/// <summary>
-		///     Gets a value indicating whether this instance is partial.
-		/// </summary>
-		/// <value>
-		///     <c>true</c> if this instance is partial; otherwise, <c>false</c>.
-		/// </value>
-		public bool IsPartial
-		{
-			get { return _parts != null && _parts.Length > 0; }
 		}
 
 		/// <summary>
@@ -230,32 +209,6 @@ namespace Digillect.Mvvm
 			_parameters = _parameters.WithValue( name, value );
 
 			return this;
-		}
-		#endregion
-
-		#region Parts
-		/// <summary>
-		///     Checks that session is used to load specified logical part.
-		/// </summary>
-		/// <param name="part">
-		///     Part to check, can't be <c>null</c>.
-		/// </param>
-		/// <returns>
-		///     <c>true</c> if specified part is loading; otherwise, <c>false</c>.
-		/// </returns>
-		/// <exception cref="System.ArgumentNullException">
-		///     if part is <c>null</c>.
-		/// </exception>
-		public bool Includes( string part )
-		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-
-			if( _parts == null )
-			{
-				return false;
-			}
-
-			return _parts.Contains( part );
 		}
 		#endregion
 	}

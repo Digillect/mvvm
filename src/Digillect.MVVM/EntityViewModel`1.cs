@@ -34,8 +34,7 @@ namespace Digillect.Mvvm
 		where TEntity : XObject
 	{
 		private const string KeyParameter = "Key";
-		private const string EntityPart = "Entity";
-
+		public const string EntityAction = "Entity";
 		private TEntity _entity;
 
 		#region Constructors/Disposer
@@ -44,7 +43,11 @@ namespace Digillect.Mvvm
 		/// </summary>
 		protected EntityViewModel()
 		{
-			RegisterPart( EntityPart, LoadEntity, ShouldLoadEntity );
+			RegisterAction()
+				.AddPart( LoadEntity, ShouldLoadEntity );
+
+			RegisterAction( EntityAction )
+				.AddPart( LoadEntity, ShouldLoadEntity );
 		}
 		#endregion
 
@@ -76,24 +79,40 @@ namespace Digillect.Mvvm
 			Contract.Requires<ArgumentNullException>( key != null, "key" );
 			Contract.Ensures( Contract.Result<Session>() != null );
 
-			return new Session( XParameters.Create( KeyParameter, key ), EntityPart );
+			return new Session( XParameters.Create( KeyParameter, key ), EntityAction );
 		}
 
 		/// <summary>
-		///     Creates the session that loads everything.
+		///     Creates the session that executes default action.
 		/// </summary>
 		/// <param name="key">Entity key.</param>
-		/// <param name="parts">Parts to load.</param>
 		/// <returns>
-		///     Session that (usually) loads everything, including entity using specified <paramref name="key" />.
+		///     Session that executes default action with parameters containing specified <paramref name="key" />.
 		/// </returns>
 		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
-		public Session CreateSession( XKey key, params string[] parts )
+		public Session CreateSession( XKey key )
 		{
 			Contract.Requires<ArgumentNullException>( key != null, "key" );
 			Contract.Ensures( Contract.Result<Session>() != null );
 
-			return new Session( XParameters.Create( KeyParameter, key ), parts );
+			return new Session( XParameters.Create( KeyParameter, key ), null );
+		}
+
+		/// <summary>
+		///     Creates the session that executes specified action.
+		/// </summary>
+		/// <param name="key">Entity key.</param>
+		/// <param name="action">Action to execute</param>
+		/// <returns>
+		///     Session that executes specified action with parameters containing specified <paramref name="key" />.
+		/// </returns>
+		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
+		public Session CreateSession( XKey key, string action )
+		{
+			Contract.Requires<ArgumentNullException>( key != null, "key" );
+			Contract.Ensures( Contract.Result<Session>() != null );
+
+			return new Session( XParameters.Create( KeyParameter, key ), action );
 		}
 		#endregion
 
