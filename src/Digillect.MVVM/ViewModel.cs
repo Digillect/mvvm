@@ -1,5 +1,5 @@
-﻿#region Copyright (c) 2011-2013 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman)
-// Copyright (c) 2011-2013 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman).
+﻿#region License
+// Copyright (c) 2011-2013 Gregory Nickonov and Andrew Nefedkin (Actis Wunderman).
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this
 // software and associated documentation files (the "Software"), to deal in the Software
@@ -35,7 +35,12 @@ namespace Digillect.Mvvm
 	/// </summary>
 	public class ViewModel : ObservableObject, IDisposable
 	{
-		private readonly Dictionary<string, PartInfo> _parts = new Dictionary<string, PartInfo>();
+		/// <summary>
+		///     Identifier for the default action.
+		/// </summary>
+		public const string DefaultAction = "Default";
+
+		private readonly Dictionary<string, ActionRegistration> _actions = new Dictionary<string, ActionRegistration>();
 		private readonly List<Session> _sessions = new List<Session>();
 		private bool _preserveSessions;
 
@@ -161,15 +166,53 @@ namespace Digillect.Mvvm
 
 		#region Loading/Sessions
 		/// <summary>
-		///     Creates the session with the list of parts to be processed.
+		///     Creates the session.
 		/// </summary>
-		/// <param name="parts">Parts to load.</param>
-		/// <returns>Session that loads specified parts.</returns>
-		public virtual Session CreateSession( params string[] parts )
+		/// <returns>
+		///     Session.
+		/// </returns>
+		public Session CreateSession()
+		{
+			return CreateSession( null, null );
+		}
+
+		/// <summary>
+		///     Creates the session.
+		/// </summary>
+		/// <param name="action">Action to process.</param>
+		/// <returns>
+		///     Session.
+		/// </returns>
+		public Session CreateSession( string action )
+		{
+			return CreateSession( null, action );
+		}
+
+		/// <summary>
+		///     Creates the session.
+		/// </summary>
+		/// <param name="parameters">Parameters of the session.</param>
+		/// <returns>
+		///     Session.
+		/// </returns>
+		public Session CreateSession( XParameters parameters )
+		{
+			return CreateSession( parameters, null );
+		}
+
+		/// <summary>
+		///     Creates the session.
+		/// </summary>
+		/// <param name="parameters">Parameters of the session.</param>
+		/// <param name="action">Action to process.</param>
+		/// <returns>
+		///     Session.
+		/// </returns>
+		public Session CreateSession( XParameters parameters, string action )
 		{
 			Contract.Ensures( Contract.Result<Session>() != null );
 
-			return new Session( parts );
+			return new Session( parameters, action );
 		}
 
 		/// <summary>
@@ -187,24 +230,21 @@ namespace Digillect.Mvvm
 		/// </exception>
 		public async Task<Session> Load( Session session )
 		{
-#if NET45
 			Contract.Requires<ArgumentNullException>( session != null, "session" );
-#else
-			// Unfortunately there is a bug in code contracts rewriter targeting async methods on NET 4.0.
-			// That's why we do not use a contract here but checking an argument "old way".
-			// This fork should be removed as soon as CC rewriter will be fixed.
-			if( session == null )
-			{
-				throw new ArgumentNullException( "session" );
-			}
-#endif
 
 			if( session.State != SessionState.Created )
 			{
 				throw new ArgumentException( "Invalid session state.", "session" );
 			}
 
-			if( !ShouldLoadSession( session ) )
+			ActionRegistration action;
+
+			if( !_actions.TryGetValue( session.Action, out action ) )
+			{
+				throw new Exception( "Session with invalid action." );
+			}
+
+			if( !action.Validate( session ) )
 			{
 				session.State = SessionState.Complete;
 
@@ -248,9 +288,11 @@ namespace Digillect.Mvvm
 				DataExchangeService.BeginDataExchange();
 			}
 
+			Task task = null;
+
 			try
 			{
-				LoadSession( session );
+				task = action.Process( session );
 			}
 			catch( Exception ex )
 			{
@@ -264,8 +306,8 @@ namespace Digillect.Mvvm
 					DataExchangeService.EndDataExchange();
 				}
 
-				bool canceled = ex is OperationCanceledException;
-				SessionAbortedEventArgs eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
+				var canceled = ex is OperationCanceledException;
+				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
 
 				OnSessionAborted( eventArgs );
 
@@ -280,7 +322,7 @@ namespace Digillect.Mvvm
 				return session;
 			}
 
-			if( session.Tasks.Count == 0 )
+			if( task == null )
 			{
 				lock( _sessions )
 				{
@@ -301,11 +343,7 @@ namespace Digillect.Mvvm
 
 			try
 			{
-#if !NET45
-				await TaskEx.WhenAll( session.Tasks );
-#else
-				await Task.WhenAll( session.Tasks );
-#endif
+				await task;
 
 				session.State = SessionState.Complete;
 
@@ -313,9 +351,9 @@ namespace Digillect.Mvvm
 			}
 			catch( Exception ex )
 			{
-				bool canceled = ex is OperationCanceledException;
-				SessionAbortedEventArgs eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
-				AggregateException aggregateException = ex as AggregateException;
+				var canceled = ex is OperationCanceledException;
+				var eventArgs = new SessionAbortedEventArgs( session, canceled ? null : ex );
+				var aggregateException = ex as AggregateException;
 
 				if( aggregateException != null )
 				{
@@ -379,338 +417,542 @@ namespace Digillect.Mvvm
 		{
 			_preserveSessions = preserve;
 		}
+		#endregion
 
+		#region Actions
 		/// <summary>
-		///     When overridden checks that the specified session should be loaded or ignored. Default behavior is
-		///     to load any session.
+		///     Registers the action with default identifier.
 		/// </summary>
-		/// <param name="session">The session to check.</param>
-		/// <returns>
-		///     <c>true</c> if view model should proceed with loading session; otherwise, <c>false</c>.
-		/// </returns>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="session" /> is null.
-		/// </exception>
-		protected virtual bool ShouldLoadSession( Session session )
+		/// <returns>Execution group to modify.</returns>
+		public IExecutionGroup RegisterAction()
 		{
-			Contract.Requires<ArgumentNullException>( session != null, "session" );
-
-			bool result = false;
-
-			foreach( var pair in _parts )
-			{
-				if( (session.Parts == null && pair.Value.LoadIfNoPartsSpecified) || session.Includes( pair.Key ) )
-				{
-					result |= pair.Value.Check( session, pair.Key );
-				}
-
-				if( result )
-				{
-					break;
-				}
-			}
-
-			return result;
+			return RegisterAction( null );
 		}
 
 		/// <summary>
-		///     Override this method to perform actual session loading.
+		///     Registers the action.
 		/// </summary>
-		/// <param name="session">The session.</param>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="session" /> is null.
-		/// </exception>
-		protected virtual void LoadSession( Session session )
+		/// <param name="action">Action identifier.</param>
+		/// <returns>Execution group to modify.</returns>
+		public IExecutionGroup RegisterAction( string action )
 		{
-			Contract.Requires<ArgumentNullException>( session != null, "session" );
+			var registration = new ActionRegistration( action ?? DefaultAction );
 
-			foreach( var pair in _parts )
+			_actions[registration.Name] = registration;
+
+			return registration;
+		}
+
+		/// <summary>
+		///     Extends existing or creates new action with default identifier.
+		/// </summary>
+		/// <returns>Execution group of existing action or newly created one.</returns>
+		public IExecutionGroup ExtendAction()
+		{
+			return ExtendAction( null );
+		}
+
+		/// <summary>
+		///     Extends existing or creates new action with specified identifier.
+		/// </summary>
+		/// <param name="action">Action identifier.</param>
+		/// <returns>Execution group of existing action or newly created one.</returns>
+		public IExecutionGroup ExtendAction( string action )
+		{
+			ActionRegistration registration;
+
+			if( !_actions.TryGetValue( action ?? DefaultAction, out registration ) )
 			{
-				if( (session.Parts == null && pair.Value.LoadIfNoPartsSpecified) || session.Includes( pair.Key ) )
-				{
-					if( pair.Value.Check( session, pair.Key ) )
-					{
-						session.Tasks.Add( pair.Value.Process( session, pair.Key ) );
-					}
-				}
+				registration = new ActionRegistration( action ?? DefaultAction );
+
+				_actions[registration.Name] = registration;
 			}
+
+			return registration;
 		}
 		#endregion
 
-		#region Parts
-		/// <summary>
-		///     Registers handler of multipart processor.
-		/// </summary>
-		/// <param name="part">Part identifier.</param>
-		/// <param name="processor">Function to load specified part.</param>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="part" /> is null.
-		/// </exception>
-		protected void RegisterPart( string part, Func<Session, string, Task> processor )
+		#region Nested type: ActionRegistration
+		private class ActionRegistration : ExecutionGroup
 		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
+			private readonly string _name;
 
-			RegisterPart( part, processor, (Func<Session, string, bool>) null, true );
-		}
-
-		/// <summary>
-		///     Registers handler of multipart processor.
-		/// </summary>
-		/// <param name="part">Part identifier.</param>
-		/// <param name="processor">Function to load specified part.</param>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="part" /> is null.
-		/// </exception>
-		protected void RegisterPart( string part, Func<Session, Task> processor )
-		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-
-			RegisterPart( part, processor, (Func<Session, bool>) null, true );
-		}
-
-		/// <summary>
-		///     Registers handler of multipart processor.
-		/// </summary>
-		/// <param name="part">Part identifier.</param>
-		/// <param name="processor">Function to load specified part.</param>
-		/// <param name="loadIfNoPartsSpecified">
-		///     <c>true</c> if this part loads when no parts specified for the session.
-		/// </param>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="part" /> is null.
-		/// </exception>
-		protected void RegisterPart( string part, Func<Session, string, Task> processor, bool loadIfNoPartsSpecified )
-		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-
-			RegisterPart( part, processor, (Func<Session, string, bool>) null, loadIfNoPartsSpecified );
-		}
-
-		/// <summary>
-		///     Registers handler of multipart processor.
-		/// </summary>
-		/// <param name="part">Part identifier.</param>
-		/// <param name="processor">Function to load specified part.</param>
-		/// <param name="loadIfNoPartsSpecified">
-		///     <c>true</c> if this part loads when no parts specified for the session.
-		/// </param>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="part" /> is null.
-		/// </exception>
-		protected void RegisterPart( string part, Func<Session, Task> processor, bool loadIfNoPartsSpecified )
-		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-
-			RegisterPart( part, processor, (Func<Session, bool>) null, loadIfNoPartsSpecified );
-		}
-
-		/// <summary>
-		///     Registers handler of multipart processor.
-		/// </summary>
-		/// <param name="part">Part identifier.</param>
-		/// <param name="processor">Function to load specified part.</param>
-		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="part" /> is null.
-		/// </exception>
-		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, string, bool> checker )
-		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-
-			RegisterPart( part, processor, checker, true );
-		}
-
-		/// <summary>
-		///     Registers handler of multipart processor.
-		/// </summary>
-		/// <param name="part">Part identifier.</param>
-		/// <param name="processor">Function to load specified part.</param>
-		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="part" /> is null.
-		/// </exception>
-		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, string, bool> checker )
-		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-
-			RegisterPart( part, processor, checker, true );
-		}
-
-		/// <summary>
-		///     Registers handler of multipart processor.
-		/// </summary>
-		/// <param name="part">Part identifier.</param>
-		/// <param name="processor">Function to load specified part.</param>
-		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="part" /> is null.
-		/// </exception>
-		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, bool> checker )
-		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-
-			RegisterPart( part, processor, checker, true );
-		}
-
-		/// <summary>
-		///     Registers handler of multipart processor.
-		/// </summary>
-		/// <param name="part">Part identifier.</param>
-		/// <param name="processor">Function to load specified part.</param>
-		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="part" /> is null.
-		/// </exception>
-		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, bool> checker )
-		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-
-			RegisterPart( part, processor, checker, true );
-		}
-
-		/// <summary>
-		///     Registers handler of multipart processor.
-		/// </summary>
-		/// <param name="part">Part identifier.</param>
-		/// <param name="processor">Function to load specified part.</param>
-		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <param name="loadIfNoPartsSpecified">
-		///     <c>true</c> if this part loads when no parts specified for the session.
-		/// </param>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="part" /> is null.
-		/// </exception>
-		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, string, bool> checker, bool loadIfNoPartsSpecified )
-		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-
-			_parts[part] = new PartInfo
-								{
-									ProcessorWithPart = processor,
-									CheckerWithPart = checker,
-									LoadIfNoPartsSpecified = loadIfNoPartsSpecified
-								};
-		}
-
-		/// <summary>
-		///     Registers handler of multipart processor.
-		/// </summary>
-		/// <param name="part">Part identifier.</param>
-		/// <param name="processor">Function to load specified part.</param>
-		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <param name="loadIfNoPartsSpecified">
-		///     <c>true</c> if this part loads when no parts specified for the session.
-		/// </param>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="part" /> is null.
-		/// </exception>
-		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, string, bool> checker, bool loadIfNoPartsSpecified )
-		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-
-			_parts[part] = new PartInfo
-								{
-									Processor = processor,
-									CheckerWithPart = checker,
-									LoadIfNoPartsSpecified = loadIfNoPartsSpecified
-								};
-		}
-
-		/// <summary>
-		///     Registers handler of multipart processor.
-		/// </summary>
-		/// <param name="part">Part identifier.</param>
-		/// <param name="processor">Function to load specified part.</param>
-		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <param name="loadIfNoPartsSpecified">
-		///     <c>true</c> if this part loads when no parts specified for the session.
-		/// </param>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="part" /> is null.
-		/// </exception>
-		protected void RegisterPart( string part, Func<Session, string, Task> processor, Func<Session, bool> checker, bool loadIfNoPartsSpecified )
-		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-
-			_parts[part] = new PartInfo
-								{
-									ProcessorWithPart = processor,
-									Checker = checker,
-									LoadIfNoPartsSpecified = loadIfNoPartsSpecified
-								};
-		}
-
-		/// <summary>
-		///     Registers handler of multipart processor.
-		/// </summary>
-		/// <param name="part">Part identifier.</param>
-		/// <param name="processor">Function to load specified part.</param>
-		/// <param name="checker">Function to check if the specified part should be loaded.</param>
-		/// <param name="loadIfNoPartsSpecified">
-		///     <c>true</c> if this part loads when no parts specified for the session.
-		/// </param>
-		/// <exception cref="ArgumentNullException">
-		///     If <paramref name="part" /> is null.
-		/// </exception>
-		protected void RegisterPart( string part, Func<Session, Task> processor, Func<Session, bool> checker, bool loadIfNoPartsSpecified )
-		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-			Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-
-			_parts[part] = new PartInfo
-								{
-									Processor = processor,
-									Checker = checker,
-									LoadIfNoPartsSpecified = loadIfNoPartsSpecified
-								};
-		}
-
-		private class PartInfo
-		{
-			#region Public Properties
-			public Func<Session, string, Task> ProcessorWithPart { get; set; }
-			public Func<Session, string, bool> CheckerWithPart { get; set; }
-			public Func<Session, Task> Processor { get; set; }
-			public Func<Session, bool> Checker { get; set; }
-			public bool LoadIfNoPartsSpecified { get; set; }
+			#region Constructors/Disposer
+			public ActionRegistration( string name )
+				: base( null )
+			{
+				_name = name;
+			}
 			#endregion
 
-			public bool Check( Session session, string part )
+			#region Public Properties
+			public string Name
 			{
-				if( Checker != null )
-				{
-					return Checker( session );
-				}
+				get { return _name; }
+			}
+			#endregion
+		}
+		#endregion
 
-				if( CheckerWithPart != null )
+		#region Nested type: Executable
+		private abstract class Executable
+		{
+			public abstract bool Validate( Session session );
+			public abstract Task Process( Session session );
+		}
+		#endregion
+
+		#region Nested type: ExecutionGroup
+		private class ExecutionGroup : Executable, IExecutionGroup
+		{
+			private readonly List<Executable> _executables;
+			private readonly ExecutionGroup _parent;
+			private List<Action<Session>> _finalizers;
+			private List<Action<Session>> _initializers;
+
+			private bool _isSequential;
+			private ValidatorRegistration _validator;
+
+			#region Constructors/Disposer
+			protected ExecutionGroup( ExecutionGroup parent )
+			{
+				_parent = parent;
+				_executables = new List<Executable>();
+			}
+			#endregion
+
+			#region Overrides of Executable
+			public override bool Validate( Session session )
+			{
+				if( _validator != null )
 				{
-					return CheckerWithPart( session, part );
+					return _validator.Validate( session );
 				}
 
 				return true;
 			}
 
-			public Task Process( Session session, string part )
+			private async Task ProcessSequentially( Session session )
 			{
-				if( Processor != null )
+				foreach( var executable in _executables )
 				{
-					return Processor( session );
+					if( executable.Validate( session ) )
+					{
+						var task = executable.Process( session );
+
+						if( task != null && !task.IsCompleted )
+						{
+							await task;
+						}
+					}
+				}
+			}
+
+			private Task ProcessParallel( Session session )
+			{
+				var tasks = new List<Task>();
+
+				foreach( var executable in _executables )
+				{
+					if( executable.Validate( session ) )
+					{
+						var task = executable.Process( session );
+
+						if( task != null )
+						{
+							if( task.IsFaulted )
+							{
+								throw task.Exception;
+							}
+
+							tasks.Add( task );
+						}
+					}
+				}
+
+				if( tasks.Count == 0 )
+				{
+					return null;
+				}
+
+				if( tasks.Count == 1 )
+				{
+					return tasks[0];
+				}
+
+#if NET45
+				return Task.WhenAll( tasks );
+#else
+				return TaskEx.WhenAll( tasks );
+#endif
+			}
+
+			public override async Task Process( Session session )
+			{
+				if( _initializers != null )
+				{
+					foreach( var initializer in _initializers )
+					{
+						initializer( session );
+					}
+				}
+
+				if( _isSequential )
+				{
+					await ProcessSequentially( session );
 				}
 				else
 				{
-					return ProcessorWithPart( session, part );
+					await ProcessParallel( session );
 				}
+
+				if( _finalizers != null )
+				{
+					foreach( var finalizer in _finalizers )
+					{
+						finalizer( session );
+					}
+				}
+			}
+			#endregion
+
+			#region Implementation of IExecutionGroup
+			public IExecutionGroup AddGroup()
+			{
+				var group = new ExecutionGroup( this );
+
+				_executables.Add( group );
+
+				return group;
+			}
+
+			public IExecutionGroup AddInitializer( Action<Session> initializer )
+			{
+				if( _initializers == null )
+				{
+					_initializers = new List<Action<Session>>();
+				}
+
+				_initializers.Add( initializer );
+
+				return this;
+			}
+
+			public IExecutionGroup AddFinalizer( Action<Session> finalizer )
+			{
+				if( _finalizers == null )
+				{
+					_finalizers = new List<Action<Session>>();
+				}
+
+				_finalizers.Add( finalizer );
+
+				return this;
+			}
+
+			public IExecutionGroup AddPart( Func<Session, Task> processor )
+			{
+				var part = new Part( processor );
+
+				_executables.Add( part );
+
+				return this;
+			}
+
+			public IExecutionGroup AddPart( Func<Session, Task> processor, Func<bool> validator )
+			{
+				var part = new Part( processor, new ValidatorRegistration( validator ) );
+
+				_executables.Add( part );
+
+				return this;
+			}
+
+			public IExecutionGroup AddPart( Func<Session, Task> processor, Func<Session, bool> validator )
+			{
+				var part = new Part( processor, new ValidatorRegistration( validator ) );
+
+				_executables.Add( part );
+
+				return this;
+			}
+
+			public IExecutionGroup AddValidator( Func<bool> validator )
+			{
+				_validator = new ValidatorRegistration( validator );
+
+				return this;
+			}
+
+			public IExecutionGroup AddValidator( Func<Session, bool> validator )
+			{
+				_validator = new ValidatorRegistration( validator );
+
+				return this;
+			}
+
+			public IExecutionGroup Sequential()
+			{
+				_isSequential = true;
+
+				return _parent ?? this;
+			}
+
+			public IExecutionGroup Parallel()
+			{
+				_isSequential = false;
+
+				return _parent ?? this;
+			}
+			#endregion
+		}
+		#endregion
+
+		#region Nested type: IExecutionGroup
+		/// <summary>
+		///     Execution group that consists of individual parts and other execution groups. Used to create session execution tree.
+		/// </summary>
+		[ContractClass( typeof( IExecutionGroupContract ) )]
+		public interface IExecutionGroup
+		{
+			/// <summary>
+			///     Adds new execution group to the current one.
+			/// </summary>
+			/// <returns>New execution group.</returns>
+			IExecutionGroup AddGroup();
+
+			/// <summary>
+			///     Adds the initializer to execution group.
+			/// </summary>
+			/// <param name="initializer">The initializer that will be called before executing parts and groups of this group.</param>
+			/// <returns>Current execution group.</returns>
+			IExecutionGroup AddInitializer( Action<Session> initializer );
+
+			/// <summary>
+			///     Adds the finalizer to execution group.
+			/// </summary>
+			/// <param name="finalizer">The finalizer that will be called after executing parts and groups of this group.</param>
+			/// <returns>Current execution group.</returns>
+			IExecutionGroup AddFinalizer( Action<Session> finalizer );
+
+			/// <summary>
+			///     Adds part to the current execution group.
+			/// </summary>
+			/// <param name="processor">Processor that will always be executed.</param>
+			/// <returns>Current execution group.</returns>
+			IExecutionGroup AddPart( Func<Session, Task> processor );
+
+			/// <summary>
+			///     Adds part to the current execution group.
+			/// </summary>
+			/// <param name="processor">Processor that will be executed if validation will pass.</param>
+			/// <param name="validator">Validator that will be called prior to processor execution.</param>
+			/// <returns>Current execution group.</returns>
+			IExecutionGroup AddPart( Func<Session, Task> processor, Func<bool> validator );
+
+			/// <summary>
+			///     Adds part to the current execution group.
+			/// </summary>
+			/// <param name="processor">Processor that will be executed if validation will pass.</param>
+			/// <param name="validator">Validator that will be called prior to processor execution.</param>
+			/// <returns>Current execution group.</returns>
+			IExecutionGroup AddPart( Func<Session, Task> processor, Func<Session, bool> validator );
+
+			/// <summary>
+			///     Add validator to the execution group.
+			/// </summary>
+			/// <param name="validator">Validator that will be called prior to processing execution group.</param>
+			/// <returns>Current execution group.</returns>
+			IExecutionGroup AddValidator( Func<bool> validator );
+
+			/// <summary>
+			///     Add validator to the execution group.
+			/// </summary>
+			/// <param name="validator">Validator that will be called prior to processing execution group.</param>
+			/// <returns>Current execution group.</returns>
+			IExecutionGroup AddValidator( Func<Session, bool> validator );
+
+			/// <summary>
+			///     Ensures that parts and other groups in this group will be executed sequentially.
+			/// </summary>
+			/// <returns>
+			///     <b>Parent</b> execution group.
+			/// </returns>
+			IExecutionGroup Sequential();
+
+			/// <summary>
+			///     Ensures that parts and other groups in this group will be executed in parallel.
+			/// </summary>
+			/// <returns>
+			///     <b>Parent</b> execution group.
+			/// </returns>
+			IExecutionGroup Parallel();
+		}
+		#endregion
+
+		#region Nested type: IExecutionGroupContract
+		[ContractClassFor( typeof( IExecutionGroup ) )]
+// ReSharper disable InconsistentNaming
+		private abstract class IExecutionGroupContract : IExecutionGroup
+// ReSharper restore InconsistentNaming
+		{
+			#region Implementation of IExecutionGroup
+			public IExecutionGroup AddGroup()
+			{
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddInitializer( Action<Session> initializer )
+			{
+				Contract.Requires<ArgumentNullException>( initializer != null, "initializer" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddFinalizer( Action<Session> finalizer )
+			{
+				Contract.Requires<ArgumentNullException>( finalizer != null, "finalizer" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddPart( Func<Session, Task> processor )
+			{
+				Contract.Requires<ArgumentNullException>( processor != null, "processor" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddPart( Func<Session, Task> processor, Func<bool> validator )
+			{
+				Contract.Requires<ArgumentNullException>( processor != null, "processor" );
+				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddPart( Func<Session, Task> processor, Func<Session, bool> validator )
+			{
+				Contract.Requires<ArgumentNullException>( processor != null, "processor" );
+				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddValidator( Func<bool> validator )
+			{
+				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddValidator( Func<Session, bool> validator )
+			{
+				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup Sequential()
+			{
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup Parallel()
+			{
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+			#endregion
+		}
+		#endregion
+
+		#region Nested type: Part
+		private class Part : Executable
+		{
+			private readonly Func<Session, Task> _processor;
+			private readonly ValidatorRegistration _validator;
+
+			#region Constructors/Disposer
+			public Part( Func<Session, Task> processor )
+				: this( processor, null )
+			{
+			}
+
+			public Part( Func<Session, Task> processor, ValidatorRegistration validator )
+			{
+				_validator = validator;
+				_processor = processor;
+			}
+			#endregion
+
+			#region Overrides of Executable
+			public override bool Validate( Session session )
+			{
+				if( _validator != null )
+				{
+					return _validator.Validate( session );
+				}
+
+				return true;
+			}
+
+			public override Task Process( Session session )
+			{
+				if( _processor != null )
+				{
+					return _processor( session );
+				}
+
+				return null;
+			}
+			#endregion
+		}
+		#endregion
+
+		#region Nested type: ValidatorRegistration
+		private class ValidatorRegistration
+		{
+			private readonly Func<bool> _v0;
+			private readonly Func<Session, bool> _v1;
+
+			#region Constructors/Disposer
+			public ValidatorRegistration( Func<bool> v0 )
+			{
+				_v0 = v0;
+			}
+
+			public ValidatorRegistration( Func<Session, bool> v1 )
+			{
+				_v1 = v1;
+			}
+			#endregion
+
+			public bool Validate( Session session )
+			{
+				if( _v1 != null )
+				{
+					return _v1( session );
+				}
+
+				if( _v0 != null )
+				{
+					return _v0();
+				}
+
+				return false;
 			}
 		}
 		#endregion

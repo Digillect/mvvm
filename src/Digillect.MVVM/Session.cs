@@ -33,30 +33,49 @@ namespace Digillect.Mvvm
 	/// </summary>
 	public class Session : IDisposable
 	{
-		private readonly Parameters _parameters = new Parameters();
-		private readonly string[] _parts;
-		private readonly List<Task> _tasks = new List<Task>();
+		private readonly string _action;
 		private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
+		private readonly Dictionary<string, object> _values = new Dictionary<string, object>();
+		private XParameters _parameters = XParameters.Empty;
 
 		#region Constructors/Disposer
 		/// <summary>
 		///     Initializes a new instance of the <see cref="Session" /> class.
 		/// </summary>
 		public Session()
+			: this( XParameters.Empty, null )
 		{
-			State = SessionState.Created;
 		}
 
 		/// <summary>
-		///     Initializes a new instance of the <see cref="Session" /> class.
+		/// Initializes a new instance of the <see cref="Session"/> class.
 		/// </summary>
-		/// <param name="parts">Parts to load.</param>
-		public Session( params string[] parts )
+		/// <param name="parameters">Parameters of the session.</param>
+		public Session( XParameters parameters )
+			: this( parameters, null )
 		{
-			if( parts != null && parts.Length > 0 )
-			{
-				_parts = parts;
-			}
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Session"/> class.
+		/// </summary>
+		/// <param name="action">Action to process.</param>
+		public Session( string action )
+			: this( XParameters.Empty, action )
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Session" /> class.
+		/// </summary>
+		/// <param name="parameters">Parameters of the session.</param>
+		/// <param name="action">Action to process.</param>
+		public Session( XParameters parameters, string action )
+		{
+			_parameters = parameters ?? XParameters.Empty;
+			_action = action ?? ViewModel.DefaultAction;
+
+			State = SessionState.Created;
 		}
 
 		/// <summary>
@@ -96,36 +115,31 @@ namespace Digillect.Mvvm
 		/// <summary>
 		///     Gets the parameters.
 		/// </summary>
-		public Parameters Parameters
+		public XParameters Parameters
 		{
 			get { return _parameters; }
 		}
 
 		/// <summary>
-		///     Gets the collection of tasks, associated with this session.
-		/// </summary>
-		public IList<Task> Tasks
-		{
-			get { return _tasks; }
-		}
-
-		/// <summary>
-		///     Gets logical part for multipart requests.
-		/// </summary>
-		public IEnumerable<string> Parts
-		{
-			get { return _parts; }
-		}
-
-		/// <summary>
-		///     Gets a value indicating whether this instance is partial.
+		/// Gets the action associated with this session.
 		/// </summary>
 		/// <value>
-		///     <c>true</c> if this instance is partial; otherwise, <c>false</c>.
+		/// The action.
 		/// </value>
-		public bool IsPartial
+		public string Action
 		{
-			get { return _parts != null && _parts.Length > 0; }
+			get { return _action; }
+		}
+
+		/// <summary>
+		/// Gets the dictionary used as name-value storage.
+		/// </summary>
+		/// <value>
+		/// The values.
+		/// </value>
+		public IDictionary<string, object> Values
+		{
+			get { return _values; }
 		}
 
 		/// <summary>
@@ -192,35 +206,9 @@ namespace Digillect.Mvvm
 			Contract.Requires<ArgumentNullException>( value != null, "value" );
 			Contract.Ensures( Contract.Result<Session>() != null );
 
-			_parameters.Add( name, value );
+			_parameters = _parameters.WithValue( name, value );
 
 			return this;
-		}
-		#endregion
-
-		#region Parts
-		/// <summary>
-		///     Checks that session is used to load specified logical part.
-		/// </summary>
-		/// <param name="part">
-		///     Part to check, can't be <c>null</c>.
-		/// </param>
-		/// <returns>
-		///     <c>true</c> if specified part is loading; otherwise, <c>false</c>.
-		/// </returns>
-		/// <exception cref="System.ArgumentNullException">
-		///     if part is <c>null</c>.
-		/// </exception>
-		public bool Includes( string part )
-		{
-			Contract.Requires<ArgumentNullException>( part != null, "part" );
-
-			if( _parts == null )
-			{
-				return false;
-			}
-
-			return _parts.Contains( part );
 		}
 		#endregion
 	}

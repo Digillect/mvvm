@@ -1,4 +1,25 @@
-﻿using System;
+﻿#region Copyright (c) 2011-2013 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman)
+// Copyright (c) 2011-2013 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman).
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this
+// software and associated documentation files (the "Software"), to deal in the Software
+// without restriction, including without limitation the rights to use, copy, modify, merge,
+// publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+// to whom the Software is furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all copies or
+// substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,13 +35,15 @@ using Digillect.Mvvm.Services;
 
 namespace Digillect.Mvvm.Tests
 {
+	[Subject( typeof( ViewModel ), "Error Handling" )]
 	public class ViewModelErrorHandlingSpec
 	{
-		public static ErrorRaisingViewModel viewModel;
-		public static Mock<IViewModelExceptionHandlingService> ehs;
-		public static Exception ehsException;
-		public static Exception eventException;
-		public static Exception resultException;
+		protected static ErrorRaisingViewModel viewModel;
+		protected static Session session;
+		protected static Mock<IViewModelExceptionHandlingService> ehs;
+		protected static Exception ehsException;
+		protected static Exception eventException;
+		protected static Exception resultException;
 
 		Establish context = () =>
 		{
@@ -29,88 +52,83 @@ namespace Digillect.Mvvm.Tests
 
 			viewModel.ViewModelExceptionHandlingService = ehs.Object;
 
+			viewModel.SessionAborted += ( sender, ea ) => eventException = ea.Exception;
+
 			ehsException = null;
 			eventException = null;
 			resultException = null;
+			session = null;
 		};
+
+		Because of = () => resultException = Catch.Exception( () => viewModel.Load( session ).Await() );
+
+		It should_call_exception_handling_service = () => ehs.Verify();
 	}
 
-	public class when_ViewModel_raises_exception_in_synchronous_loading_part_and_it_is_handled_by_IViewModelExceptionHandlingService : ViewModelErrorHandlingSpec
+	public class when_view_model_raises_exception_in_synchronous_loading_part_and_it_is_handled_by_exception_handling_service : ViewModelErrorHandlingSpec
 	{
 		Establish context = () =>
 		{
 			ehs.Setup( x => x.HandleException( viewModel, MoqIt.IsAny<Session>(), MoqIt.IsAny<Exception>() ) )
-				.Callback( ( ViewModel vm, Session session, Exception ex ) => { ehsException = ex; } )
+				.Callback( ( ViewModel vm, Session s, Exception ex ) => { ehsException = ex; } )
 				.Returns( true )
 				.Verifiable();
 
-			viewModel.SessionAborted += ( sender, ea ) => eventException = ea.Exception;
+			session = viewModel.LoadAndThrowSync();
 		};
 
-		Because of = () => resultException = Catch.Exception( () => viewModel.LoadAndThrowSync().Await() );
-
-		It should_call_IViewModelExceptionHandlingService = () => ehs.Verify();
-		It should_pass_an_exception_to_SessionAborted_event = () => eventException.ShouldNotBeNull();
+		It should_pass_an_exception_to_an_event = () => eventException.ShouldNotBeNull();
 		It should_pass_an_exception_to_error_handling_service = () => ehsException.ShouldNotBeNull();
 		It should_not_rethrow_exception_to_caller = () => resultException.ShouldBeNull();
 	}
 
-	public class when_ViewModel_raises_exception_in_synchronous_loading_part_and_it_is_not_handled_by_IViewModelExceptionHandlingService : ViewModelErrorHandlingSpec
+	public class when_view_model_raises_exception_in_synchronous_loading_part_and_it_is_not_handled_by_exception_handling_service : ViewModelErrorHandlingSpec
 	{
 		Establish context = () =>
 		{
 			ehs.Setup( x => x.HandleException( viewModel, MoqIt.IsAny<Session>(), MoqIt.IsAny<Exception>() ) )
-				.Callback( ( ViewModel vm, Session session, Exception ex ) => { ehsException = ex; } )
+				.Callback( ( ViewModel vm, Session s, Exception ex ) => { ehsException = ex; } )
 				.Returns( false )
 				.Verifiable();
 
-			viewModel.SessionAborted += ( sender, ea ) => eventException = ea.Exception;
+			session = viewModel.LoadAndThrowSync();
 		};
 
-		Because of = () => resultException = Catch.Exception( () => viewModel.LoadAndThrowSync().Await() );
-
-		It should_call_IViewModelExceptionHandlingService = () => ehs.Verify();
-		It should_pass_an_exception_to_SessionAborted_event = () => eventException.ShouldNotBeNull();
+		It should_pass_an_exception_to_an_event = () => eventException.ShouldNotBeNull();
 		It should_pass_an_exception_to_error_handling_service = () => ehsException.ShouldNotBeNull();
 		It should_rethrow_exception_to_caller = () => resultException.ShouldNotBeNull();
 	}
 
-	public class when_ViewModel_raises_exception_in_asynchronous_loading_part_and_it_is_handled_by_IViewModelExceptionHandlingService : ViewModelErrorHandlingSpec
+	public class when_view_model_raises_exception_in_asynchronous_loading_part_and_it_is_handled_by_exception_handling_service : ViewModelErrorHandlingSpec
 	{
 		Establish context = () =>
 		{
 			ehs.Setup( x => x.HandleException( viewModel, MoqIt.IsAny<Session>(), MoqIt.IsAny<Exception>() ) )
-				.Callback( ( ViewModel vm, Session session, Exception ex ) => { ehsException = ex; } )
+				.Callback( ( ViewModel vm, Session s, Exception ex ) => { ehsException = ex; } )
 				.Returns( true )
 				.Verifiable();
 
-			viewModel.SessionAborted += ( sender, ea ) => eventException = ea.Exception;
+			session = viewModel.LoadAndThrowAsync();
 		};
 
-		Because of = () => resultException = Catch.Exception( () => viewModel.LoadAndThrowAsync().Await() );
-
-		It should_call_IViewModelExceptionHandlingService = () => ehs.Verify();
-		It should_pass_an_exception_to_SessionAborted_event = () => eventException.ShouldNotBeNull();
+		It should_pass_an_exception_to_an_event = () => eventException.ShouldNotBeNull();
 		It should_pass_an_exception_to_error_handling_service = () => ehsException.ShouldNotBeNull();
 		It should_not_rethrow_exception_to_caller = () => resultException.ShouldBeNull();
 	}
 
-	public class when_ViewModel_raises_exception_in_asynchronous_loading_part_and_it_is_not_handled_by_IViewModelExceptionHandlingService : ViewModelErrorHandlingSpec
+	public class when_view_model_raises_exception_in_asynchronous_loading_part_and_it_is_not_handled_by_exception_handling_service : ViewModelErrorHandlingSpec
 	{
 		Establish context = () =>
 		{
 			ehs.Setup( x => x.HandleException( viewModel, MoqIt.IsAny<Session>(), MoqIt.IsAny<Exception>() ) )
-				.Callback( ( ViewModel vm, Session session, Exception ex ) => { ehsException = ex; } )
+				.Callback( ( ViewModel vm, Session s, Exception ex ) => { ehsException = ex; } )
 				.Returns( false )
 				.Verifiable();
 
-			viewModel.SessionAborted += ( sender, ea ) => eventException = ea.Exception;
+			session = viewModel.LoadAndThrowAsync();
 		};
 
-		Because of = () => resultException = Catch.Exception( () => viewModel.LoadAndThrowAsync().Await() );
-
-		It should_call_IViewModelExceptionHandlingService = () => ehs.Verify();
-		It should_pass_an_exception_to_SessionAborted_event = () => eventException.ShouldNotBeNull();
+		It should_pass_an_exception_to_event = () => eventException.ShouldNotBeNull();
 		It should_pass_an_exception_to_error_handling_service = () => ehsException.ShouldNotBeNull();
 		It should_rethrow_exception_to_caller = () => resultException.ShouldNotBeNull();
 	}
@@ -119,36 +137,31 @@ namespace Digillect.Mvvm.Tests
 	{
 		public ErrorRaisingViewModel()
 		{
-			RegisterPart( "main", ( session, part ) => LoadMainPart( session ) );
+			RegisterAction().AddPart( Processor );
 		}
 
-		public Task LoadAndThrowSync()
+		public Session LoadAndThrowSync()
 		{
-			return Load( new Session().AddParameter( "ThrowSync", true ) );
+			return CreateSession().AddParameter( "ThrowSync", true );
 		}
 
-		public Task LoadAndThrowAsync()
+		public Session LoadAndThrowAsync()
 		{
-			return Load( new Session().AddParameter( "ThrowAsync", true ) );
+			return CreateSession().AddParameter( "ThrowAsync", true );
 		}
 
-		protected override void LoadSession( Session session )
+		private async Task Processor( Session session )
 		{
-			base.LoadSession( session );
-
-			if( session.Parameters.Get<bool>( "ThrowSync" ) )
+			if( session.Parameters.GetValue<bool>( "ThrowSync" ) )
 			{
-				throw new NotImplementedException();
+				throw new Exception( "Sync" );
 			}
-		}
 
-		private async Task LoadMainPart( Session session )
-		{
 			await Task.Delay( 1000 );
 
-			if( session.Parameters.Get<bool>( "ThrowAsync" ) )
+			if( session.Parameters.GetValue<bool>( "ThrowAsync" ) )
 			{
-				throw new NotImplementedException();
+				throw new Exception( "Async" );
 			}
 		}
 	}

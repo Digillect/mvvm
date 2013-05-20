@@ -19,6 +19,9 @@
 // IN THE SOFTWARE.
 #endregion
 
+using System;
+using System.Diagnostics.Contracts;
+
 namespace Digillect.Mvvm
 {
 	/// <summary>
@@ -33,9 +36,12 @@ namespace Digillect.Mvvm
 		/// <returns>
 		///     <see cref="Digillect.XKey" /> that contains entry named <c>key</c> with the value of object's key.
 		/// </returns>
-		public static Parameters KeyParameter( this XObject source )
+		public static XParameters KeyParameter( this XObject source )
 		{
-			return Parameters.Create( "key", source.GetKey() );
+			Contract.Requires<ArgumentNullException>( source != null, "source" );
+			Contract.Ensures( Contract.Result<XParameters>() != null );
+
+			return XParameters.Create( "Key", source.GetKey() );
 		}
 	}
 }
