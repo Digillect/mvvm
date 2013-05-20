@@ -175,7 +175,7 @@
     </Reference>
     <Reference Include="Digillect.ObjectModel">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Digillect.ObjectModel.4.1.0-dev-00006\lib\wp71\Digillect.ObjectModel.dll</HintPath>
+      <HintPath>..\..\packages\Digillect.ObjectModel.4.1.0\lib\wp71\Digillect.ObjectModel.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=736440c9b414ea16, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Phone" />
@@ -249,12 +249,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.5\tools\Microsoft.Bcl.Build.targets" />
-  <PropertyGroup>
-    <CompileDependsOn>$(CompileDependsOn);CheckForCodeContracts</CompileDependsOn>
-  </PropertyGroup>
-  <Target Name="CheckForCodeContracts" Condition=" '$(CodeContractsImported)' != 'true' ">
-    <Error Text="Project requires Code Contracts http://msdn.microsoft.com/en-us/devlabs/dd491992.aspx" />
-  </Target>
+  <Import Project="..\..\tools\build\Digillect.CodeContracts.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -34,6 +34,9 @@ namespace Digillect.Mvvm
 		where TEntity : XObject
 	{
 		private const string KeyParameter = "Key";
+		/// <summary>
+		/// Identifier for the action that loads entity alone.
+		/// </summary>
 		public const string EntityAction = "Entity";
 		private TEntity _entity;
 

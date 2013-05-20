@@ -35,6 +35,9 @@ namespace Digillect.Mvvm
 	/// </summary>
 	public class ViewModel : ObservableObject, IDisposable
 	{
+		/// <summary>
+		///     Identifier for the default action.
+		/// </summary>
 		public const string DefaultAction = "Default";
 
 		private readonly Dictionary<string, ActionRegistration> _actions = new Dictionary<string, ActionRegistration>();
@@ -441,7 +444,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Extends existing or creates new action with default identifier.
+		///     Extends existing or creates new action with default identifier.
 		/// </summary>
 		/// <returns>Execution group of existing action or newly created one.</returns>
 		public IExecutionGroup ExtendAction()
@@ -450,7 +453,7 @@ namespace Digillect.Mvvm
 		}
 
 		/// <summary>
-		/// Extends existing or creates new action with specified identifier.
+		///     Extends existing or creates new action with specified identifier.
 		/// </summary>
 		/// <param name="action">Action identifier.</param>
 		/// <returns>Execution group of existing action or newly created one.</returns>
@@ -504,8 +507,8 @@ namespace Digillect.Mvvm
 		{
 			private readonly List<Executable> _executables;
 			private readonly ExecutionGroup _parent;
-			private List<Action<Session>> _initializers;
 			private List<Action<Session>> _finalizers;
+			private List<Action<Session>> _initializers;
 
 			private bool _isSequential;
 			private ValidatorRegistration _validator;
@@ -535,7 +538,7 @@ namespace Digillect.Mvvm
 				{
 					if( executable.Validate( session ) )
 					{
-						Task task = executable.Process( session );
+						var task = executable.Process( session );
 
 						if( task != null && !task.IsCompleted )
 						{
@@ -553,7 +556,7 @@ namespace Digillect.Mvvm
 				{
 					if( executable.Validate( session ) )
 					{
-						Task task = executable.Process( session );
+						var task = executable.Process( session );
 
 						if( task != null )
 						{
@@ -576,14 +579,12 @@ namespace Digillect.Mvvm
 				{
 					return tasks[0];
 				}
-				else
-				{
+
 #if NET45
-					return Task.WhenAll( tasks );
+				return Task.WhenAll( tasks );
 #else
-					return TaskEx.WhenAll( tasks );
+				return TaskEx.WhenAll( tasks );
 #endif
-				}
 			}
 
 			public override async Task Process( Session session )
@@ -616,10 +617,6 @@ namespace Digillect.Mvvm
 			#endregion
 
 			#region Implementation of IExecutionGroup
-			/// <summary>
-			///     Adds new execution group to the current one.
-			/// </summary>
-			/// <returns>New execution group.</returns>
 			public IExecutionGroup AddGroup()
 			{
 				var group = new ExecutionGroup( this );
@@ -631,8 +628,6 @@ namespace Digillect.Mvvm
 
 			public IExecutionGroup AddInitializer( Action<Session> initializer )
 			{
-				Contract.Requires<ArgumentNullException>( initializer != null, "initializer" );
-
 				if( _initializers == null )
 				{
 					_initializers = new List<Action<Session>>();
@@ -645,8 +640,6 @@ namespace Digillect.Mvvm
 
 			public IExecutionGroup AddFinalizer( Action<Session> finalizer )
 			{
-				Contract.Requires<ArgumentNullException>( finalizer != null, "finalizer" );
-
 				if( _finalizers == null )
 				{
 					_finalizers = new List<Action<Session>>();
@@ -702,14 +695,14 @@ namespace Digillect.Mvvm
 			{
 				_isSequential = true;
 
-				return _parent;
+				return _parent ?? this;
 			}
 
 			public IExecutionGroup Parallel()
 			{
 				_isSequential = false;
 
-				return _parent;
+				return _parent ?? this;
 			}
 			#endregion
 		}
@@ -719,6 +712,7 @@ namespace Digillect.Mvvm
 		/// <summary>
 		///     Execution group that consists of individual parts and other execution groups. Used to create session execution tree.
 		/// </summary>
+		[ContractClass( typeof( IExecutionGroupContract ) )]
 		public interface IExecutionGroup
 		{
 			/// <summary>
@@ -728,13 +722,14 @@ namespace Digillect.Mvvm
 			IExecutionGroup AddGroup();
 
 			/// <summary>
-			/// Adds the initializer to execution group.
+			///     Adds the initializer to execution group.
 			/// </summary>
 			/// <param name="initializer">The initializer that will be called before executing parts and groups of this group.</param>
 			/// <returns>Current execution group.</returns>
 			IExecutionGroup AddInitializer( Action<Session> initializer );
+
 			/// <summary>
-			/// Adds the finalizer to execution group.
+			///     Adds the finalizer to execution group.
 			/// </summary>
 			/// <param name="finalizer">The finalizer that will be called after executing parts and groups of this group.</param>
 			/// <returns>Current execution group.</returns>
@@ -792,6 +787,95 @@ namespace Digillect.Mvvm
 			///     <b>Parent</b> execution group.
 			/// </returns>
 			IExecutionGroup Parallel();
+		}
+		#endregion
+
+		#region Nested type: IExecutionGroupContract
+		[ContractClassFor( typeof( IExecutionGroup ) )]
+// ReSharper disable InconsistentNaming
+		private abstract class IExecutionGroupContract : IExecutionGroup
+// ReSharper restore InconsistentNaming
+		{
+			#region Implementation of IExecutionGroup
+			public IExecutionGroup AddGroup()
+			{
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddInitializer( Action<Session> initializer )
+			{
+				Contract.Requires<ArgumentNullException>( initializer != null, "initializer" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddFinalizer( Action<Session> finalizer )
+			{
+				Contract.Requires<ArgumentNullException>( finalizer != null, "finalizer" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddPart( Func<Session, Task> processor )
+			{
+				Contract.Requires<ArgumentNullException>( processor != null, "processor" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddPart( Func<Session, Task> processor, Func<bool> validator )
+			{
+				Contract.Requires<ArgumentNullException>( processor != null, "processor" );
+				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddPart( Func<Session, Task> processor, Func<Session, bool> validator )
+			{
+				Contract.Requires<ArgumentNullException>( processor != null, "processor" );
+				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddValidator( Func<bool> validator )
+			{
+				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddValidator( Func<Session, bool> validator )
+			{
+				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup Sequential()
+			{
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup Parallel()
+			{
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+			#endregion
 		}
 		#endregion
 
