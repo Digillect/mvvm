@@ -87,6 +87,20 @@ namespace Digillect.Mvvm.Tests
 		It should_execute_finalizer_at_the_end = () => sut.P2.ShouldEqual( 3 );
 	}
 
+	public class when_part_completes_synchronously_in_parallel_action : ViewModelActionsTest
+	{
+		Establish context = () => session = sut.CreateSession( "PSP" );
+
+		It should_run_without_errors = () => session.State.ShouldEqual( SessionState.Complete );
+	}
+
+	public class when_part_completes_synchronously_in_sequential_action : ViewModelActionsTest
+	{
+		Establish context = () => session = sut.CreateSession( "PSS" );
+
+		It should_run_without_errors = () => session.State.ShouldEqual( SessionState.Complete );
+	}
+
 	public class ActionViewModel : ViewModel
 	{
 		int _counter = 0;
@@ -147,6 +161,13 @@ namespace Digillect.Mvvm.Tests
 				.AddInitializer( s => GetCounter() )
 				.AddPart( Processor1 )
 				.AddFinalizer( s => P2 = GetCounter() );
+
+			RegisterAction( "PSP" )
+				.AddPart( session => null );
+
+			RegisterAction( "PSS" )
+				.AddPart( session => null )
+				.Sequential();
 		}
 
 		int GetCounter()
