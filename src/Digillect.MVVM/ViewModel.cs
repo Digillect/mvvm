@@ -540,7 +540,7 @@ namespace Digillect.Mvvm
 					{
 						var task = executable.Process( session );
 
-						if( task != null && !task.IsCompleted )
+						if( task != null )
 						{
 							await task;
 						}
@@ -560,11 +560,6 @@ namespace Digillect.Mvvm
 
 						if( task != null )
 						{
-							if( task.IsFaulted )
-							{
-								throw task.Exception;
-							}
-
 							tasks.Add( task );
 						}
 					}
@@ -597,13 +592,11 @@ namespace Digillect.Mvvm
 					}
 				}
 
-				if( _isSequential )
+				var task = _isSequential ? ProcessSequentially( session ) : ProcessParallel( session );
+
+				if( task != null )
 				{
-					await ProcessSequentially( session );
-				}
-				else
-				{
-					await ProcessParallel( session );
+					await task;
 				}
 
 				if( _finalizers != null )
@@ -669,6 +662,33 @@ namespace Digillect.Mvvm
 			}
 
 			public IExecutionGroup AddPart( Func<Session, Task> processor, Func<Session, bool> validator )
+			{
+				var part = new Part( processor, new ValidatorRegistration( validator ) );
+
+				_executables.Add( part );
+
+				return this;
+			}
+
+			public IExecutionGroup AddPart( Action<Session> processor )
+			{
+				var part = new Part( processor );
+
+				_executables.Add( part );
+
+				return this;
+			}
+
+			public IExecutionGroup AddPart( Action<Session> processor, Func<bool> validator )
+			{
+				var part = new Part( processor, new ValidatorRegistration( validator ) );
+
+				_executables.Add( part );
+
+				return this;
+			}
+
+			public IExecutionGroup AddPart( Action<Session> processor, Func<Session, bool> validator )
 			{
 				var part = new Part( processor, new ValidatorRegistration( validator ) );
 
@@ -846,6 +866,32 @@ namespace Digillect.Mvvm
 				return null;
 			}
 
+			public IExecutionGroup AddPart( Action<Session> processor )
+			{
+				Contract.Requires<ArgumentNullException>( processor != null, "processor" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddPart( Action<Session> processor, Func<bool> validator )
+			{
+				Contract.Requires<ArgumentNullException>( processor != null, "processor" );
+				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
+			public IExecutionGroup AddPart( Action<Session> processor, Func<Session, bool> validator )
+			{
+				Contract.Requires<ArgumentNullException>( processor != null, "processor" );
+				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
+				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
+
+				return null;
+			}
+
 			public IExecutionGroup AddValidator( Func<bool> validator )
 			{
 				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
@@ -882,19 +928,31 @@ namespace Digillect.Mvvm
 		#region Nested type: Part
 		private class Part : Executable
 		{
-			private readonly Func<Session, Task> _processor;
+			private readonly Action<Session> _syncProcessor;
+			private readonly Func<Session, Task> _asyncProcessor;
 			private readonly ValidatorRegistration _validator;
 
 			#region Constructors/Disposer
-			public Part( Func<Session, Task> processor )
-				: this( processor, null )
+			public Part( Func<Session, Task> asyncProcessor )
+				: this( asyncProcessor, null )
 			{
 			}
 
-			public Part( Func<Session, Task> processor, ValidatorRegistration validator )
+			public Part( Func<Session, Task> asyncProcessor, ValidatorRegistration validator )
 			{
 				_validator = validator;
-				_processor = processor;
+				_asyncProcessor = asyncProcessor;
+			}
+
+			public Part( Action<Session> syncProcessor )
+				: this( syncProcessor, null )
+			{
+			}
+
+			public Part( Action<Session> syncProcessor, ValidatorRegistration validator )
+			{
+				_validator = validator;
+				_syncProcessor = syncProcessor;
 			}
 			#endregion
 
@@ -911,9 +969,13 @@ namespace Digillect.Mvvm
 
 			public override Task Process( Session session )
 			{
-				if( _processor != null )
+				if( _syncProcessor != null )
 				{
-					return _processor( session );
+					_syncProcessor( session );
+				}
+				else if( _asyncProcessor != null )
+				{
+					return _asyncProcessor( session );
 				}
 
 				return null;

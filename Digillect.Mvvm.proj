@@ -14,9 +14,16 @@
 	<ItemGroup>
 		<LibWP71 Include="$(BuildPath)\wp71\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)"/>
 		<LibWP71 Include="$(BuildPath)\wp71\Microsoft.Contracts.dll"/>
+		<LibWP8 Include="$(BuildPath)\net45+wp8+win8\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)"/>
+		<LibWin8 Include="$(BuildPath)\net45+wp8+win8\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)"/>
+		<LibNet45 Include="$(BuildPath)\net45+wp8+win8\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)"/>
 		<LibPortable Include="$(BuildPath)\net45+wp8+win8\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)">
-			<Profile>net45+wp8+win8</Profile>
+			<Profile>net45+win8+wp8</Profile>
 		</LibPortable>
+		<LibPortable Include="$(BuildPath)\net45+wp8+win8\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)">
+			<Profile>net45+win8</Profile>
+		</LibPortable>
+
 	</ItemGroup>
 
 	<Import Project="packages\Digillect.Build.Tools.$(BuildToolsVersion)\tools\NuGet.Packaging.targets"/>
