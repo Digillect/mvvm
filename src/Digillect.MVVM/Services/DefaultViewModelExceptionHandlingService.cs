@@ -26,7 +26,7 @@ namespace Digillect.Mvvm.Services
 	/// <summary>
 	///     Default implementation of <see cref="IViewModelExceptionHandlingService" />.
 	/// </summary>
-	public class DefaultViewModelExceptionHandlingService : IViewModelExceptionHandlingService
+	public sealed class DefaultViewModelExceptionHandlingService : IViewModelExceptionHandlingService
 	{
 		private readonly IExceptionHandlingService _exceptionHandlingService;
 

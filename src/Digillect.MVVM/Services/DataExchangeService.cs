@@ -28,7 +28,12 @@ namespace Digillect.Mvvm.Services
 	///     Default implementation of <see cref="IDataExchangeService" />
 	/// </summary>
 	[SuppressMessage( "Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Instance of this class will be created through IoC container." )]
-	internal sealed class DataExchangeService : IDataExchangeService
+#if WINDOWS_PHONE_71
+	public
+#else
+	internal
+#endif
+	sealed class DataExchangeService : IDataExchangeService
 	{
 		private static readonly object SyncRoot = new object();
 		private int _dataExchangeCount;
