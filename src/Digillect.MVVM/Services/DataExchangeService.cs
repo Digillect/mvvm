@@ -20,7 +20,9 @@
 #endregion
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace Digillect.Mvvm.Services
 {
@@ -33,7 +35,7 @@ namespace Digillect.Mvvm.Services
 #else
 	internal
 #endif
-	sealed class DataExchangeService : IDataExchangeService
+	sealed class DataExchangeService : IDataExchangeService, INotifyPropertyChanged
 	{
 		private static readonly object SyncRoot = new object();
 		private int _dataExchangeCount;
@@ -55,6 +57,11 @@ namespace Digillect.Mvvm.Services
 		public int DataExchangeCount
 		{
 			get { return _dataExchangeCount; }
+			set
+			{
+				_dataExchangeCount = value;
+				OnPropertyChanged();
+			}
 		}
 
 		/// <summary>
@@ -107,6 +114,19 @@ namespace Digillect.Mvvm.Services
 						handler( this, EventArgs.Empty );
 					}
 				}
+			}
+		}
+		#endregion
+
+		#region INotifyPropertyChanged
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		void OnPropertyChanged( [CallerMemberName] string propertyName = null )
+		{
+			PropertyChangedEventHandler handler = PropertyChanged;
+			if( handler != null )
+			{
+				handler( this, new PropertyChangedEventArgs( propertyName ) );
 			}
 		}
 		#endregion
