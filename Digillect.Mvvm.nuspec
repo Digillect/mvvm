@@ -16,7 +16,7 @@
 				<dependency id="Digillect.ObjectModel" version="4.1.0"/>
 				<dependency id="Autofac" version="3.0.2"/>
 			</group>
-			<group targetFramework="wp71">
+			<group targetFramework="wp71"> 
 				<dependency id="Digillect.ObjectModel" version="4.1.0"/>
 				<dependency id="Autofac" version="[2.6.3.862, 3.0)"/>
 				<dependency id="Microsoft.Bcl" version="1.0.19"/>
