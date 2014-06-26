@@ -16,6 +16,10 @@
 				<dependency id="Digillect.ObjectModel" version="4.1.1"/>
 				<dependency id="Autofac" version="3.5.0"/>
 			</group>
+			<group targetFramework="wp8"> 
+				<dependency id="Digillect.ObjectModel" version="4.1.1"/>
+				<dependency id="Autofac" version="3.5.0"/>
+			</group>
 			<group targetFramework="wp71"> 
 				<dependency id="Digillect.ObjectModel" version="4.1.1"/>
 				<dependency id="Autofac" version="[2.6.3.862, 3.0)"/>
