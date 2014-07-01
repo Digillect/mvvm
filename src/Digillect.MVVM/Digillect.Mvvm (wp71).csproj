@@ -172,9 +172,8 @@
     <Reference Include="Autofac">
       <HintPath>..\..\packages\Autofac.2.6.3.862\lib\SL4-WindowsPhone71\Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="Digillect.ObjectModel, Version=4.1.1.0, Culture=neutral, PublicKeyToken=46fb24501f5dffcf, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Digillect.ObjectModel.4.1.1\lib\wp71\Digillect.ObjectModel.dll</HintPath>
+    <Reference Include="Digillect.ObjectModel">
+      <HintPath>..\..\packages\Digillect.ObjectModel.4.1.2\lib\wp71\Digillect.ObjectModel.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=736440c9b414ea16, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Phone" />

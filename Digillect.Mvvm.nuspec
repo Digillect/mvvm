@@ -9,19 +9,19 @@
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Digillect Model-View-ViewModel Framework</description>
 		<releaseNotes/>
-		<copyright>Copyright © 2011-2013 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman). All rights reserved.</copyright>
+		<copyright>Copyright © 2011-2014 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman). All rights reserved.</copyright>
 		<tags>digillect mvvm model view viewmodel</tags>
 		<dependencies>
 			<group>
-				<dependency id="Digillect.ObjectModel" version="4.1.1"/>
+				<dependency id="Digillect.ObjectModel" version="4.1.2"/>
 				<dependency id="Autofac" version="3.5.0"/>
 			</group>
 			<group targetFramework="wp8"> 
-				<dependency id="Digillect.ObjectModel" version="4.1.1"/>
+				<dependency id="Digillect.ObjectModel" version="4.1.2"/>
 				<dependency id="Autofac" version="3.5.0"/>
 			</group>
 			<group targetFramework="wp71"> 
-				<dependency id="Digillect.ObjectModel" version="4.1.1"/>
+				<dependency id="Digillect.ObjectModel" version="4.1.2"/>
 				<dependency id="Autofac" version="[2.6.3.862, 3.0)"/>
 				<dependency id="Microsoft.Bcl" version="1.1.9"/>
 				<dependency id="Microsoft.Bcl.Async" version="1.0.168"/>
