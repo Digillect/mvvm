@@ -9,7 +9,7 @@
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Digillect Model-View-ViewModel Framework</description>
 		<releaseNotes/>
-		<copyright>Copyright © 2011-2013 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman). All rights reserved.</copyright>
+		<copyright>Copyright © 2011-2014 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman). All rights reserved.</copyright>
 		<tags>digillect mvvm model view viewmodel</tags>
 		<dependencies>
 			<group>
