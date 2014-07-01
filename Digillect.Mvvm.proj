@@ -7,18 +7,16 @@
 
 		<BuildPath>target\$(Configuration)\bin</BuildPath>
 		<OutputPath>target\$(Configuration)\packages</OutputPath>
-		<VersionAssembly>$(BuildPath)\net45+wp8+win8\Digillect.Mvvm.dll</VersionAssembly>
+		<VersionAssembly>$(BuildPath)\net45+win8+wp8+wp81+wpa81\Digillect.Mvvm.dll</VersionAssembly>
 		<ExcludeList>$(BuildPath)\**\*.xml.old;$(BuildPath)\**\*.dll.config</ExcludeList>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<LibWP71 Include="$(BuildPath)\wp71\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)"/>
 		<LibWP71 Include="$(BuildPath)\wp71\Microsoft.Contracts.dll"/>
-		<LibWP8 Include="$(BuildPath)\net45+wp8+win8\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)"/>
-		<LibWin8 Include="$(BuildPath)\net45+wp8+win8\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)"/>
-		<LibNet45 Include="$(BuildPath)\net45+wp8+win8\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)"/>
-		<LibPortable Include="$(BuildPath)\net45+wp8+win8\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)">
-			<Profile>net45+wp8+win8+wpa81</Profile>
+		<LibNet45 Include="$(BuildPath)\net45+win8+wp8+wp81+wpa81\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)"/>
+		<LibPortable Include="$(BuildPath)\net45+win8+wp8+wp81+wpa81\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)">
+			<Profile>net45+win8+wp8+wp81+wpa81</Profile>
 		</LibPortable>
 
 	</ItemGroup>
