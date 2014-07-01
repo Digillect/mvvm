@@ -40,7 +40,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Digillect.ObjectModel">
-      <HintPath>..\..\packages\Digillect.ObjectModel.4.1.1\lib\net40\Digillect.ObjectModel.dll</HintPath>
+      <HintPath>..\..\packages\Digillect.ObjectModel.4.1.2\lib\net40\Digillect.ObjectModel.dll</HintPath>
     </Reference>
     <Reference Include="Machine.Specifications">
       <HintPath>..\..\packages\Machine.Specifications.0.8.2\lib\net45\Machine.Specifications.dll</HintPath>
