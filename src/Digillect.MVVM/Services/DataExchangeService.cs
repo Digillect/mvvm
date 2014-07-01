@@ -71,10 +71,10 @@ namespace Digillect.Mvvm.Services
 		{
 			lock( SyncRoot )
 			{
-				_dataExchangeCount++;
+				DataExchangeCount++;
 			}
 
-			if( _dataExchangeCount == 1 )
+			if( DataExchangeCount == 1 )
 			{
 				EventHandler handler = DataExchangeStarted;
 
@@ -90,15 +90,15 @@ namespace Digillect.Mvvm.Services
 		/// </summary>
 		public void EndDataExchange()
 		{
-			if( _dataExchangeCount > 0 )
+			if( DataExchangeCount > 0 )
 			{
 				bool fire = false;
 
 				lock( SyncRoot )
 				{
-					if( _dataExchangeCount > 0 )
+					if( DataExchangeCount > 0 )
 					{
-						if( --_dataExchangeCount == 0 )
+						if( --DataExchangeCount == 0 )
 						{
 							fire = true;
 						}
