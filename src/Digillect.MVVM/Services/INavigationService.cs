@@ -46,5 +46,11 @@ namespace Digillect.Mvvm.Services
 		///     Navigated to the previous view, if any.
 		/// </summary>
 		void GoBack();
+
+        	/// <summary>
+        	///     Navigates back to the specified view or first view if not found.
+        	/// </summary>
+        	/// <param name="viewName">Name of the view.</param>
+        	void GoBack( string viewName );
 	}
 }
