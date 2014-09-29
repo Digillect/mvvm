@@ -39,6 +39,11 @@ namespace Digillect.Mvvm.Services
 		}
 
 		public abstract void GoBack();
+
+        	public void GoBack( string viewName )
+        	{
+        	    Contract.Requires<ArgumentNullException>( viewName != null, "viewName" );
+        	}
 		#endregion
 	}
 }
