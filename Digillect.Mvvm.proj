@@ -18,6 +18,9 @@
 		<LibPortable Include="$(BuildPath)\net45+win8+wp8+wp81+wpa81\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)">
 			<Profile>net45+win8+wp8+wp81+wpa81</Profile>
 		</LibPortable>
+		<LibWP80 Include="$(BuildPath)\net45+win8+wp8+wp81+wpa81\**\Digillect.Mvvm.*" Exclude="$(ExcludeList)">
+			<Profile>net45+win8+wp8+wp81+wpa81</Profile>
+		</LibWP80>
 
 	</ItemGroup>
 
