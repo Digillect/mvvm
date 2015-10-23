@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="BuildAndPackage" InitialTargets="CheckForBuildTools" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
-		<BuildToolsVersion>1.2.5</BuildToolsVersion>
-		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+		<BuildToolsVersion>1.2.6</BuildToolsVersion>
+		<Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+		<VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
 	</PropertyGroup>
 
 	<Target Name="CheckForBuildTools" Condition="!Exists('packages\Digillect.Build.Tools.$(BuildToolsVersion)\tools\Build.targets')">
 		<Error Text="Project requires Digillect.Build.Tools package to run."/>
 	</Target>
-	
+
 	<Import Project="packages\Digillect.Build.Tools.$(BuildToolsVersion)\tools\Build.targets" Condition="Exists('packages\Digillect.Build.Tools.$(BuildToolsVersion)\tools\Build.targets')"/>
 
 	<ItemGroup>
@@ -25,7 +26,7 @@
 	</ItemGroup>
 
 	<PropertyGroup>
-		<MSpecCommand>$(MSBuildProjectDirectory)\packages\Machine.Specifications.0.8.2\tools\mspec-clr4.exe --xml .\report.xml</MSpecCommand>
+		<MSpecCommand>$(MSBuildProjectDirectory)\packages\Machine.Specifications.Runner.Console.0.9.2\tools\mspec-clr4.exe --xml .\report.xml</MSpecCommand>
 	</PropertyGroup>
 
 	<Target Name="Test">
@@ -37,7 +38,7 @@
 	</Target>
 
 	<Target Name="UpdateAssemblyVersion" Condition="'$(BuildNumber)' != ''">
-		<FileUpdate Files="src\AssemblySharedInfo.cs" Regex='BuildNumber = "\d+"' ReplacementText='BuildNumber = "$(BuildNumber)"'/>
+		<FileUpdate Files="$(MSBuildProjectDirectory)\src\AssemblySharedInfo.cs" Regex='(BuildNumber\s*=\s*)"\d+"' ReplacementText='$1"$(BuildNumber)"' />
 	</Target>
 
 	<Target Name="BeforeBuildOrRebuild" DependsOnTargets="UpdateAssemblyVersion"/>

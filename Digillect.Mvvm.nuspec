@@ -6,24 +6,26 @@
 		<version>$version$</version>
 		<authors>Gregory Nickonov, Andrew Nefedkin</authors>
 		<owners>Gregory Nickonov, Andrew Nefedkin</owners>
+		<licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+		<projectUrl>https://github.com/Digillect/mvvm</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Digillect Model-View-ViewModel Framework</description>
 		<releaseNotes/>
-		<copyright>Copyright © 2011-2014 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman). All rights reserved.</copyright>
+		<copyright>Copyright © 2011-2015 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman). All rights reserved.</copyright>
 		<tags>digillect mvvm model view viewmodel</tags>
 		<dependencies>
 			<group>
 				<dependency id="Digillect.ObjectModel" version="4.1.2"/>
-				<dependency id="Autofac" version="3.5.0"/>
+				<dependency id="Autofac" version="3.5.2" />
 			</group>
-			<group targetFramework="wp8"> 
+			<group targetFramework="wp8">
 				<dependency id="Digillect.ObjectModel" version="4.1.2"/>
-				<dependency id="Autofac" version="3.5.0"/>
+				<dependency id="Autofac" version="3.5.2" />
 			</group>
-			<group targetFramework="wp71"> 
+			<group targetFramework="wp71">
 				<dependency id="Digillect.ObjectModel" version="4.1.2"/>
 				<dependency id="Autofac" version="[2.6.3.862, 3.0)"/>
-				<dependency id="Microsoft.Bcl" version="1.1.9"/>
+				<dependency id="Microsoft.Bcl" version="1.1.10" />
 				<dependency id="Microsoft.Bcl.Async" version="1.0.168"/>
 			</group>
 		</dependencies>
