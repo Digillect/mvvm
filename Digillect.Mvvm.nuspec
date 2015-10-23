@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 
 <package>
-	<metadata>
+	<metadata minClientVersion="2.8.5">
 		<id>Digillect.Mvvm</id>
 		<version>$version$</version>
 		<authors>Gregory Nickonov, Andrew Nefedkin</authors>
