@@ -37,7 +37,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion(AssemblyInfo.Version)]
 [assembly: AssemblyFileVersion(AssemblyInfo.FileVersion)]
 [assembly: AssemblyInformationalVersion(AssemblyInfo.ProductVersion)]
-[assembly: CLSCompliant(false)]
+[assembly: CLSCompliant(true)]
 [assembly: ComVisible(false)]
 [assembly: NeutralResourcesLanguage("en-US")]
 [assembly: SatelliteContractVersion(AssemblyInfo.SatelliteContractVersion)]

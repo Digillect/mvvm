@@ -173,6 +173,8 @@ namespace Digillect.Mvvm
 		/// </returns>
 		public Session CreateSession()
 		{
+			Contract.Ensures(Contract.Result<Session>() != null);
+
 			return CreateSession( null, null );
 		}
 
@@ -185,6 +187,8 @@ namespace Digillect.Mvvm
 		/// </returns>
 		public Session CreateSession( string action )
 		{
+			Contract.Ensures(Contract.Result<Session>() != null);
+
 			return CreateSession( null, action );
 		}
 
@@ -197,6 +201,8 @@ namespace Digillect.Mvvm
 		/// </returns>
 		public Session CreateSession( XParameters parameters )
 		{
+			Contract.Ensures(Contract.Result<Session>() != null);
+
 			return CreateSession( parameters, null );
 		}
 
@@ -670,33 +676,6 @@ namespace Digillect.Mvvm
 				return this;
 			}
 
-			public IExecutionGroup AddPart( Action<Session> processor )
-			{
-				var part = new Part( processor );
-
-				_executables.Add( part );
-
-				return this;
-			}
-
-			public IExecutionGroup AddPart( Action<Session> processor, Func<bool> validator )
-			{
-				var part = new Part( processor, new ValidatorRegistration( validator ) );
-
-				_executables.Add( part );
-
-				return this;
-			}
-
-			public IExecutionGroup AddPart( Action<Session> processor, Func<Session, bool> validator )
-			{
-				var part = new Part( processor, new ValidatorRegistration( validator ) );
-
-				_executables.Add( part );
-
-				return this;
-			}
-
 			public IExecutionGroup AddValidator( Func<bool> validator )
 			{
 				_validator = new ValidatorRegistration( validator );
@@ -733,6 +712,7 @@ namespace Digillect.Mvvm
 		///     Execution group that consists of individual parts and other execution groups. Used to create session execution tree.
 		/// </summary>
 		[ContractClass( typeof( IExecutionGroupContract ) )]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
 		public interface IExecutionGroup
 		{
 			/// <summary>
@@ -866,32 +846,6 @@ namespace Digillect.Mvvm
 				return null;
 			}
 
-			public IExecutionGroup AddPart( Action<Session> processor )
-			{
-				Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
-
-				return null;
-			}
-
-			public IExecutionGroup AddPart( Action<Session> processor, Func<bool> validator )
-			{
-				Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
-				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
-
-				return null;
-			}
-
-			public IExecutionGroup AddPart( Action<Session> processor, Func<Session, bool> validator )
-			{
-				Contract.Requires<ArgumentNullException>( processor != null, "processor" );
-				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
-				Contract.Ensures( Contract.Result<IExecutionGroup>() != null );
-
-				return null;
-			}
-
 			public IExecutionGroup AddValidator( Func<bool> validator )
 			{
 				Contract.Requires<ArgumentNullException>( validator != null, "validator" );
@@ -928,7 +882,6 @@ namespace Digillect.Mvvm
 		#region Nested type: Part
 		private class Part : Executable
 		{
-			private readonly Action<Session> _syncProcessor;
 			private readonly Func<Session, Task> _asyncProcessor;
 			private readonly ValidatorRegistration _validator;
 
@@ -942,17 +895,6 @@ namespace Digillect.Mvvm
 			{
 				_validator = validator;
 				_asyncProcessor = asyncProcessor;
-			}
-
-			public Part( Action<Session> syncProcessor )
-				: this( syncProcessor, null )
-			{
-			}
-
-			public Part( Action<Session> syncProcessor, ValidatorRegistration validator )
-			{
-				_validator = validator;
-				_syncProcessor = syncProcessor;
 			}
 			#endregion
 
@@ -969,11 +911,7 @@ namespace Digillect.Mvvm
 
 			public override Task Process( Session session )
 			{
-				if( _syncProcessor != null )
-				{
-					_syncProcessor( session );
-				}
-				else if( _asyncProcessor != null )
+				if (_asyncProcessor != null)
 				{
 					return _asyncProcessor( session );
 				}

@@ -36,6 +36,7 @@ namespace Digillect.Mvvm
 		/// <returns>
 		///     <see cref="Digillect.XKey" /> that contains entry named <c>key</c> with the value of object's key.
 		/// </returns>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated through Code Contracts")]
 		public static XParameters KeyParameter( this XObject source )
 		{
 			Contract.Requires<ArgumentNullException>( source != null, "source" );

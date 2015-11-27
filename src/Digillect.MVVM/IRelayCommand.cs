@@ -31,6 +31,7 @@ namespace Digillect.Mvvm
 		/// <summary>
 		///     Raises event that indicates that <see cref="System.Windows.Input.ICommand.CanExecute" /> return value has been changed.
 		/// </summary>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate")]
 		void RaiseCanExecuteChanged();
 	}
 }

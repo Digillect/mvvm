@@ -36,7 +36,7 @@ namespace Digillect.Mvvm
 		private readonly string _action;
 		private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
 		private readonly Dictionary<string, object> _values = new Dictionary<string, object>();
-		private XParameters _parameters = XParameters.Empty;
+		private XParameters _parameters;
 
 		#region Constructors/Disposer
 		/// <summary>
@@ -169,6 +169,7 @@ namespace Digillect.Mvvm
 		/// <summary>
 		///     Gets the <see cref="System.Threading.CancellationToken" /> to be used in asynchronous operations.
 		/// </summary>
+		[CLSCompliant(false)]
 		public CancellationToken Token
 		{
 			get { return _tokenSource.Token; }

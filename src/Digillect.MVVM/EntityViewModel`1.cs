@@ -76,7 +76,6 @@ namespace Digillect.Mvvm
 		/// <returns>
 		///     Session that loads entity using specified <paramref name="key" />.
 		/// </returns>
-		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
 		public Session CreateEntitySession( XKey key )
 		{
 			Contract.Requires<ArgumentNullException>( key != null, "key" );
@@ -92,7 +91,6 @@ namespace Digillect.Mvvm
 		/// <returns>
 		///     Session that executes default action with parameters containing specified <paramref name="key" />.
 		/// </returns>
-		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
 		public Session CreateSession( XKey key )
 		{
 			Contract.Requires<ArgumentNullException>( key != null, "key" );
@@ -109,7 +107,6 @@ namespace Digillect.Mvvm
 		/// <returns>
 		///     Session that executes specified action with parameters containing specified <paramref name="key" />.
 		/// </returns>
-		[SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Session can be used by caller." )]
 		public Session CreateSession( XKey key, string action )
 		{
 			Contract.Requires<ArgumentNullException>( key != null, "key" );
@@ -139,6 +136,7 @@ namespace Digillect.Mvvm
 		/// <exception cref="System.ArgumentNullException">
 		///     If <paramref name="session" /> is null.
 		/// </exception>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated through Code Contracts")]
 		protected virtual bool ShouldLoadEntity( Session session )
 		{
 			Contract.Requires<ArgumentNullException>( session != null, "session" );

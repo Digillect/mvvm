@@ -29,10 +29,10 @@ namespace Digillect.Mvvm.Services
 	/// <summary>
 	///     Default implementation of <see cref="IDataExchangeService" />
 	/// </summary>
-	[SuppressMessage( "Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Instance of this class will be created through IoC container." )]
 #if WINDOWS_PHONE_71
 	public
 #else
+	[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Instance of this class will be created through IoC container.")]
 	internal
 #endif
 	sealed class DataExchangeService : IDataExchangeService, INotifyPropertyChanged
@@ -74,7 +74,7 @@ namespace Digillect.Mvvm.Services
 				DataExchangeCount++;
 			}
 
-			if( DataExchangeCount == 1 )
+			if (_dataExchangeCount == 1)
 			{
 				EventHandler handler = DataExchangeStarted;
 
@@ -90,13 +90,13 @@ namespace Digillect.Mvvm.Services
 		/// </summary>
 		public void EndDataExchange()
 		{
-			if( DataExchangeCount > 0 )
+			if (_dataExchangeCount > 0)
 			{
 				bool fire = false;
 
 				lock( SyncRoot )
 				{
-					if( DataExchangeCount > 0 )
+					if (_dataExchangeCount > 0)
 					{
 						if( --DataExchangeCount == 0 )
 						{
@@ -121,7 +121,7 @@ namespace Digillect.Mvvm.Services
 		#region INotifyPropertyChanged
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		void OnPropertyChanged( [CallerMemberName] string propertyName = null )
+		private void OnPropertyChanged([CallerMemberName] string propertyName = null)
 		{
 			PropertyChangedEventHandler handler = PropertyChanged;
 			if( handler != null )
