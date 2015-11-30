@@ -9,7 +9,7 @@ call :ResolveNuGet nuget.exe || exit /b %ERRORLEVEL%
 
 if exist .nuget\packages.config (
 	echo Restoring packages from %~dp0.nuget\packages.config
-	"%NuGetExe%" restore .nuget\packages.config -PackagesDirectory packages -Verbosity quiet -NonInteractive || exit /b %ERRORLEVEL%
+	"%NuGetExe%" restore .nuget\packages.config -Verbosity quiet -NonInteractive || exit /b %ERRORLEVEL%
 )
 
 %SystemRoot%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe build.proj /nologo /v:m /p:NuGetExecutable="%NuGetExe%" %*
