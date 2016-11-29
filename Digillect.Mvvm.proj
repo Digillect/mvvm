@@ -1,31 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(DigillectBuildToolsPath)\Digillect.Build.Packaging.Nuget.props" Condition="'$(DigillectBuildToolsPath)' != '' And Exists('$(DigillectBuildToolsPath)\Digillect.Build.Packaging.Nuget.props')" />
+
 	<PropertyGroup>
-		<BuildToolsVersion Condition="'$(BuildToolsVersion)' == ''">2.0.0</BuildToolsVersion>
-		<Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
-		<VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
 		<BuildPath>$(MSBuildProjectDirectory)\target\$(Configuration)\bin\</BuildPath>
 		<OutputPath>$(MSBuildProjectDirectory)\target\$(Configuration)\package\</OutputPath>
 		<VersionAssembly>$(BuildPath)net45+win8+wp8+wpa81\Digillect.Mvvm.dll</VersionAssembly>
 	</PropertyGroup>
 
-	<Import Project="$(MSBuildProjectDirectory)\packages\Digillect.Build.Tools.$(BuildToolsVersion)\build\Digillect.Build.Packaging.Nuget.props" />
+  <Import Project="$(DigillectBuildToolsPath)\Digillect.Build.Packaging.NuGet.targets" Condition="'$(DigillectBuildToolsPath)' != '' And Exists('$(DigillectBuildToolsPath)\Digillect.Build.Packaging.Nuget.targets')" />
 
-	<PropertyGroup>
-		<_PackageExcludeList>$(BuildPath)**\*.xml.old;$(BuildPath)**\*.dll.config</_PackageExcludeList>
-	</PropertyGroup>
+  <Target Name="BeforePackage">
+    <PropertyGroup>
+      <_PackageExcludeList>$(BuildPath)**\*.xml.old;$(BuildPath)**\*.dll.config;$(BuildPath)**\CodeContractsDeclarative\**</_PackageExcludeList>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<LibWP71 Include="$(BuildPath)wp71\**\Digillect.Mvvm.*" Exclude="$(_PackageExcludeList)" />
-		<LibWP71 Include="$(BuildPath)wp71\Microsoft.Contracts.dll" />
-		<LibPortable Include="$(BuildPath)net45+win8+wp8+wpa81\**\Digillect.Mvvm.*" Exclude="$(_PackageExcludeList)">
-			<Profile>net45+dnxcore50+win8+wp8+wpa81</Profile>
-		</LibPortable>
-		<LibWP8 Include="$(BuildPath)net45+win8+wp8+wpa81\**\Digillect.Mvvm.*" Exclude="$(_PackageExcludeList)" />
-	</ItemGroup>
-
-	<Import Project="$(MSBuildProjectDirectory)\packages\Digillect.Build.Tools.$(BuildToolsVersion)\build\Digillect.Build.Packaging.NuGet.targets" />
+    <ItemGroup>
+      <NuPkgLib Include="$(BuildPath)wp71\**\Digillect.Mvvm.*" Exclude="$(_PackageExcludeList)">
+        <FxTarget>wp71</FxTarget>
+      </NuPkgLib>
+      <NuPkgLib Include="$(BuildPath)wp71\Microsoft.Contracts.dll">
+        <FxTarget>wp71</FxTarget>
+      </NuPkgLib>
+      <NuPkgLib Include="$(BuildPath)net45+win8+wp8+wpa81\**\Digillect.Mvvm.*" Exclude="$(_PackageExcludeList)">
+        <FxTarget>portable</FxTarget>
+        <FxProfile>net45+dnxcore50+win8+wp8+wpa81+MonoAndroid10+Xamarin.iOS10+MonoTouch10</FxProfile>
+      </NuPkgLib>
+      <NuPkgLib Include="$(BuildPath)net45+win8+wp8+wpa81\**\Digillect.Mvvm.*" Exclude="$(_PackageExcludeList)">
+        <FxTarget>wp8</FxTarget>
+      </NuPkgLib>
+    </ItemGroup>
+  </Target>
 
 	<Target Name="TransformPackageVersion">
 		<PropertyGroup>

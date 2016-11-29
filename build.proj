@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" InitialTargets="_CheckRequirements" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
-		<BuildToolsVersion>2.0.0-beta</BuildToolsVersion>
-		<Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
-		<VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
-		<NuGetVerbosity Condition="'$(NuGetVerbosity)' == ''">quiet</NuGetVerbosity>
-		<MSBuildCommunityTasksPath>$(MSBuildProjectDirectory)\packages\MSBuildTasks.1.4.0.128\tools</MSBuildCommunityTasksPath>
+		<DigillectBuildToolsPath>$(MSBuildProjectDirectory)\packages\Digillect.Build.Tools.2.0.0-rc\build</DigillectBuildToolsPath>
+		<MSBuildCommunityTasksPath>$(MSBuildProjectDirectory)\packages\MSBuildTasks.1.5.0.214\tools</MSBuildCommunityTasksPath>
 		<MachineSpecificationsRunner>$(MSBuildProjectDirectory)\packages\Machine.Specifications.Runner.Console.0.9.2\tools\mspec-clr4.exe</MachineSpecificationsRunner>
 	</PropertyGroup>
 
-	<Import Project="$(MSBuildProjectDirectory)\packages\Digillect.Build.Tools.$(BuildToolsVersion)\build\Digillect.Build.Common.props" Condition="Exists('$(MSBuildProjectDirectory)\packages\Digillect.Build.Tools.$(BuildToolsVersion)\build\Digillect.Build.Common.props')" />
+	<Import Project="$(DigillectBuildToolsPath)\Digillect.Build.Common.props" Condition="Exists('$(DigillectBuildToolsPath)\Digillect.Build.Common.props')" />
 
 	<ItemGroup>
 		<!--ProjectReference Include="$(MSBuildProjectDirectory)\src\Digillect.Mvvm\Digillect.Mvvm (net40).csproj" /-->
@@ -19,16 +16,16 @@
 			<TestFramework>Machine.Specifications</TestFramework>
 		</ProjectReference>
 		<ProjectReference Include="$(MSBuildProjectDirectory)\Digillect.Mvvm.proj">
-			<AdditionalProperties>BuildToolsVersion=$(BuildToolsVersion);NuGetExecutable=$(NuGetExecutable);NuGetVerbosity=$(NuGetVerbosity)</AdditionalProperties>
+			<AdditionalProperties>DigillectBuildToolsPath=$(DigillectBuildToolsPath);NuGetExecutable=$(NuGetExecutable);NuGetVerbosity=$(NuGetVerbosity)</AdditionalProperties>
 		</ProjectReference>
 	</ItemGroup>
 
-	<Import Project="$(MSBuildProjectDirectory)\packages\Digillect.Build.Tools.$(BuildToolsVersion)\build\Digillect.Build.Common.targets" Condition="Exists('$(MSBuildProjectDirectory)\packages\Digillect.Build.Tools.$(BuildToolsVersion)\build\Digillect.Build.Common.targets')" />
-	<Import Project="$(MSBuildProjectDirectory)\packages\Digillect.Build.Tools.$(BuildToolsVersion)\build\Digillect.Build.Testing.MSpec.targets" Condition="Exists('$(MSBuildProjectDirectory)\packages\Digillect.Build.Tools.$(BuildToolsVersion)\build\Digillect.Build.Testing.MSpec.targets')" />
+	<Import Project="$(DigillectBuildToolsPath)\Digillect.Build.Common.targets" Condition="Exists('$(DigillectBuildToolsPath)\Digillect.Build.Common.targets')" />
+	<Import Project="$(DigillectBuildToolsPath)\Digillect.Build.Testing.MSpec.targets" Condition="Exists('$(DigillectBuildToolsPath)\Digillect.Build.Testing.MSpec.targets')" />
 	<Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" Condition="Exists('$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets')" />
 
 	<Target Name="_CheckRequirements">
-		<Error Condition="!Exists('$(MSBuildProjectDirectory)\packages\Digillect.Build.Tools.$(BuildToolsVersion)\build\Digillect.Build.Common.props')" Text="This project requires the Digillect.Build.Tools $(BuildToolsVersion) package." />
+		<Error Condition="!Exists('$(DigillectBuildToolsPath)\Digillect.Build.Common.props')" Text="This project requires the Digillect.Build.Tools package." />
 		<Error Condition="!Exists('$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets')" Text="This project requires the MSBuildTasks package." />
 		<Error Condition="!Exists($(MachineSpecificationsRunner))" Text="This project requires the Machine.Specifications.Runner.Console package." />
 	</Target>
