@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" InitialTargets="_CheckRequirements" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
-		<DigillectBuildToolsPath>$(MSBuildProjectDirectory)\packages\Digillect.Build.Tools.2.0.0-rc\build</DigillectBuildToolsPath>
+		<DigillectBuildToolsPath>$(MSBuildProjectDirectory)\packages\Digillect.Build.Tools.2.0.0-rc2\build</DigillectBuildToolsPath>
 		<MSBuildCommunityTasksPath>$(MSBuildProjectDirectory)\packages\MSBuildTasks.1.5.0.214\tools</MSBuildCommunityTasksPath>
 		<MachineSpecificationsRunner>$(MSBuildProjectDirectory)\packages\Machine.Specifications.Runner.Console.0.9.2\tools\mspec-clr4.exe</MachineSpecificationsRunner>
 	</PropertyGroup>

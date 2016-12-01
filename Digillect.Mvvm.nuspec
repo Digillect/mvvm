@@ -14,14 +14,14 @@
 		<copyright>Copyright © 2011 Gregory Nickonov and Andrew Nefedkin (Actis® Wunderman)</copyright>
 		<tags>digillect mvvm model view viewmodel</tags>
 		<dependencies>
-			<group>
+			<group targetFramework="netstandard1.1">
+				<dependency id="Digillect.ObjectModel" version="4.1.2"/>
+				<dependency id="Autofac" version="4.2.1" />
+			</group>
+			<!--<group targetFramework="wp8">
 				<dependency id="Digillect.ObjectModel" version="4.1.2"/>
 				<dependency id="Autofac" version="3.5.2" />
-			</group>
-			<group targetFramework="wp8">
-				<dependency id="Digillect.ObjectModel" version="4.1.2"/>
-				<dependency id="Autofac" version="3.5.2" />
-			</group>
+			</group>-->
 			<group targetFramework="wp71">
 				<dependency id="Digillect.ObjectModel" version="4.1.2"/>
 				<dependency id="Autofac" version="[2.6.3.862, 3.0)"/>

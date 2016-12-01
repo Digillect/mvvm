@@ -1,0 +1,14 @@
+﻿{
+  "supports": {},
+  "dependencies": {
+    "Autofac": "4.2.1",
+    "Digillect.ObjectModel": "4.1.3-dev-00029",
+    "DotNet.Contracts": "1.10.20606.1",
+    "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
+    "System.Diagnostics.Contracts": "4.3.0",
+    "System.Runtime.Serialization.Primitives": "4.3.0"
+  },
+  "frameworks": {
+    "netstandard1.1": {}
+  }
+}
